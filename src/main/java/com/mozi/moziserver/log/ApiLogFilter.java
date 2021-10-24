@@ -26,15 +26,13 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @Slf4j
 @RequiredArgsConstructor
 public class ApiLogFilter extends OncePerRequestFilter {
     //private final static Pattern reqParamPwPattern = Pattern.compile("(?<=\\\"pw\\\":\\\")[\\S]+(?=\\\"\\,)");
 
-    private final String activeProfile;
+    private final String activeProfiles;
     private final ObjectMapper objectMapper;
 
     @Override
@@ -44,7 +42,7 @@ public class ApiLogFilter extends OncePerRequestFilter {
 
         final LocalDateTime startDatetime = LocalDateTime.now();
         ApiLog.ApiLogBuilder apiLogBuilder = ApiLog.builder()
-                .profile(activeProfile)
+                .profiles(activeProfiles)
                 .time(startDatetime);
 
         final String threadId = UUID.randomUUID().toString();
@@ -198,7 +196,7 @@ public class ApiLogFilter extends OncePerRequestFilter {
     @Builder
     @Getter
     static class ApiLog {
-        private final String profile;
+        private final String profiles;
         @Builder.Default
         private final String logType = "API";
         private final LocalDateTime time;

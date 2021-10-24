@@ -2,8 +2,10 @@ package com.mozi.moziserver;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.openfeign.EnableFeignClients;
 
 // TODO @EnableJpaAuditing
+@EnableFeignClients
 @SpringBootApplication
 public class MoziServerApplication {
 

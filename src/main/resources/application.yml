@@ -2,3 +2,8 @@ spring:
   datasource:
     platform: mysql
     driverClassName: com.mysql.cj.jdbc.Driver
+social:
+  kakao:
+    url: http://127.0.0.1 #TODO FIX
+    appId: 1
+    adminKey: 1
