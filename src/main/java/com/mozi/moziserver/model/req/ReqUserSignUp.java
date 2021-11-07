@@ -16,6 +16,4 @@ public class ReqUserSignUp {
     private String id;
     @NotBlank
     private String pw;
-    @NotBlank
-    private String phoneAuthNumber;
 }

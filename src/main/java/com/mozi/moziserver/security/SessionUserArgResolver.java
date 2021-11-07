@@ -1,5 +1,6 @@
 package com.mozi.moziserver.security;
 
+import com.mozi.moziserver.model.UserAccount;
 import com.mozi.moziserver.model.entity.User;
 import org.springframework.core.MethodParameter;
 import org.springframework.security.core.Authentication;
@@ -13,7 +14,7 @@ public class SessionUserArgResolver implements HandlerMethodArgumentResolver {
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
-        if (parameter.getParameterAnnotation(com.mozi.moziserver.security.SessionUser.class) == null) {
+        if (parameter.getParameterAnnotation(SessionUser.class) == null) {
             return false;
         }
 
@@ -23,7 +24,7 @@ public class SessionUserArgResolver implements HandlerMethodArgumentResolver {
     }
 
     @Override
-    public User resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer, NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
-        return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    public Long resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer, NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
+        return ((UserAccount) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUserSeq();
     }
 }

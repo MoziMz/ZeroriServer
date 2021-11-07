@@ -12,6 +12,9 @@ import java.util.Optional;
 @Repository
 public interface UserAuthRepository extends JpaRepository<UserAuth, Long> {
 
+    @Override
+    <S extends UserAuth> S save(S entity);
+
     Optional<UserAuth> findUserAuthByTypeAndId(@Param("type") UserAuthType type, @Param("id") String id);
 
 //    @AutoPwEncrypt

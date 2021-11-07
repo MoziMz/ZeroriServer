@@ -6,6 +6,6 @@ spring:
     password: ${DB_PASSWORD}
 social:
   kakao:
-    url: http://127.0.0.1 #TODO FIX
-    appId: 1
-    adminKey: 1
+    url: https://kapi.kakao.com
+    appId: 655263
+    adminKey: 6a40d795716b4964c9026f4766e5fae4

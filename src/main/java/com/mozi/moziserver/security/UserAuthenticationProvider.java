@@ -22,7 +22,6 @@ import java.util.Optional;
 public class UserAuthenticationProvider implements AuthenticationProvider {
 
     private final UserAuthRepository userAuthRepository;
-    private final UserRepository userRepository;
 
     private final KakaoClient kakaoClient;
 
@@ -67,9 +66,7 @@ public class UserAuthenticationProvider implements AuthenticationProvider {
 //                return new com.mozi.moziserver.security.UserAuthentication();
 //        }
 
-        User user = userAuth.getType() == UserAuthType.ID
-                ? getUserSeqByTypeId(userAuth)
-                : getUserSeqByTypeAndSocialId(userAuth.getType(), socialId);
+        User user = getUserSeqByTypeAndSocialId(userAuth.getType(), socialId);
 
         return user == null ? new com.mozi.moziserver.security.UserAuthentication() : new com.mozi.moziserver.security.UserAuthentication(user);
     }
@@ -77,24 +74,6 @@ public class UserAuthenticationProvider implements AuthenticationProvider {
     @Override
     public boolean supports(Class<?> authentication) {
         return authentication.equals(com.mozi.moziserver.security.UserAuthToken.class);
-    }
-
-    private User getUserSeqByTypeId(UserAuth userAuth) {
-        final String rawPassword = userAuth.getPw();
-
-        return userAuthRepository.findUserAuthByTypeAndId(userAuth.getType(), userAuth.getId())
-                .filter(uAuth -> uAuth.getPw().equals(rawPassword))
-                .map(UserAuth::getUser)
-                .orElse(null);
-
-//        Optional<UserAuth> userAuthOptional = userAuthRepository.findUserAuthByTypeAndId(userAuth.getType(), userAuth.getId());
-//
-//        if (userAuthOptional.isEmpty()
-//                -uAuth -> uAuth.getPw().equals(rawPassword))
-////                TODO || 암호화 적용하면 이렇게 바꿈 !userAuthPwAspect.passwordMatches(userAuth.getId(), rawPassword, userAuth.getPw()))
-//            return null;
-//
-//        return userAuthOptional.get().getUser();
     }
 
     private User getUserSeqByTypeAndSocialId(UserAuthType type, String socialId) {

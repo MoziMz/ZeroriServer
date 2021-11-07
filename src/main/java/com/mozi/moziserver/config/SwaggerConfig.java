@@ -10,6 +10,7 @@ import springfox.documentation.service.ApiInfo;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 
+import javax.servlet.http.HttpSession;
 import java.util.Locale;
 
 @Configuration
@@ -20,7 +21,7 @@ public class SwaggerConfig {
     @Bean
     public Docket api() {
         return new Docket(DocumentationType.SWAGGER_2)
-                .ignoredParameterTypes(Locale.class)
+                .ignoredParameterTypes(Locale.class, HttpSession.class)
                 .useDefaultResponseMessages(false)
                 .select()
                 .apis(RequestHandlerSelectors.basePackage(MoziServerApplication.class.getPackageName()))

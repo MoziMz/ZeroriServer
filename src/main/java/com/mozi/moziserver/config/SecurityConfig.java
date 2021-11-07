@@ -5,10 +5,8 @@ import com.mozi.moziserver.common.Constant;
 import com.mozi.moziserver.log.ApiLogFilter;
 import com.mozi.moziserver.repository.RememberMeTokenRepository;
 import com.mozi.moziserver.repository.UserRepository;
-import com.mozi.moziserver.security.DefaultAccessDeniedHandler;
-import com.mozi.moziserver.security.DefaultAuthenticationEntryPoint;
-import com.mozi.moziserver.security.DefaultLogoutSuccessHandler;
-import com.mozi.moziserver.security.RememberMeFilter;
+import com.mozi.moziserver.security.*;
+import com.mozi.moziserver.service.UserSignService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,13 +25,13 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @SuppressWarnings("unused")
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-//    @Autowired
-//    UserAuthenticationProvider userAuthenticationProvider;
+    @Autowired
+    UserAuthenticationProvider userAuthenticationProvider;
 
     @Autowired
     private RememberMeTokenRepository rememberMeTokenRepository;
     @Autowired
-    private UserRepository userRepository;
+    private UserSignService userSignService;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -44,13 +42,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        // auth.authenticationProvider()
+        auth
+                .userDetailsService(userSignService)
+                .and()
+                .authenticationProvider(userAuthenticationProvider);
     }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        final RememberMeFilter rememberMeFilter = new RememberMeFilter("moziserver", rememberMeTokenRepository, userRepository);
-
         final String activeProfiles = String.join(",", env.getActiveProfiles());
 
         http
@@ -58,7 +57,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .headers().frameOptions().disable()
                 .and()
                 .addFilterBefore(new ApiLogFilter(activeProfiles, objectMapper), UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(rememberMeFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeRequests()
                 .antMatchers(Constant.PERMIT_ALL_PATHS).permitAll()
                 .antMatchers(Constant.AUTHENTICATED_PATHS).authenticated()
@@ -73,7 +71,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .logout()
                 .logoutUrl("/api/v1/users/signout")
-                .logoutSuccessHandler(new DefaultLogoutSuccessHandler(rememberMeTokenRepository, rememberMeFilter))
                 .deleteCookies("JSESSIONID");
     }
 

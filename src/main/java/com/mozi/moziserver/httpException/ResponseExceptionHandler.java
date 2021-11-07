@@ -1,6 +1,7 @@
 package com.mozi.moziserver.httpException;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -23,6 +24,13 @@ public class ResponseExceptionHandler {
                 ? e.getFieldError().getDefaultMessage() + " (" + e.getFieldError().getField() + ")"
                 : e.getGlobalError() != null ? e.getGlobalError().getDefaultMessage() : e.getMessage();
         ResponseException ex = ResponseError.BadRequest.METHOD_ARGUMENT_NOT_VALID.getResponseException(message);
+        return handle(ex);
+    }
+
+    @ExceptionHandler
+    @ResponseBody
+    public ResponseEntity<ResponseException> handle(BadCredentialsException e) {
+        ResponseException ex = ResponseError.BadRequest.INVALID_EMAIL_OR_PASSWORD.getResponseException();
         return handle(ex);
     }
 

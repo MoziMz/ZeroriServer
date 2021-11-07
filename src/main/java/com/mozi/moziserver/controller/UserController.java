@@ -4,7 +4,7 @@ import com.mozi.moziserver.common.Constant;
 import com.mozi.moziserver.model.entity.User;
 import com.mozi.moziserver.model.req.ReqUserSignIn;
 import com.mozi.moziserver.model.req.ReqUserSignUp;
-import com.mozi.moziserver.service.UserSignService;
+import com.mozi.moziserver.service.UserService;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.MDC;
@@ -29,7 +29,7 @@ import static org.springframework.security.web.context.HttpSessionSecurityContex
 @RequiredArgsConstructor
 public class UserController {
 
-    private final UserSignService userSignService;
+    private final UserService userService;
 
     //
 //    @SwaggerResponseError({
@@ -42,7 +42,7 @@ public class UserController {
     public ResponseEntity<Void> signUpUser(
             @RequestBody @Valid ReqUserSignUp reqUserSignUp
     ) {
-        userSignService.signUp(reqUserSignUp);
+        userService.signUp(reqUserSignUp);
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
@@ -59,13 +59,11 @@ public class UserController {
 
         // TODO Param Validation
 
-        Authentication auth = userSignService.signIn(reqUserSignIn);
+        Authentication auth = userService.signIn(reqUserSignIn);
 
         SecurityContext sc = SecurityContextHolder.getContext();
         sc.setAuthentication(auth);
         session.setAttribute(SPRING_SECURITY_CONTEXT_KEY, sc);
-
-        MDC.put(Constant.MDC_KEY_USER_SEQ, ((User) auth.getPrincipal()).getSeq().toString());
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
