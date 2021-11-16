@@ -10,9 +10,13 @@ import javax.persistence.Id;
 
 @Getter
 @Setter
-@Entity(name = "user")
-public class User extends AbstractTimeEntity {
+@Entity(name = "island_type")
+public class IslandType extends AbstractTimeEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long seq;
+    private Integer type;
+
+    private String name;
+
+    private Integer maxRewardLevel;
+
 }
