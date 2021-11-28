@@ -1,12 +1,11 @@
 package com.mozi.moziserver.model.entity;
 
+import com.mozi.moziserver.model.mappedenum.ChallengeTagType;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.util.List;
 
 @Getter
 @Setter
@@ -22,7 +21,7 @@ public class Challenge extends AbstractTimeEntity {
 
     private Integer recommendedCnt;
 
-    private String tags;
+    private ChallengeTagType tags;
 
     private String currentPlayerCnt;
 
@@ -39,5 +38,9 @@ public class Challenge extends AbstractTimeEntity {
     private Integer point;
 
     private Integer difficulty;
+
+    @OneToMany
+    @JoinColumn(name="challeng_seq")
+    private List<ChallengeTag> tagList;
 
 }

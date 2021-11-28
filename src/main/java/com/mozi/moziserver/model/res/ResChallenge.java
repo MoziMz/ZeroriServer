@@ -1,10 +1,9 @@
 package com.mozi.moziserver.model.res;
 
 import com.mozi.moziserver.model.entity.Challenge;
+import com.mozi.moziserver.model.mappedenum.ChallengeTagType;
 import lombok.Getter;
 
-import java.time.LocalDateTime;
-import java.util.Date;
 
 @Getter
 public class ResChallenge {
@@ -14,7 +13,7 @@ public class ResChallenge {
 
     private Integer recommendedCnt;
 
-    private String tags;
+    private ChallengeTagType tags;
 
     private String currentPlayerCnt;
 
