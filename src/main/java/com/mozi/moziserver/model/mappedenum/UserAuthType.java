@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public enum UserAuthType {
-    ID(1),
+    EMAIL(1),
     KAKAO(2);
 //    FACEBOOK(3),
 //    GOOGLE(4),
@@ -23,6 +23,6 @@ public enum UserAuthType {
     }
 
     public boolean isSocial() {
-        return this != ID;
+        return this != EMAIL;
     }
 }

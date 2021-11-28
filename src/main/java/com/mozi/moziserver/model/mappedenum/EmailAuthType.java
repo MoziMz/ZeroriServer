@@ -5,15 +5,15 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public enum EmailAuthType {
-    JOIN(1, 3 * 3600 * 1000),
-    RESET_PW(2, 3 * 3600 * 1000);
+    JOIN(1, 3 * 3600),
+    RESET_PW(2, 3 * 3600);
 
     @Getter
     private final int type;
-    private final long expiredMilis;
+    private final long expiredSeconds;
 
-    public long getExpiredMilis() {
-        return expiredMilis;
+    public long getExpiredSeconds() {
+        return expiredSeconds;
     }
 
     public static EmailAuthType valueOf(int type) {

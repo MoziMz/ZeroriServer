@@ -11,7 +11,6 @@ public interface ResponseError {
         METHOD_ARGUMENT_NOT_VALID(""),
         BAD_REQUEST("bad request"),
         INVALID_EMAIL("invalid email"),
-        INVALID_ID("invalid id"),
         ALREADY_EXISTS_EMAIL("already exists email"),
         INVALID_EMAIL_OR_PASSWORD("invalid email or password"),;
 

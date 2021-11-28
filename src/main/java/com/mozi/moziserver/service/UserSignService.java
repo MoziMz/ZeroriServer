@@ -10,6 +10,11 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Optional;
+
+import static com.mozi.moziserver.common.Constant.EMAIL_DOMAIN_GROUPS;
+
 @Service
 @RequiredArgsConstructor
 public class UserSignService implements UserDetailsService {
@@ -18,13 +23,31 @@ public class UserSignService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        UserAuth userAuth = userAuthRepository.findUserAuthByTypeAndId(UserAuthType.ID, username)
-                .orElse(null);
+        String email = username;
 
-        if(userAuth == null) {
+        int atIndex = email.lastIndexOf('@');
+        String emailIdWithAt = email.substring(0, atIndex+1);
+        String emailDomain = email.substring(atIndex+1).toLowerCase();
+        List<String> currentDomainGroup = null;
+
+        for(List<String> domainGroup : EMAIL_DOMAIN_GROUPS) {
+            if(domainGroup.contains(emailDomain)) {
+                currentDomainGroup = domainGroup;
+                break;
+            }
+        }
+
+        if(currentDomainGroup == null) {
             return null;
         }
 
-        return new UserAccount(userAuth);
+        for(String domain : currentDomainGroup) {
+            Optional<UserAuth> userAuthOptional = userAuthRepository.findUserAuthByTypeAndId(UserAuthType.EMAIL, emailIdWithAt + domain);
+            if(userAuthOptional.isPresent()) {
+                return new UserAccount(userAuthOptional.get());
+            }
+        }
+
+        return null;
     }
 }

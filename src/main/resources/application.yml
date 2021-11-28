@@ -4,8 +4,21 @@ spring:
     url: jdbc:mysql://${DB_ADDRESS}:3306/zeroplanet?autoReconnect=true&useSSL=false
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
+  mail:
+    host: smtp.daum.net
+    port: 465
+    username: ${EMAIL_USERNAME}
+    password: ${EMAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          ssl:
+            enable: true
 social:
   kakao:
     url: https://kapi.kakao.com
-    appId: 655263
-    adminKey: 6a40d795716b4964c9026f4766e5fae4
+    appId: ${KAKAO_APPID}
+    adminKey: ${KAKAO_ADMINKEY}
+  naver:
+

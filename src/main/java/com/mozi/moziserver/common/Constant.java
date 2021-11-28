@@ -4,8 +4,10 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 public interface Constant {
 //    String PROFILE_LOCAL = "local";
@@ -44,4 +46,15 @@ public interface Constant {
     String[] ROLE_USER_PATHS = new String[]{
             "/api/**"
     };
+
+    String EMAIL_REGEX = "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@"
+            + "[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
+
+    List<List<String>> EMAIL_DOMAIN_GROUPS = Arrays.asList(
+            Arrays.asList("gmail.com"),
+            Arrays.asList("naver.com"),
+            Arrays.asList("daum.net", "hanmail.net"),
+            Arrays.asList("kakao.com"),
+            Arrays.asList("icloud.com", "me.com", "mac.com")
+    );
 }

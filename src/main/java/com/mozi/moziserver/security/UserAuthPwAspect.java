@@ -21,6 +21,7 @@ public class UserAuthPwAspect {
 
     private final PasswordEncoder passwordEncoder;
 
+    // TODO
     @Before(value = "execution(* EmailAuthService.*(*)) " +
             "&& @annotation(AutoPwEncrypt) " +
             "&& args(userAuth)")
@@ -32,12 +33,11 @@ public class UserAuthPwAspect {
         }
     }
 
-    @Before(value = "execution(* UserAuthRepository.*(*)) " +
-            "&& @annotation(AutoPwEncrypt) " +
+    @Before(value = "execution(* UserAuthRepository.save(*)) " +
             "&& args(userAuth)")
     public void onAutoPwEncryptRepositoryBefore(UserAuth userAuth) {
         if (userAuth != null
-                && !StringUtils.isEmpty(userAuth.getPw())
+                && StringUtils.hasLength(userAuth.getPw())
                 && !BCRYPT_PATTERN.matcher(userAuth.getPw()).matches()) {
             userAuth.setPw(encryptPassword(userAuth));
         }

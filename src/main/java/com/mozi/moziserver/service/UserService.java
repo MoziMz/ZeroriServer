@@ -1,6 +1,5 @@
 package com.mozi.moziserver.service;
 
-import com.mozi.moziserver.common.Constant;
 import com.mozi.moziserver.httpException.ResponseError;
 import com.mozi.moziserver.model.entity.User;
 import com.mozi.moziserver.model.entity.UserAuth;
@@ -19,6 +18,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
+import static com.mozi.moziserver.common.Constant.EMAIL_DOMAIN_GROUPS;
+import static com.mozi.moziserver.common.Constant.EMAIL_REGEX;
+
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -28,6 +32,7 @@ public class UserService {
     private final AuthenticationManager authenticationManager;
     private final UserAuthenticationProvider userAuthenticationProvider;
     private final PasswordEncoder passwordEncoder;
+    private final EmailAuthService emailAuthService;
 //    private final KakaoClient kakaoClient;
 
     @Value("${social.kakao.appid}")
@@ -42,18 +47,43 @@ public class UserService {
 
     public User signUp(ReqUserSignUp reqUserSignUp) {
 
-        if (reqUserSignUp.getType() != UserAuthType.ID) {
-            throw ResponseError.BadRequest.INVALID_ID.getResponseException();
+        if (reqUserSignUp.getType() != UserAuthType.EMAIL) {
+            throw ResponseError.BadRequest.INVALID_EMAIL.getResponseException();
         }
 
         String email = reqUserSignUp.getId();
 
-        if (!email.matches(Constant.ID_REGEX)) {
-            throw ResponseError.BadRequest.INVALID_ID.getResponseException();
+        if (!email.matches(EMAIL_REGEX)){
+            throw ResponseError.BadRequest.INVALID_EMAIL.getResponseException();
+        }
+
+        int atIndex = email.lastIndexOf('@');
+        String emailIdWithAt = email.substring(0, atIndex+1);
+        String emailDomain = email.substring(atIndex+1).toLowerCase();
+        List<String> currentDomainGroup = null;
+
+        for(List<String> domainGroup : EMAIL_DOMAIN_GROUPS) {
+            if(domainGroup.contains(emailDomain)) {
+                currentDomainGroup = domainGroup;
+                break;
+            }
+        }
+
+        if(currentDomainGroup == null) {
+            throw ResponseError.BadRequest.INVALID_EMAIL.getResponseException();
+        }
+
+
+        for(String domain : currentDomainGroup) {
+            boolean isExists = userAuthRepository.findUserAuthByTypeAndId(UserAuthType.EMAIL, emailIdWithAt + domain).isPresent();
+            if(isExists) {
+                throw ResponseError.BadRequest.ALREADY_EXISTS_EMAIL.getResponseException();
+            }
         }
 
         UserAuth userAuth = new UserAuth();
-        userAuth.setType(UserAuthType.ID);
+        userAuth.setId(reqUserSignUp.getId());
+        userAuth.setPw(passwordEncoder.encode(reqUserSignUp.getPw()));
 
         User user = new User();
         userRepository.save(user);
@@ -61,21 +91,9 @@ public class UserService {
         if (user.getSeq() == null)
             throw ResponseError.InternalServerError.UNEXPECTED_ERROR.getResponseException();
 
-        userAuth.setId(reqUserSignUp.getId());
-        userAuth.setPw(passwordEncoder.encode(reqUserSignUp.getPw()));
         userAuth.setUser(user);
 
-        try {
-            userAuthRepository.save(userAuth);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw ResponseError.InternalServerError.UNEXPECTED_ERROR.getResponseException(); // FIXME id 중복 에러체크
-        }
-
-        if (userAuth.getSeq() == null)
-            throw ResponseError.InternalServerError.UNEXPECTED_ERROR.getResponseException();
-
-        // TODO 인증메일 발송
+        emailAuthService.sendJoinEmail(userAuth);
 
         return user;
     }
@@ -84,7 +102,7 @@ public class UserService {
 
         Authentication auth = null;
 
-        if(req.getType() == UserAuthType.ID) {
+        if(req.getType() == UserAuthType.EMAIL) {
             auth = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(req.getId(), req.getPw())
             );
