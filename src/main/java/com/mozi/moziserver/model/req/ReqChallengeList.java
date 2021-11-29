@@ -1,6 +1,7 @@
 package com.mozi.moziserver.model.req;
 
 import com.mozi.moziserver.model.mappedenum.ChallengeTagType;
+import com.mozi.moziserver.model.mappedenum.ChallengeThemeType;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,6 +12,8 @@ import javax.validation.constraints.Min;
 @Setter
 public class ReqChallengeList {
     private ChallengeTagType challengeTagType;
+
+    private ChallengeThemeType challengeThemeType;
 
     @Min(1L)
     private Long prevLastPostSeq;

@@ -40,7 +40,11 @@ public class Challenge extends AbstractTimeEntity {
     private Integer difficulty;
 
     @OneToMany
-    @JoinColumn(name="challeng_seq")
+    @JoinColumn(name="challenge_seq")
     private List<ChallengeTag> tagList;
+
+    @OneToMany
+    @JoinColumn(name="challenge_seq")
+    private List<ChallengeTheme> themeList;
 
 }
