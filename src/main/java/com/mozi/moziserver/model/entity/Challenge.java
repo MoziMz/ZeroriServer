@@ -1,5 +1,6 @@
 package com.mozi.moziserver.model.entity;
 
+import com.mozi.moziserver.model.mappedenum.ChallengeDifficultyType;
 import com.mozi.moziserver.model.mappedenum.ChallengeTagType;
 import lombok.Getter;
 import lombok.Setter;
@@ -21,6 +22,7 @@ public class Challenge extends AbstractTimeEntity {
 
     private Integer recommendedCnt;
 
+    @Enumerated(EnumType.STRING)
     private ChallengeTagType tags;
 
     private String currentPlayerCnt;
@@ -37,7 +39,8 @@ public class Challenge extends AbstractTimeEntity {
 
     private Integer point;
 
-    private Integer difficulty;
+    @Enumerated(EnumType.STRING)
+    private ChallengeDifficultyType difficulty;
 
     @OneToMany
     @JoinColumn(name="challenge_seq")

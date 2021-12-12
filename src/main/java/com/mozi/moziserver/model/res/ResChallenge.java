@@ -1,6 +1,7 @@
 package com.mozi.moziserver.model.res;
 
 import com.mozi.moziserver.model.entity.Challenge;
+import com.mozi.moziserver.model.mappedenum.ChallengeDifficultyType;
 import com.mozi.moziserver.model.mappedenum.ChallengeTagType;
 import lombok.Getter;
 
@@ -27,7 +28,7 @@ public class ResChallenge {
 
     private Integer point;
 
-    private Integer difficulty;
+    private ChallengeDifficultyType difficulty;
 
     private String updatedAt;  // 가장 최신 인증 시간 (몇 분 전에 인증했어요)
 
