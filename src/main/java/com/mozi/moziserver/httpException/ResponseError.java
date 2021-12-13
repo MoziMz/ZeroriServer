@@ -115,7 +115,8 @@ public interface ResponseError {
     //404
     @RequiredArgsConstructor
     enum NotFound {
-        USER_NOT_EXISTS("user not exists");
+        USER_NOT_EXISTS("user not exists"),
+        USER_CHALLENGE_NOT_EXISTS("user-challenge not exists");
 
         private final String message;
 

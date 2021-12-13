@@ -1,9 +1,13 @@
 package com.mozi.moziserver.model.res;
 
 import com.mozi.moziserver.model.entity.Challenge;
+import com.mozi.moziserver.model.entity.UserChallenge;
 import com.mozi.moziserver.model.mappedenum.ChallengeDifficultyType;
 import com.mozi.moziserver.model.mappedenum.ChallengeTagType;
 import lombok.Getter;
+
+import java.time.LocalDateTime;
+import java.util.Optional;
 
 
 @Getter
@@ -30,15 +34,16 @@ public class ResChallenge {
 
     private ChallengeDifficultyType difficulty;
 
-    private String updatedAt;  // 가장 최신 인증 시간 (몇 분 전에 인증했어요)
+    private LocalDateTime updatedAt;  // 가장 최신 인증 시간 (몇 분 전에 인증했어요)
 
     private Integer todayConfirmCnt; // 오늘 인증 횟수
 
     private Boolean scrab; // 스크랩 여부
 
+    private ResUserChallenge userChallenge;
 
 
-    private ResChallenge(Challenge challenge) {
+    private ResChallenge(Challenge challenge, Optional<UserChallenge> optionalUserChallenge) {
         this.name = challenge.getName();
         this.description = challenge.getDescription();
         this.recommendedCnt = challenge.getRecommendedCnt();
@@ -51,8 +56,10 @@ public class ResChallenge {
         this.repeatRate = challenge.getRepeatRate();
         this.point = challenge.getPoint();
         this.difficulty = challenge.getDifficulty();
-        this.updatedAt = challenge.getUpdatedAt().toString();
-
+        this.updatedAt = challenge.getUpdatedAt();
+        this.userChallenge = optionalUserChallenge
+                .map(ResUserChallenge::of)
+                .orElse(null);
     }
 
 //    private Integer CalRepeatRate(Integer repeatPlayerCnt, Integer totalPlayerCnt) {
@@ -64,5 +71,7 @@ public class ResChallenge {
 //        else return 0;
 //    }
 
-    public static ResChallenge of(Challenge challenge) {return new ResChallenge(challenge);}
+    public static ResChallenge of(Challenge challenge, Optional<UserChallenge> optionalUserChallenge) {
+        return new ResChallenge(challenge, optionalUserChallenge);
+    }
 }

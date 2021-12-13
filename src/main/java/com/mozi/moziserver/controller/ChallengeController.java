@@ -1,10 +1,13 @@
 package com.mozi.moziserver.controller;
 
+import com.mozi.moziserver.model.entity.Challenge;
+import com.mozi.moziserver.model.entity.UserChallenge;
 import com.mozi.moziserver.model.req.ReqChallengeList;
 import com.mozi.moziserver.model.res.ResChallenge;
 import com.mozi.moziserver.model.res.ResChallengeList;
 import com.mozi.moziserver.security.SessionUser;
 import com.mozi.moziserver.service.ChallengeService;
+import com.mozi.moziserver.service.UserChallengeService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +19,7 @@ import springfox.documentation.annotations.ApiIgnore;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -24,16 +28,19 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ChallengeController {
     private final ChallengeService challengeService;
+    private final UserChallengeService userChallengeService;
 
     @ApiOperation("챌린지 하나 조회")
     @GetMapping("/v1/challenges/{seq}")
-    public List<ResChallenge> getChallenge(
+    public ResChallenge getChallenge(
+            @ApiParam(hidden = true) @SessionUser Long userSeq,
             @PathVariable Long seq
     ) {
-        return challengeService.getChallenge(seq)
-                .stream()
-                .map(ResChallenge::of)
-                .collect(Collectors.toList());
+        Challenge challenge = challengeService.getChallenge(seq);
+
+        Optional<UserChallenge> optionalUserChallenge = userChallengeService.getActiveUserChallenge(userSeq, challenge);
+
+        return ResChallenge.of(challenge, optionalUserChallenge);
     }
 
     @ApiOperation("챌린지 모두 조회")
