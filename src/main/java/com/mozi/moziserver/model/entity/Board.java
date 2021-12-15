@@ -7,16 +7,21 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Date;
+
 
 @Getter
 @Setter
-@Entity(name = "user")
-public class User extends AbstractTimeEntity {
+@Entity(name = "board")
+public class Board extends AbstractTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long seq;
 
-    private String nickName;
+    private String title;
 
-    private String email;
+    private String content;
 }
+
