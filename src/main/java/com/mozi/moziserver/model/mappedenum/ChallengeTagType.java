@@ -7,9 +7,9 @@ import org.hibernate.cfg.Environment;
 @Getter
 @RequiredArgsConstructor
 public enum ChallengeTagType {
-    INDOOR("실내"),
-    ENVIRONMENT("환경"),
-    OUTDOOR("실외");
+    실내("실내"),
+    환경("환경"),
+    실외("실외");
     
     private final String name;
 }

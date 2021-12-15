@@ -6,9 +6,9 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum ChallengeThemeType {
-    BEGINNER("초급"),
-    INTERMEDIATE("중급"),
-    ADVANCED("상급");
+    초급("초급"),
+    중급("중급"),
+    상급("상급");
 
     private final String name;
 }
