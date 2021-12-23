@@ -55,14 +55,39 @@ public class ChallengeService {
         Challenge challenge=challengeRepository.findById(seq)
                 .orElseThrow(ResponseError.BadRequest.INVALID_SEQ::getResponseException);
 
-
         ChallengeScrab challengeScrab=ChallengeScrab.builder()
                 .challengeSeq(challenge.getSeq())
                 .userSeq(user.getSeq())
                 .build();
 
-        challengeScrabRepository.save(challengeScrab);
+        try {
+            challengeScrabRepository.save(challengeScrab);
+        } catch (Exception e) {
+            throw ResponseError.BadRequest.ALREADY_CREATED.getResponseException(); // for duplicate exception
+        } // FIXME DuplicateKeyException
 
     }
+
+    @Transactional
+    public void deleteChallengeScrab(Long userSeq, Long seq){
+        User user = userRepository.findById(userSeq)
+                .orElseThrow(ResponseError.NotFound.USER_NOT_EXISTS::getResponseException);
+
+        Challenge challenge=challengeRepository.findById(seq)
+                .orElseThrow(ResponseError.BadRequest.INVALID_SEQ::getResponseException);
+        try {
+            int deleteCount = challengeScrabRepository.deleteChallengeScrabByUserSeqAndChallengeSeq(user.getSeq(),challenge.getSeq());
+            if (deleteCount == 0) {
+                // 동시성 처리: 지울려고 했는데 못 지웠으면 함수실행을 끝낸다.
+                throw ResponseError.BadRequest.ALREADY_DELETED.getResponseException();
+            }
+        } catch (Exception e) {
+            throw ResponseError.BadRequest.ALREADY_DELETED.getResponseException(); // for duplicate exception
+        } // FIXME DuplicateKeyException
+
+
+
+    }
+
 
 }

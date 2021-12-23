@@ -67,4 +67,16 @@ public class ChallengeController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    @ApiOperation("챌린지 스크랩")
+    @DeleteMapping("/v1/challenges/{seq}/scrabs")
+    public ResponseEntity<Void> deleteChallengeScrab(
+            @ApiParam(hidden = true) @SessionUser Long userSeq,
+            @PathVariable Long seq
+    ){
+        challengeService.deleteChallengeScrab(userSeq,seq);
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
 }
+

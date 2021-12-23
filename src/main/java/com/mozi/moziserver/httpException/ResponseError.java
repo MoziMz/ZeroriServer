@@ -13,7 +13,9 @@ public interface ResponseError {
         INVALID_EMAIL("invalid email"),
         ALREADY_EXISTS_EMAIL("already exists email"),
         INVALID_EMAIL_OR_PASSWORD("invalid email or password"),
-        INVALID_SEQ("invalid seq");
+        INVALID_SEQ("invalid seq"),
+        ALREADY_CREATED( "already created"),
+        ALREADY_DELETED("already deleted");
 
 //        BAD_REQUEST(HttpStatus.BAD_REQUEST, "bad request"),
 //        INVALID_ID(HttpStatus.BAD_REQUEST, "invalid id"),

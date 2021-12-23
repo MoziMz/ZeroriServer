@@ -50,4 +50,8 @@ public class Challenge extends AbstractTimeEntity {
     @JoinColumn(name="challenge_seq")
     private List<ChallengeTheme> themeList;
 
+    @OneToMany
+    @JoinColumn(name="challenge_seq")
+    private List<Confirm> confirmList;
+
 }

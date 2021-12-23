@@ -46,7 +46,11 @@ public class QuestionService {
                 .imgUrl(imgUrl)
                 .build();
 
-        questionRepository.save(question);
+        try {
+            questionRepository.save(question);
+        } catch (Exception e) {
+            throw ResponseError.BadRequest.ALREADY_CREATED.getResponseException(); // for duplicate exception
+        }
 
     }
 

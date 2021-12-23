@@ -3,10 +3,9 @@ package com.mozi.moziserver.model.entity;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -19,4 +18,9 @@ public class User extends AbstractTimeEntity {
     private String nickName;
 
     private String email;
+
+    @OneToMany
+    @JoinColumn(name="user_seq")
+    private List<Confirm> confirmList;
+
 }
