@@ -24,11 +24,18 @@ public class QuestionService {
 
     private final QuestionRepository questionRepository;
 
+    private final S3ImageService s3ImageService;
+
     @Transactional
     public void createQuestion(Long userSeq, ReqQuestionCreate reqQuestionCreate){
 
         User user = userRepository.findById(userSeq)
                 .orElseThrow(ResponseError.NotFound.USER_NOT_EXISTS::getResponseException);
+
+        Long seq = questionRepository.findSeq();
+
+        String imgUrl = s3ImageService.fileUpload(reqQuestionCreate.getImgUrl(), "question", seq);
+
 
         Question question=Question.builder()
                 .user(user)
@@ -36,7 +43,7 @@ public class QuestionService {
                 .category(reqQuestionCreate.getQuestionCategory())
                 .title(reqQuestionCreate.getTitle())
                 .content(reqQuestionCreate.getContent())
-                .imgUrl(reqQuestionCreate.getImgUrl())
+                .imgUrl(imgUrl)
                 .build();
 
         questionRepository.save(question);
