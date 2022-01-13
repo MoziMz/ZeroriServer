@@ -1,6 +1,9 @@
 package com.mozi.moziserver.controller;
 
 import com.mozi.moziserver.model.entity.Confirm;
+import com.mozi.moziserver.model.entity.ConfirmSticker;
+import com.mozi.moziserver.model.entity.PostboxMessageAnimal;
+import com.mozi.moziserver.model.entity.PreparationItem;
 import com.mozi.moziserver.model.mappedenum.DeclarationType;
 import com.mozi.moziserver.model.req.ReqChallengeList;
 import com.mozi.moziserver.model.req.ReqConfirm;
@@ -77,6 +80,19 @@ public class ConfirmController {
                 .collect(Collectors.toList());
     }
 
+    @ApiOperation("인증 하나 조회")
+    @GetMapping("/v1/challenges/{seq}/confirms/{date}")
+    public ResConfirm getConfirm(
+            @ApiParam(hidden = true) @SessionUser Long userSeq,
+            @PathVariable("seq") Long seq,
+            @PathVariable("date") @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss") Date date
+    ) {
+        Confirm confirm=confirmService.getConfirm(userSeq,seq,date);
+
+        List<ConfirmSticker> confirmStickerList=confirmService.getConfirmStickerList(userSeq,seq,date);
+
+        return ResConfirm.of(confirm,confirmStickerList);
+    }
 
     @ApiOperation("인증 삭제")
     @DeleteMapping("/v1/challenges/{seq}/confirms/{date}")

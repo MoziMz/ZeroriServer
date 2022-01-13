@@ -42,7 +42,7 @@ public class ConfirmRepositoryImpl extends QuerydslRepositorySupport implements 
                 .stream()
                 .collect(Collectors.toList());
 
-                return confirmList;
+        return confirmList;
 
     }
 
@@ -97,30 +97,28 @@ public class ConfirmRepositoryImpl extends QuerydslRepositorySupport implements 
 
     }
 
-//    @Override
-//    public Optional<Confirm> findByUserAndChallengeSeqAndDate(Long userSeq,Long seq,Date date){
-//        List<User> user=from(qUser)
-//                .where(qUser.seq.eq(userSeq))
-//                .fetch()
-//                .stream()
-//                .collect(Collectors.toList());
-//
-//        List<Challenge> challenge=from(qChallenge)
-//                .where(qChallenge.seq.eq(seq))
-//                .fetch()
-//                .stream()
-//                .collect(Collectors.toList());
-//
-//        Optional<Confirm> confirm = from(qConfirm)
-//                .innerJoin(qConfirm.id.challenge,qChallenge)
-//                .innerJoin(qConfirm.id.user,qUser)
-//                .where(qConfirm.id.user.in(user),qConfirm.id.challenge.in(challenge),qConfirm.id.date.in(date))
-//                .fetch()
-//                .stream()
-//                .collect(Collectors.);
-//
-//        return confirm;
-//    }
+    @Override
+    public Confirm findByUserAndChallengeSeqAndDate(Long userSeq,Long seq,Date date){
+        List<User> user=from(qUser)
+                .where(qUser.seq.eq(userSeq))
+                .fetch()
+                .stream()
+                .collect(Collectors.toList());
+
+        List<Challenge> challenge=from(qChallenge)
+                .where(qChallenge.seq.eq(seq))
+                .fetch()
+                .stream()
+                .collect(Collectors.toList());
+
+        Confirm confirm = from(qConfirm)
+                .innerJoin(qConfirm.id.challenge,qChallenge)
+                .innerJoin(qConfirm.id.user,qUser)
+                .where(qConfirm.id.user.in(user),qConfirm.id.challenge.in(challenge),qConfirm.id.date.in(date))
+                .fetchOne();
+
+        return confirm;
+    }
 
 //    @Override
 //    public List<Confirm> findAllbyUserbyOrderDesc(Long userSeq){

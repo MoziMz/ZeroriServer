@@ -4,10 +4,7 @@ import com.mozi.moziserver.httpException.ResponseError;
 import com.mozi.moziserver.model.entity.*;
 import com.mozi.moziserver.model.mappedenum.DeclarationType;
 import com.mozi.moziserver.model.req.ReqConfirm;
-import com.mozi.moziserver.repository.ChallengeRepository;
-import com.mozi.moziserver.repository.ConfirmRepository;
-import com.mozi.moziserver.repository.DeclarationRepository;
-import com.mozi.moziserver.repository.UserRepository;
+import com.mozi.moziserver.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -28,6 +25,8 @@ public class ConfirmService {
     private final ConfirmRepository confirmRepository;
 
     private final DeclarationRepository declarationRepository;
+
+    private final ConfirmStickerRepository confirmStickerRepository;
 
     //인증 생성
     @Transactional
@@ -74,11 +73,17 @@ public class ConfirmService {
         return confirmRepository.findByUserByOrderDesc(userSeq);
     }
 
-//    //인증 하나 조회
-//    @Transactional
-//    public Optional<Confirm> getConfirm(Long userSeq, Long seq, Date date) {
-//        return confirmRepository.findByUserAndChallengeSeqAndDate(userSeq,seq,date);
-//    }
+    //인증 하나 조회
+    @Transactional
+    public Confirm getConfirm(Long userSeq, Long seq, Date date) {
+        return confirmRepository.findByUserAndChallengeSeqAndDate(userSeq,seq,date);
+    }
+
+    //confirmSticker 조회
+    @Transactional
+    public List<ConfirmSticker> getConfirmStickerList(Long userSeq,Long seq,Date date){
+        return confirmStickerRepository.findByUserAndSeqAndDate(userSeq,seq,date);
+    }
 
     @Transactional
     public void deleteConfirm(Long userSeq, Long seq,Date date) {

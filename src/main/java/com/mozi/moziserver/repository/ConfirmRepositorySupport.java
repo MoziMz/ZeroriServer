@@ -13,5 +13,5 @@ public interface ConfirmRepositorySupport {
 
     List<Confirm> findByUserByOrderDesc(Long userSeq);
 
-    //Optional<Confirm> findByUserAndChallengeSeqAndDate(Long userSeq,Long seq,Date date);
+    Confirm findByUserAndChallengeSeqAndDate(Long userSeq,Long seq,Date date);
 }

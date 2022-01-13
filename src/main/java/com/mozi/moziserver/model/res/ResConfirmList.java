@@ -17,12 +17,15 @@ public class ResConfirmList {
 
     private String imgUrl;
 
+    private String challengeName;
+
 
     private ResConfirmList(Confirm confirm) {
 
         this.nickName=confirm.getId().getUser().getNickName();
         this.date=confirm.getId().getDate();
         this.imgUrl=confirm.getImgUrl();
+        this.challengeName=confirm.getId().getChallenge().getName();
 
     }
 
