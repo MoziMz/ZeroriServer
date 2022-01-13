@@ -72,14 +72,25 @@ public class ConfigurationController {
         return ResMyPage.of(userAuth);
     }
 
-    // 닉네임, 비밀번호
-    @ApiOperation("프로필 편집_POST")
-    @PostMapping("/v1/users/mypages")
-    public ResponseEntity<Void> updateUserInfo(
+    // 닉네임 수정
+    @ApiOperation("프로필 수정_POST_닉네임")
+    @PostMapping("/v1/users/mypage/nicknames")
+    public ResponseEntity<Void> updateUserNickName(
             @ApiParam(hidden = true) @SessionUser Long userSeq,
-            @RequestBody @Valid ReqProfileUpdate reqProfileUpdate
+            @RequestBody @Valid ReqUserNickNameAndEmail req
     ) {
-        myPageService.updateUserInfo(userSeq, reqProfileUpdate);
+        myPageService.updateUserNickName(userSeq, req.getNickName());
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    // 비밀번호 수정
+    @ApiOperation("프로필 수정_POST_비밀번호")
+    @PostMapping("/v1/users/mypage/passwords")
+    public ResponseEntity<Void> updateUserPassword(
+            @ApiParam(hidden = true) @SessionUser Long userSeq,
+            @RequestBody @Valid ReqUserNickNameAndEmail req
+    ) {
+        myPageService.updateUserPassword(userSeq, req.getPw());
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
@@ -90,7 +101,7 @@ public class ConfigurationController {
             @ApiParam(hidden = true) @SessionUser Long userSeq,
             @RequestBody @Valid ReqNickName reqNickName
     ) {
-        User user = myPageService.getUserNickName(userSeq, reqNickName.getNickName());
+        User user = myPageService.getAllNickName(userSeq, reqNickName.getNickName());
         try {
             if(reqNickName.getNickName().equals(ResDuplicationCheck.of(user).getNickName())) {
                 return Boolean.TRUE;
@@ -108,7 +119,7 @@ public class ConfigurationController {
             @ApiParam(hidden = true) @SessionUser Long userSeq,
             @RequestBody @Valid ReqEmail reqEmail
     ) {
-        User user = myPageService.getUserEmail(userSeq, reqEmail.getEmail());
+        User user = myPageService.getAllEmail(userSeq, reqEmail.getEmail());
 
         try {
             if(reqEmail.getEmail().equals(ResDuplicationCheck.of(user).getEmail())) {
@@ -121,7 +132,7 @@ public class ConfigurationController {
         return Boolean.FALSE;
     }
 
-    @ApiOperation("이메일 인증")
+    @ApiOperation("이메일 인증 후 수정")
     @PostMapping(value = "/v1/users/mypages/email-auths", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> authUserEmail(
             @ApiParam(hidden = true) @SessionUser Long userSeq,

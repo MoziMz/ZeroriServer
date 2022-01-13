@@ -10,11 +10,13 @@ public interface MyPageRepositorySupport {
 
     UserAuth getUserInfo(User user);
 
-    User getUserNickName(User user, String nickName);
+    User getAllNickName(User user, String nickName);
+
+    User getAllEmail(User user, String email);
 
     void updateUserEmail(User user, String email);
 
-    User getUserEmail(User user, String email);
+    void updateUserNickName(User user, String nickName);
 
-    void updateUserInfo(User user, String nickName, String pw);
+    void updateUserPassword(User user, String pw);
 }

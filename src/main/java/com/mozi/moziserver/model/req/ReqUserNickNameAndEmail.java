@@ -7,9 +7,7 @@ import javax.validation.constraints.NotBlank;
 
 @Getter
 @Setter
-public class ReqProfileUpdate {
+public class ReqUserNickNameAndEmail {
     private String nickName;
-
-    @NotBlank
     private String pw;
 }

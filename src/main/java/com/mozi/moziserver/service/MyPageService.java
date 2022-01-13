@@ -3,8 +3,6 @@ package com.mozi.moziserver.service;
 import com.mozi.moziserver.httpException.ResponseError;
 import com.mozi.moziserver.model.entity.User;
 import com.mozi.moziserver.model.entity.UserAuth;
-import com.mozi.moziserver.model.mappedenum.UserAuthType;
-import com.mozi.moziserver.model.req.ReqProfileUpdate;
 import com.mozi.moziserver.repository.MyPageRepository;
 import com.mozi.moziserver.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -35,19 +33,19 @@ public class MyPageService {
     }
 
     // 닉네임 중복체크
-    public User getUserNickName(Long userSeq, String nickName) {
+    public User getAllNickName(Long userSeq, String nickName) {
         User user = userRepository.findById(userSeq)
                 .orElseThrow(ResponseError.NotFound.USER_NOT_EXISTS::getResponseException);
 
-        return myPageRepository.getUserNickName(user, nickName);
+        return myPageRepository.getAllNickName(user, nickName);
     }
 
     // 이메일 중복체크
-    public User getUserEmail(Long userSeq, String email) {
+    public User getAllEmail(Long userSeq, String email) {
         User user = userRepository.findById(userSeq)
                 .orElseThrow(ResponseError.NotFound.USER_NOT_EXISTS::getResponseException);
 
-        return myPageRepository.getUserEmail(user, email);
+        return myPageRepository.getAllEmail(user, email);
     }
 
     // 이메일 인증
@@ -79,13 +77,23 @@ public class MyPageService {
     }
 
     // 닉네임, 비밀번호 수정
-    public void updateUserInfo(Long userSeq, ReqProfileUpdate req) {
+    public void updateUserNickName(Long userSeq, String nickName) {
         User user = userRepository.findById(userSeq)
                 .orElseThrow(ResponseError.NotFound.USER_NOT_EXISTS::getResponseException);
 
-        myPageRepository.updateUserInfo(
+        myPageRepository.updateUserNickName(
                 user,
-                req.getNickName(),
-                passwordEncoder.encode(req.getPw()));
+                nickName
+        );
+    }
+
+    public void updateUserPassword(Long userSeq, String password) {
+        User user = userRepository.findById(userSeq)
+                .orElseThrow(ResponseError.NotFound.USER_NOT_EXISTS::getResponseException);
+
+        myPageRepository.updateUserPassword(
+                user,
+                passwordEncoder.encode(password)
+        );
     }
 }

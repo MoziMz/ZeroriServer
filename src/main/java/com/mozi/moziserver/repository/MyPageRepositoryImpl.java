@@ -1,6 +1,7 @@
 package com.mozi.moziserver.repository;
 
 import com.mozi.moziserver.model.entity.*;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,7 +30,7 @@ public class MyPageRepositoryImpl extends QuerydslRepositorySupport implements M
     }
 
     @Override
-    public User getUserNickName(
+    public User getAllNickName(
             User user,
             String nickName
     ) {
@@ -39,7 +40,7 @@ public class MyPageRepositoryImpl extends QuerydslRepositorySupport implements M
     }
 
     @Override
-    public User getUserEmail(User user, String email) {
+    public User getAllEmail(User user, String email) {
         return from(qUser)
                 .where(qUser.email.eq(email))
                 .fetchOne();
@@ -54,24 +55,22 @@ public class MyPageRepositoryImpl extends QuerydslRepositorySupport implements M
                 .execute();
 
          entityManager.clear();
-
-//        JPAQueryFactory jpaQueryFactory = null;
-//
-//        long execute = jpaQueryFactory
-//                .update(qUser)
-//                .set(qUser.email, email)
-//                .where(qUser.seq.eq(seq))
-//                .execute();
-
     }
 
     @Override
     @Transactional
-    public void updateUserInfo(User user, String nickName, String pw) {
+    public void updateUserNickName(User user, String nickName) {
         update(qUser)
                 .set(qUser.nickName, nickName)
                 .where(qUser.eq(user))
                 .execute();
+
+        entityManager.clear();
+    }
+
+    @Override
+    @Transactional
+    public void updateUserPassword(User user, String pw) {
 
         update(qUserAuth)
                 .set(qUserAuth.pw, pw)
