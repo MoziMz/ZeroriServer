@@ -36,7 +36,8 @@ public interface Constant {
             "/health",
             "/api/*/users/signin",
             "/api/*/users/signup",
-            "/api/*/users/signout"
+            "/api/*/users/signout",
+            "/api/*/users/find-email"
     };
 
     String[] AUTHENTICATED_PATHS = new String[]{

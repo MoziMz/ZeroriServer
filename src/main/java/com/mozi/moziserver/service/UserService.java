@@ -4,6 +4,7 @@ import com.mozi.moziserver.httpException.ResponseError;
 import com.mozi.moziserver.model.entity.User;
 import com.mozi.moziserver.model.entity.UserAuth;
 import com.mozi.moziserver.model.mappedenum.UserAuthType;
+import com.mozi.moziserver.model.req.ReqUserNickNameAndEmail;
 import com.mozi.moziserver.model.req.ReqUserSignIn;
 import com.mozi.moziserver.model.req.ReqUserSignUp;
 import com.mozi.moziserver.repository.UserAuthRepository;
@@ -12,9 +13,12 @@ import com.mozi.moziserver.security.UserAuthToken;
 import com.mozi.moziserver.security.UserAuthenticationProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -181,5 +185,17 @@ public class UserService {
 
     private void googleSignUp(ReqUserSignIn reqUserSignIn) {
         // TODO
+    }
+
+    // 유저 id(email) 찾기
+    public ResponseEntity<String> findUserEmail(ReqUserNickNameAndEmail req) {
+
+        UserAuth userAuth = userAuthRepository.findUserEmailByNickName(req.getNickName());
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+
+        if(userAuth != null && encoder.matches(req.getPw(), userAuth.getPw())){
+            return new ResponseEntity<>(userAuth.getId(), HttpStatus.OK);
+        }
+        else return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 }

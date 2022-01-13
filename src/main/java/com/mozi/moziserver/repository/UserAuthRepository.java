@@ -10,7 +10,7 @@ import java.util.Optional;
 
 // TODO
 @Repository
-public interface UserAuthRepository extends JpaRepository<UserAuth, Long> {
+public interface UserAuthRepository extends JpaRepository<UserAuth, Long>, UserAuthRepositorySupport {
 
     @Override
     <S extends UserAuth> S save(S entity);
