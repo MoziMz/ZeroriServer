@@ -1,6 +1,8 @@
 package com.mozi.moziserver.model.entity;
 
+import com.mozi.moziserver.model.PlanDate;
 import com.mozi.moziserver.model.mappedenum.ChallengeTagType;
+import com.mozi.moziserver.model.mappedenum.PlanDateListConverter;
 import com.mozi.moziserver.model.mappedenum.UserChallengeStateType;
 import lombok.Getter;
 import lombok.Setter;
@@ -8,6 +10,7 @@ import lombok.Setter;
 import javax.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -22,7 +25,8 @@ public class UserChallenge extends AbstractTimeEntity {
 
     private LocalDate startDate;
 
-    private String planDate;
+    @Convert(converter = PlanDateListConverter.class)
+    private List<PlanDate> PlanDateList;
 
     private Integer totalConfirmCnt;
 
