@@ -7,13 +7,16 @@ import lombok.Setter;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
 public class ReqChallengeList {
-    private ChallengeTagType challengeTagType;
 
-    private ChallengeThemeType challengeThemeType;
+    private List<String> challengeTagType;
+
+    private List<String> challengeThemeType;
 
     @Min(1L)
     private Long prevLastPostSeq;

@@ -1,15 +1,13 @@
 package com.mozi.moziserver.model.entity;
 
 import com.mozi.moziserver.model.mappedenum.ChallengeTagType;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import java.io.Serializable;
 
 @Getter
+@Setter
 @Embeddable
 @NoArgsConstructor
 @AllArgsConstructor

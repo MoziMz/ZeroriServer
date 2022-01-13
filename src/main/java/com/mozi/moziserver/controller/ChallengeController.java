@@ -44,7 +44,7 @@ public class ChallengeController {
     }
 
     @ApiOperation("챌린지 모두 조회")
-    @GetMapping("/v1/challenges")
+    @PostMapping("/v1/challenges")
     public List<ResChallengeList> getChallengeList(
             @ApiParam(hidden = true) @SessionUser Long userSeq,
             @Valid ReqChallengeList req

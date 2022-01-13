@@ -20,7 +20,9 @@ public class ResChallenge {
 
     private ChallengeTagType tags;
 
-    private String currentPlayerCnt;
+//    private String tags;
+
+    private Integer currentPlayerCnt;
 
     private Integer totalPlayerCnt;
 

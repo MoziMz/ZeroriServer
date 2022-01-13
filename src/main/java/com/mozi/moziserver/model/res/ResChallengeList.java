@@ -4,6 +4,9 @@ import com.mozi.moziserver.model.entity.Challenge;
 import com.mozi.moziserver.model.mappedenum.ChallengeTagType;
 import lombok.Getter;
 
+import java.util.Collections;
+import java.util.List;
+
 @Getter
 public class ResChallengeList {
     private String name;
@@ -14,7 +17,9 @@ public class ResChallengeList {
 
     private ChallengeTagType tags;
 
-    private String currentPlayerCnt;
+//    private String tags;
+
+    private Integer currentPlayerCnt;
 
     private String imgUrl; // 가장 최근 인증한 사람의 프로필 이미지
 

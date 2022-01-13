@@ -10,8 +10,8 @@ import java.util.List;
 public interface ChallengeRepositorySupport {
     List<Challenge> findAll (
             Long userSeq,
-            ChallengeTagType tagType,
-            ChallengeThemeType themeType,
+            List<String> tagType,
+            List<String> themeType,
             Integer pageSize,
             Long prevLastPostSeq
     );

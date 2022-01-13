@@ -25,7 +25,7 @@ public class Challenge extends AbstractTimeEntity {
     @Enumerated(EnumType.STRING)
     private ChallengeTagType tags;
 
-    private String currentPlayerCnt;
+    private Integer currentPlayerCnt;
 
     private Integer totalPlayerCnt;
 

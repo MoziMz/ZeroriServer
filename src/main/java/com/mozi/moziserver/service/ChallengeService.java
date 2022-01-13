@@ -1,12 +1,12 @@
 package com.mozi.moziserver.service;
 
 import com.mozi.moziserver.httpException.ResponseError;
-import com.mozi.moziserver.model.entity.Challenge;
-import com.mozi.moziserver.model.entity.ChallengeScrab;
-import com.mozi.moziserver.model.entity.User;
+import com.mozi.moziserver.model.entity.*;
+import com.mozi.moziserver.model.req.ReqAdminChallenge;
 import com.mozi.moziserver.model.req.ReqChallengeList;
 import com.mozi.moziserver.repository.ChallengeRepository;
 import com.mozi.moziserver.repository.ChallengeScrabRepository;
+import com.mozi.moziserver.repository.ChallengeTagRepository;
 import com.mozi.moziserver.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,18 +14,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
+
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class ChallengeService {
+
     private final ChallengeRepository challengeRepository;
-
     private final UserRepository userRepository;
-
     private final ChallengeScrabRepository challengeScrabRepository;
-
+    private final ChallengeTagRepository challengeTagRepository;
 
     // 챌린지 하나 조회
     public Challenge getChallenge(Long seq) {
@@ -89,5 +88,37 @@ public class ChallengeService {
 
     }
 
+    // 챌린지 생성
+    @Transactional
+    public void createChallenge(ReqAdminChallenge req){
+        Challenge challenge = new Challenge();
 
+        challenge.setName(req.getName());
+        challenge.setDescription(req.getDescription());
+        challenge.setRecommendedCnt(req.getRecommendedCnt());
+        challenge.setTags(req.getTags());
+        challenge.setCurrentPlayerCnt(req.getCurrentPlayerCnt());
+        challenge.setTotalPlayerCnt(req.getTotalPlayerCnt());
+        challenge.setRepeatPlayerCnt(req.getRepeatPlayerCnt());
+        challenge.setTotalCnt(req.getTotalCnt());
+        challenge.setTotalChallengeConfirmCnt(req.getTotalChallengeConfirmCnt());
+        challenge.setRepeatRate(req.getRepeatRate());
+        challenge.setPoint(req.getPoint());
+        challenge.setDifficulty(req.getDifficulty());
+
+        try{
+            challengeRepository.save(challenge);
+
+            ChallengeTagId challengeTagId = new ChallengeTagId();
+            ChallengeTag challengeTag = ChallengeTag.builder().id(challengeTagId).build();
+
+            challengeTag.getId().setChallenge(challenge);
+            challengeTag.getId().setTagName(req.getTags());
+
+            challengeTagRepository.save(challengeTag);
+
+        }catch (Exception e){
+            throw ResponseError.BadRequest.ALREADY_CREATED.getResponseException();
+        }
+    }
 }

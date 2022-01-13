@@ -1,17 +1,13 @@
 package com.mozi.moziserver.repository;
 
-import com.mozi.moziserver.model.entity.Challenge;
-import com.mozi.moziserver.model.entity.QChallenge;
-import com.mozi.moziserver.model.entity.QChallengeTag;
-import com.mozi.moziserver.model.entity.QChallengeTheme;
+import com.fasterxml.jackson.databind.util.ArrayBuilders;
+import com.mozi.moziserver.model.entity.*;
 import com.mozi.moziserver.model.mappedenum.ChallengeTagType;
 import com.mozi.moziserver.model.mappedenum.ChallengeThemeType;
 import com.querydsl.core.types.Predicate;
-
-
+import com.querydsl.core.types.dsl.BooleanExpression;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
-
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -28,8 +24,8 @@ public class ChallengeRepositoryImpl extends QuerydslRepositorySupport implement
     @Override
     public List<Challenge> findAll (
             Long userSeq,
-            ChallengeTagType tagType,
-            ChallengeThemeType themeType,
+            List<String> tagType,
+            List<String> themeType,
             Integer pageSize,
             Long prevLastPostSeq
     ) {
@@ -37,44 +33,54 @@ public class ChallengeRepositoryImpl extends QuerydslRepositorySupport implement
                 predicateOptional(qChallenge.seq::lt,prevLastPostSeq),
         };
 
+        List<ChallengeTagType> tags = new ArrayList<>();
+        List<ChallengeThemeType> themes = new ArrayList<>();
+
+        tags = (tagType != null) ? setTags(tags, tagType) : null;
+        themes = (themeType != null) ? setThemes(themes, themeType) : null;
+
         List<Challenge> challengeList = from(qChallenge)
+                .leftJoin(qChallengeTheme).on(qChallenge.seq.eq(qChallengeTheme.id.challenge.seq))
+                .leftJoin(qChallengeTag).on(qChallenge.seq.eq(qChallengeTag.id.challenge.seq))
                 .where(predicates)
+                .where(
+                        tagNameIn(tags),
+                        themeNameIn(themes)
+                )
+                .groupBy(qChallenge.seq)
+                .orderBy(qChallenge.seq.asc())
                 .limit(pageSize)
                 .fetch()
                 .stream()
                 .collect(Collectors.toList());
 
-        challengeList.forEach(t -> t.setTagList(new LinkedList<>()));
-        challengeList.forEach(t -> t.setThemeList(new LinkedList<>()));
-
-        // OneToMany 모두 이 방식으로 변경
-        from(qChallengeTag)
-                .where(qChallengeTag.id.challenge.in(challengeList))
-                .fetch()
-                .forEach(tag -> tag.getId().getChallenge().getTagList().add(tag));
-
-        from(qChallengeTheme)
-                .where(qChallengeTheme.id.challenge.in(challengeList))
-                .fetch()
-                .forEach(theme -> theme.getId().getChallenge().getThemeList().add(theme));
-
-        if(tagType != null) {
-            return challengeList
-                    .stream()
-                    .filter( c -> c.getTagList().stream().anyMatch( ct -> ct.getId().getTagName() == tagType))
-                    .collect(Collectors.toList());
-        }
-        else if(themeType != null) {
-            return challengeList
-                    .stream()
-                    .filter(c -> c.getThemeList().stream().anyMatch(ct -> ct.getId().getThemeName() == themeType))
-                    .collect(Collectors.toList());
-        }
-
         return challengeList;
+
     }
 
     private <T> Predicate predicateOptional(final Function<T, Predicate> whereFunc, final T value) {
         return value != null ? whereFunc.apply(value) : null;
+    }
+
+    private List<ChallengeTagType> setTags(List<ChallengeTagType> tags, List<String> tagType) {
+        for (int i = 0; i < tagType.size(); i++) {
+            tags.add(ChallengeTagType.valueOf(tagType.get(i)));
+        }
+        return tags;
+    }
+
+    private List<ChallengeThemeType> setThemes(List<ChallengeThemeType> themes, List<String> themeType) {
+        for (int i = 0; i < themeType.size(); i++) {
+            themes.add(ChallengeThemeType.valueOf(themeType.get(i)));
+        }
+        return themes;
+    }
+
+    private BooleanExpression tagNameIn(List<ChallengeTagType> tags) {
+        return tags != null ? qChallengeTag.id.tagName.in(tags) : null;
+    }
+
+    private BooleanExpression themeNameIn(List<ChallengeThemeType> themes) {
+        return themes != null ? qChallengeTheme.id.themeName.in(themes) : null;
     }
 }
