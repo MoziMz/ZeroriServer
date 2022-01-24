@@ -14,7 +14,7 @@ import javax.servlet.http.HttpSession;
 import java.util.Locale;
 
 @Configuration
-@Profile({"default", "dev"})
+//@Profile({"default", "dev"})
 public class SwaggerConfig {
     // path : /swagger-ui/index.html
 
