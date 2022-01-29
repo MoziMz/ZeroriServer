@@ -1,5 +1,6 @@
 package com.mozi.moziserver.httpException;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -7,6 +8,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+@Slf4j
 @ControllerAdvice
 @SuppressWarnings("unused")
 public class ResponseExceptionHandler {
@@ -37,6 +39,8 @@ public class ResponseExceptionHandler {
     @ExceptionHandler
     @ResponseBody
     public ResponseEntity<ResponseException> handle(Throwable t) {
+        log.error("UNEXPECTED_ERROR", t);
+
         ResponseException ex = ResponseError.InternalServerError.UNEXPECTED_ERROR.getResponseException(t.getMessage());
         return handle(ex);
     }
