@@ -14,15 +14,14 @@ import java.util.stream.Collectors;
 
 @Getter
 public class ResUserChallenge {
-    private Long seq;
-    private UserChallengeStateType state;
-    private LocalDate startDate;
-    private List<ResPlanDate> planDateList;
-    private Integer totalConfirmCnt;
-    private ResUser user;
-//    private ResChallenge challenge;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+    private final Long seq;
+    private final UserChallengeStateType state;
+    private final LocalDate startDate;
+    private final List<ResPlanDate> planDateList;
+    private final Integer totalConfirmCnt;
+    private final ResUser user;
+    private final LocalDateTime createdAt;
+    private final LocalDateTime updatedAt;
 
     private ResUserChallenge(UserChallenge userChallenge) {
         this.seq = userChallenge.getSeq();
@@ -35,7 +34,6 @@ public class ResUserChallenge {
                 .collect(Collectors.toList());
         this.totalConfirmCnt = userChallenge.getTotalConfirmCnt();
         this.user = ResUser.of(userChallenge.getUser());
-//        this.challenge = ResChallenge.of(userChallenge.getChallenge());
         this.createdAt = userChallenge.getCreatedAt();
         this.updatedAt = userChallenge.getUpdatedAt();
     }

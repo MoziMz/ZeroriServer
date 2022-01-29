@@ -15,7 +15,15 @@ public interface ResponseError {
         INVALID_EMAIL_OR_PASSWORD("invalid email or password"),
         INVALID_SEQ("invalid seq"),
         ALREADY_CREATED( "already created"),
-        ALREADY_DELETED("already deleted");
+        ALREADY_DELETED("already deleted"),
+        ALREADY_EXISTS_USER_CHALLENGE_IN_PROGRESS("already exists user challenge in progress"),
+        PLAN_DATE_TYPE_NOT_INVALID("plan date type cannot be in success or fail, when creating a user-challenge"),
+        ALREADY_ENDED_USER_CHALLENGE("already ended user-challenge cannot be modified"),
+        PAST_DATES_UPDATE_NOT_INVALID("past dates update not invalid"),
+        PAST_START_DATE("past start date not invalid"),
+        INVALID_TURN("invalid turn");
+
+        // INVALID 는 한가지로 명확하지 않을때 쓴다.
 
 //        BAD_REQUEST(HttpStatus.BAD_REQUEST, "bad request"),
 //        INVALID_ID(HttpStatus.BAD_REQUEST, "invalid id"),
@@ -118,6 +126,7 @@ public interface ResponseError {
     @RequiredArgsConstructor
     enum NotFound {
         USER_NOT_EXISTS("user not exists"),
+        CHALLENGE_NOT_EXISTS("challenge not exists"),
         USER_CHALLENGE_NOT_EXISTS("user-challenge not exists");
 
         private final String message;
