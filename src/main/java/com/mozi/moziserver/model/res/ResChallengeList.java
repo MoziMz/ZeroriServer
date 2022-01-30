@@ -9,6 +9,8 @@ import java.util.List;
 
 @Getter
 public class ResChallengeList {
+    private Long seq;
+
     private String name;
 
     private String description;
@@ -27,6 +29,7 @@ public class ResChallengeList {
 
 
     private ResChallengeList(Challenge challenge) {
+        this.seq = challenge.getSeq();
         this.name = challenge.getName();
         this.description = challenge.getDescription();
         this.recommendedCnt = challenge.getRecommendedCnt();
