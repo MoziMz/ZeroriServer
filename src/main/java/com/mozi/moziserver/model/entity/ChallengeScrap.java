@@ -11,7 +11,7 @@ import javax.persistence.*;
 @Builder
 @Entity(name = "challenge_scrab")
 @IdClass(ChallengeUserSeq.class)
-public class ChallengeScrab extends AbstractTimeEntity{
+public class ChallengeScrap extends AbstractTimeEntity{
 
     @Id
     private Long userSeq;

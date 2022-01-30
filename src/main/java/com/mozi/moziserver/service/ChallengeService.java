@@ -5,7 +5,7 @@ import com.mozi.moziserver.model.entity.*;
 import com.mozi.moziserver.model.req.ReqAdminChallenge;
 import com.mozi.moziserver.model.req.ReqChallengeList;
 import com.mozi.moziserver.repository.ChallengeRepository;
-import com.mozi.moziserver.repository.ChallengeScrabRepository;
+import com.mozi.moziserver.repository.ChallengeScrapRepository;
 import com.mozi.moziserver.repository.ChallengeTagRepository;
 import com.mozi.moziserver.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +23,7 @@ public class ChallengeService {
 
     private final ChallengeRepository challengeRepository;
     private final UserRepository userRepository;
-    private final ChallengeScrabRepository challengeScrabRepository;
+    private final ChallengeScrapRepository challengeScrapRepository;
     private final ChallengeTagRepository challengeTagRepository;
 
     // 챌린지 하나 조회
@@ -54,13 +54,13 @@ public class ChallengeService {
         Challenge challenge=challengeRepository.findById(seq)
                 .orElseThrow(ResponseError.BadRequest.INVALID_SEQ::getResponseException);
 
-        ChallengeScrab challengeScrab=ChallengeScrab.builder()
+        ChallengeScrap challengeScrap = ChallengeScrap.builder()
                 .challengeSeq(challenge.getSeq())
                 .userSeq(user.getSeq())
                 .build();
 
         try {
-            challengeScrabRepository.save(challengeScrab);
+            challengeScrapRepository.save(challengeScrap);
         } catch (Exception e) {
             throw ResponseError.BadRequest.ALREADY_CREATED.getResponseException(); // for duplicate exception
         } // FIXME DuplicateKeyException
@@ -75,7 +75,7 @@ public class ChallengeService {
         Challenge challenge=challengeRepository.findById(seq)
                 .orElseThrow(ResponseError.BadRequest.INVALID_SEQ::getResponseException);
         try {
-            int deleteCount = challengeScrabRepository.deleteChallengeScrabByUserSeqAndChallengeSeq(user.getSeq(),challenge.getSeq());
+            int deleteCount = challengeScrapRepository.deleteChallengeScrapByUserSeqAndChallengeSeq(user.getSeq(),challenge.getSeq());
             if (deleteCount == 0) {
                 // 동시성 처리: 지울려고 했는데 못 지웠으면 함수실행을 끝낸다.
                 throw ResponseError.BadRequest.ALREADY_DELETED.getResponseException();
