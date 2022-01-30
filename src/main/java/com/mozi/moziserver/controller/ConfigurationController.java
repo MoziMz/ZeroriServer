@@ -101,9 +101,9 @@ public class ConfigurationController {
             @ApiParam(hidden = true) @SessionUser Long userSeq,
             @RequestBody @Valid ReqNickName reqNickName
     ) {
-        User user = myPageService.getAllNickName(userSeq, reqNickName.getNickName());
+        UserAuth userAuth = myPageService.getAllNickName(userSeq, reqNickName.getNickName());
         try {
-            if(reqNickName.getNickName().equals(ResDuplicationCheck.of(user).getNickName())) {
+            if(reqNickName.getNickName().equals(ResDuplicationCheck.of(userAuth).getNickName())) {
                 return Boolean.TRUE;
             }
         }
@@ -119,17 +119,25 @@ public class ConfigurationController {
             @ApiParam(hidden = true) @SessionUser Long userSeq,
             @RequestBody @Valid ReqEmail reqEmail
     ) {
-        User user = myPageService.getAllEmail(userSeq, reqEmail.getEmail());
+        UserAuth userAuth = myPageService.getAllEmail(userSeq, reqEmail.getEmail());
 
-        try {
-            if(reqEmail.getEmail().equals(ResDuplicationCheck.of(user).getEmail())) {
-                return Boolean.TRUE;
-            }
+        String email = (userAuth != null ? ResDuplicationCheck.of(userAuth).getEmail() : null);
+        String id = (userAuth != null ? ResDuplicationCheck.of(userAuth).getId() : null);
+
+        if(reqEmail.getEmail().equals(email) || reqEmail.getEmail().equals(id)) {
+            return Boolean.TRUE;
         }
-        catch (NullPointerException e) {
-            return Boolean.FALSE;
-        }
-        return Boolean.FALSE;
+        else return Boolean.FALSE;
+
+//        try {
+//            if(reqEmail.getEmail().equals(email) || reqEmail.getEmail().equals(id)) {
+//                return Boolean.TRUE;
+//            }
+//        }
+//        catch (Exception e) {
+//            return Boolean.FALSE;
+//        }
+//        return Boolean.FALSE;
     }
 
     @ApiOperation("이메일 인증 후 수정")

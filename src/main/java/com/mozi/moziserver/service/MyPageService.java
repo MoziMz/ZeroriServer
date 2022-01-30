@@ -33,7 +33,7 @@ public class MyPageService {
     }
 
     // 닉네임 중복체크
-    public User getAllNickName(Long userSeq, String nickName) {
+    public UserAuth getAllNickName(Long userSeq, String nickName) {
         User user = userRepository.findById(userSeq)
                 .orElseThrow(ResponseError.NotFound.USER_NOT_EXISTS::getResponseException);
 
@@ -41,7 +41,7 @@ public class MyPageService {
     }
 
     // 이메일 중복체크
-    public User getAllEmail(Long userSeq, String email) {
+    public UserAuth getAllEmail(Long userSeq, String email) {
         User user = userRepository.findById(userSeq)
                 .orElseThrow(ResponseError.NotFound.USER_NOT_EXISTS::getResponseException);
 

@@ -20,7 +20,15 @@ public class UserAuthRepositoryImpl extends QuerydslRepositorySupport implements
 
         return from(qUserAuth)
                 .innerJoin(qUser).on(qUserAuth.user.seq.eq(qUser.seq))
-                .where(qUser.nickName.eq(nickName))
+                .where(qUser.nickName.eq(nickName), qUserAuth.quit.eq("F"))
+                .fetchOne();
+    }
+
+    @Override
+    public String checkQuitUser(String id) {
+        return from(qUserAuth)
+                .select(qUserAuth.quit)
+                .where(qUserAuth.id.eq(id))
                 .fetchOne();
     }
 }

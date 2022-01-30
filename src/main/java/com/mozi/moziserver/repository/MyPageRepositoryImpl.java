@@ -30,19 +30,23 @@ public class MyPageRepositoryImpl extends QuerydslRepositorySupport implements M
     }
 
     @Override
-    public User getAllNickName(
+    public UserAuth getAllNickName(
             User user,
             String nickName
     ) {
-        return from(qUser)
+        return from(qUserAuth)
+                .innerJoin(qUser).on(qUserAuth.user.seq.eq(qUser.seq))
+                .where(qUserAuth.quit.eq("F"))
                 .where(qUser.nickName.eq(nickName))
                 .fetchOne();
     }
 
     @Override
-    public User getAllEmail(User user, String email) {
-        return from(qUser)
-                .where(qUser.email.eq(email))
+    public UserAuth getAllEmail(User user, String email) {
+        return from(qUserAuth)
+                .join(qUser).on(qUserAuth.user.seq.eq(qUser.seq))
+                .where(qUserAuth.quit.eq("F"))
+                .where(qUser.email.eq(email).or(qUserAuth.id.eq(email)))
                 .fetchOne();
     }
 

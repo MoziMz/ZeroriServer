@@ -105,8 +105,9 @@ public class UserService {
     public Authentication signIn(ReqUserSignIn req) {
 
         Authentication auth = null;
+        String checkQuitUser = userAuthRepository.checkQuitUser(req.getId());
 
-        if(req.getType() == UserAuthType.EMAIL) {
+        if((req.getType() == UserAuthType.EMAIL) &&(checkQuitUser.equals("F"))) {
             auth = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(req.getId(), req.getPw())
             );
@@ -115,7 +116,8 @@ public class UserService {
 
             auth = authenticationManager.authenticate(userAuthToken);
 
-            if ((auth == null || !auth.isAuthenticated()) && req.getType().isSocial()) {
+
+            if ((auth == null || !auth.isAuthenticated()) && checkQuitUser.equals("F") && req.getType().isSocial()) {
 //            if (reqUserSignIn.getType() == UserAuthType.KAKAO) kakaoSignUp(reqUserSignIn);
 //            else if(reqUserSignIn.getType() == UserAuthType.FACEBOOK) facebookSignUp(reqUserSignIn);
 //            else if(reqUserSignIn.getType() == UserAuthType.NAVER) naverSignUp(reqUserSignIn);
