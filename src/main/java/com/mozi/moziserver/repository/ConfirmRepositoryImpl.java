@@ -8,6 +8,8 @@ import com.mozi.moziserver.model.entity.QUser;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -16,6 +18,8 @@ public class ConfirmRepositoryImpl extends QuerydslRepositorySupport implements 
     private final QConfirmId qConfirmId=QConfirmId.confirmId;
     private final QUser qUser= QUser.user;
     private final QChallenge qChallenge=QChallenge.challenge;
+    @PersistenceContext
+    private EntityManager entityManager;
 
 
     public ConfirmRepositoryImpl() {super(Confirm.class);}
@@ -120,33 +124,14 @@ public class ConfirmRepositoryImpl extends QuerydslRepositorySupport implements 
         return confirm;
     }
 
-//    @Override
-//    public List<Confirm> findAllbyUserbyOrderDesc(Long userSeq){
-//        List<Confirm> list;
-//        return list;
-//    }
+    @Override
+    public void updateDeclarationState(Confirm confirm,Byte state){
+        update(qConfirm)
+                .set(qConfirm.confirmState,state)
+                .where(qConfirm.eq(confirm))
+                .execute();
 
-//    @Override
-//    Optional<Confirm> findByUserAndChallengeSeqAndDate(Long userSeq, Long seq, Date date){
-////        return from(qUserIsland)
-////                .innerJoin(qUserIsland.islandType, qIslandType).fetchJoin()
-////                .innerJoin(qUserIsland.islandReward, qIslandReward).fetchJoin()
-////                .fetch();
-//
-////        Member  findMember = queryFactory.selectFrom(member)
-////
-////                .where(member.username.eq("member1")
-////
-////                        .and(member.age.eq(10)))
-////
-////                .fetchOne();
-////
-////
-////        assertThat(findMember.getUsername()).isEqualTo("member1");
-//
-//        Optional<Confirm> confirm=from(qConfirm)
-//                .where(qConfirmId.eq(userSeq.))
-//
-//    }
+        entityManager.clear();
+    }
 
 }

@@ -11,7 +11,6 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity(name = "confirm")
-//@Table(indexes = @Index(name="idx_challenge_seq", columnList = "challenge_seq, date"))
 public class Confirm extends AbstractTimeEntity{
 
     @EmbeddedId
@@ -19,5 +18,7 @@ public class Confirm extends AbstractTimeEntity{
 
     @Column(name="img_url")
     private String imgUrl;
+
+    private Byte confirmState;
 
 }

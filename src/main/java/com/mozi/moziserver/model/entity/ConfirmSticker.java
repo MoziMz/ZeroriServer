@@ -18,20 +18,6 @@ public class ConfirmSticker extends AbstractTimeEntity{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long seq;
 
-//    private ConfirmId confirmId;
-
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "user_seq")
-//    private User user;
-//
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "challenge_seq")
-//    Challenge challenge;
-//
-//    @Column(name = "date")
-//    @Temporal(TemporalType.TIMESTAMP)
-//    private Date date;
-
     @Column(name = "user_seq")
     private Long userSeq;
 
@@ -45,9 +31,6 @@ public class ConfirmSticker extends AbstractTimeEntity{
     @ManyToOne
     @JoinColumn(name = "sticker_seq")
     StickerImg stickerImg;
-
-//    @Column(name = "sticker_seq")
-//    private Long stickerSeq;
 
     @Column(name = "location_x")
     private BigDecimal locationX;

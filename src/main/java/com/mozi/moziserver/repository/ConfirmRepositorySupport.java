@@ -14,4 +14,6 @@ public interface ConfirmRepositorySupport {
     List<Confirm> findByUserByOrderDesc(Long userSeq);
 
     Confirm findByUserAndChallengeSeqAndDate(Long userSeq,Long seq,Date date);
+
+    void updateDeclarationState(Confirm confirm,Byte state);
 }

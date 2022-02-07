@@ -1,16 +1,14 @@
 package com.mozi.moziserver.controller;
 
-import com.mozi.moziserver.model.entity.Confirm;
-import com.mozi.moziserver.model.entity.ConfirmSticker;
-import com.mozi.moziserver.model.entity.PostboxMessageAnimal;
-import com.mozi.moziserver.model.entity.PreparationItem;
+import com.mozi.moziserver.model.entity.*;
 import com.mozi.moziserver.model.mappedenum.DeclarationType;
-import com.mozi.moziserver.model.req.ReqChallengeList;
-import com.mozi.moziserver.model.req.ReqConfirm;
-import com.mozi.moziserver.model.req.ReqQuestionCreate;
+import com.mozi.moziserver.model.req.ReqConfirmCreate;
+import com.mozi.moziserver.model.req.ReqDeclarationCreate;
+import com.mozi.moziserver.model.req.ReqUserStickerList;
 import com.mozi.moziserver.model.res.*;
 import com.mozi.moziserver.security.SessionUser;
 import com.mozi.moziserver.service.ConfirmService;
+import com.mozi.moziserver.model.entity.UserStickerImg;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +21,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -39,9 +36,9 @@ public class ConfirmController {
     public ResponseEntity<Void> createConfirm(
             @ApiParam(hidden = true) @SessionUser Long userSeq,
             @PathVariable Long seq,
-            @RequestBody @Valid ReqConfirm reqConfirm
+            @RequestBody @Valid ReqConfirmCreate reqConfirmCreate
             ){
-        confirmService.createConfirm(userSeq, seq,reqConfirm);
+        confirmService.createConfirm(userSeq, seq,reqConfirmCreate);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
@@ -107,14 +104,35 @@ public class ConfirmController {
     }
 
     @ApiOperation("신고 생성")
-    @PostMapping("/v1/challenges/{seq}/confirms/{date}/declaration/{type}")
+    @PostMapping("/v1/confirms/declarations")
     public ResponseEntity<Void> createDeclaration(
             @ApiParam(hidden = true) @SessionUser Long userSeq,
-            @PathVariable("seq") Long seq,
-            @PathVariable("date") @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss") Date date,
-            @PathVariable("type") DeclarationType type
+            @RequestBody @Valid ReqDeclarationCreate reqDeclarationCreate
     ){
-        confirmService.createDeclaration(userSeq, seq,date,type);
+        confirmService.createDeclaration(userSeq,reqDeclarationCreate);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @ApiOperation("스티커 전체 조회")
+    @GetMapping("/v1/confirms/stickers")
+    public List<ResStickerList> getStickerList(
+            @ApiParam(hidden = true) @SessionUser Long userSeq
+    ) {
+        List<UserStickerImg> userStickerImgList=confirmService.getUserStickerImg(userSeq);
+
+        return userStickerImgList
+                .stream()
+                .map(ResStickerList::of)
+                .collect(Collectors.toList());
+    }
+
+    @ApiOperation("유저 스티커 생성")
+    @PostMapping("/v1/confirms/stickers")
+    public ResponseEntity<Void> createUserSticker(
+            @ApiParam(hidden = true) @SessionUser Long userSeq,
+            @RequestBody @Valid ReqUserStickerList userStickerList
+    ){
+        confirmService.createUserSticker(userSeq, userStickerList);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
