@@ -6,4 +6,6 @@ import java.util.List;
 
 public interface StickerImgRepositorySupport {
     List<StickerImg> findAll();
+
+    List<StickerImg> findAllBySeq(List<Long> stickerSeq);
 }

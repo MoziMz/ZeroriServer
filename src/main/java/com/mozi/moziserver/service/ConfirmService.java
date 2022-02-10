@@ -153,6 +153,11 @@ public class ConfirmService {
         return stickerImgRepository.findAll();
     }
 
+    @Transactional
+    public List<StickerImg> getStickerImgList(List<Long> stickerSeqList){
+        return stickerImgRepository.findAllBySeq(stickerSeqList);
+    }
+
     public List<UserStickerImg> getUserStickerImg(Long userSeq) {
 
             List<Long> userStickerSeqList=userStickerRepository.stickerSeqfindByUserSeq(userSeq);
@@ -178,4 +183,33 @@ public class ConfirmService {
 
     }
 
+    //UserSticker 생성
+    @Transactional
+    public void createUserSticker(Long userSeq, ReqUserStickerList userStickerList){
+
+        User user = userRepository.findById(userSeq)
+                .orElseThrow(ResponseError.NotFound.USER_NOT_EXISTS::getResponseException);
+
+        List<Long> stickerSeqList=userStickerList.getStickerSeqList();
+
+        List<UserSticker> newUserStickerList=new ArrayList<UserSticker>();
+
+
+        List<StickerImg> stickerImgList=getStickerImgList(stickerSeqList);
+        for(StickerImg stickerImg:stickerImgList){
+            UserStickerId userStickerId=new UserStickerId(user,stickerImg);
+                 UserSticker userSticker=UserSticker.builder()
+                        .id(userStickerId)
+                        .build();
+                newUserStickerList.add(userSticker);
+
+
+        }
+        try {
+            userStickerRepository.saveAll(newUserStickerList);
+        } catch (Exception e) {
+            throw ResponseError.BadRequest.ALREADY_CREATED.getResponseException(); // for duplicate exception
+        }
+
+    }
 }
