@@ -19,6 +19,7 @@ public class Confirm extends AbstractTimeEntity{
     @Column(name="img_url")
     private String imgUrl;
 
+    @Column(name="declaration_state")
     private Byte confirmState;
 
 }

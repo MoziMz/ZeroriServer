@@ -8,13 +8,14 @@ import org.springframework.format.annotation.DateTimeFormat;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
 
+
 @Getter
 public class ReqDeclarationCreate {
     @NotNull
     private Long seq;
 
     @NotNull
-    @JsonFormat(shape = JsonFormat.Shape.STRING,pattern="yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(shape = JsonFormat.Shape.STRING,pattern="yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private Date date;
 
     @NotNull

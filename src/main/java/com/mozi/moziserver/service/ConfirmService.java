@@ -112,9 +112,23 @@ public class ConfirmService {
         } // FIXME DuplicateKeyException
     }
 
+    @Transactional
+    public void updateConfirmState(Confirm confirm){
+
+        Byte state=1;
+
+        confirmRepository.updateDeclarationState(
+                confirm,state
+        );
+    }
+
     //신고 생성
     @Transactional
-    public void createDeclaration(Long userSeq, Long seq, Date date, DeclarationType type){
+    public void createDeclaration(Long userSeq, ReqDeclarationCreate reqDeclarationCreate){
+
+        Long seq=reqDeclarationCreate.getSeq();
+        Date date=reqDeclarationCreate.getDate();
+        DeclarationType type=reqDeclarationCreate.getType();
 
         User user = userRepository.findById(userSeq)
                 .orElseThrow(ResponseError.NotFound.USER_NOT_EXISTS::getResponseException);
@@ -122,13 +136,15 @@ public class ConfirmService {
         Challenge challenge=challengeRepository.findById(seq)
                 .orElseThrow(ResponseError.BadRequest.INVALID_SEQ::getResponseException);
 
-        ConfirmId id=new ConfirmId();
-        id.setUser(user);
-        id.setChallenge(challenge);
-        id.setDate(date);
+        ConfirmId confirmId=new ConfirmId(user,challenge,date);
+
+        Confirm confirm=confirmRepository.getById(confirmId);
+
+
+        updateConfirmState(confirm);
 
         Declaration declaration=Declaration.builder()
-                .id(id)
+                .id(confirmId)
                 .declarationType(type)
                 .build();
 
