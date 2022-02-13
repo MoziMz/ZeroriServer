@@ -9,7 +9,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Entity(name = "challenge_scrab")
+@Entity(name = "challenge_scrap")
 @IdClass(ChallengeUserSeq.class)
 public class ChallengeScrap extends AbstractTimeEntity{
 
