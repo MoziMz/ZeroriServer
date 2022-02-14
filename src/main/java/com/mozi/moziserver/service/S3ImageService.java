@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import com.amazonaws.services.s3.AmazonS3Client;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.io.File;
 
 
@@ -22,6 +24,7 @@ public class S3ImageService {
     private String bucketName;
 
     // 파일 업로드 + return URL
+    @Transactional
     public String fileUpload(String filePath, String folderName, Long seq) {
 
         File file = new File(filePath);

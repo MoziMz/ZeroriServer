@@ -51,7 +51,6 @@ public class MyPageRepositoryImpl extends QuerydslRepositorySupport implements M
     }
 
     @Override
-    @Transactional
     public void updateUserEmail(User user, String email) {
          update(qUser)
                 .set(qUser.email, email)
@@ -62,7 +61,6 @@ public class MyPageRepositoryImpl extends QuerydslRepositorySupport implements M
     }
 
     @Override
-    @Transactional
     public void updateUserNickName(User user, String nickName) {
         update(qUser)
                 .set(qUser.nickName, nickName)
@@ -73,7 +71,6 @@ public class MyPageRepositoryImpl extends QuerydslRepositorySupport implements M
     }
 
     @Override
-    @Transactional
     public void updateUserPassword(User user, String pw) {
 
         update(qUserAuth)

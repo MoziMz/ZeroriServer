@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -49,6 +50,7 @@ public class MyPageService {
     }
 
     // 이메일 인증
+    @Transactional
     public void authUserEmail(Long userSeq, String email) {
         User user = userRepository.findById(userSeq)
                 .orElseThrow(ResponseError.NotFound.USER_NOT_EXISTS::getResponseException);
@@ -77,6 +79,7 @@ public class MyPageService {
     }
 
     // 닉네임, 비밀번호 수정
+    @Transactional
     public void updateUserNickName(Long userSeq, String nickName) {
         User user = userRepository.findById(userSeq)
                 .orElseThrow(ResponseError.NotFound.USER_NOT_EXISTS::getResponseException);
@@ -87,6 +90,7 @@ public class MyPageService {
         );
     }
 
+    @Transactional
     public void updateUserPassword(Long userSeq, String password) {
         User user = userRepository.findById(userSeq)
                 .orElseThrow(ResponseError.NotFound.USER_NOT_EXISTS::getResponseException);
