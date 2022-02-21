@@ -116,6 +116,7 @@ public class UserService {
 
             auth = authenticationManager.authenticate(userAuthToken);
 
+            // TODO checkQuitUser 바꿔야한다.
 
             if ((auth == null || !auth.isAuthenticated()) && checkQuitUser.equals("F") && req.getType().isSocial()) {
 //            if (reqUserSignIn.getType() == UserAuthType.KAKAO) kakaoSignUp(reqUserSignIn);

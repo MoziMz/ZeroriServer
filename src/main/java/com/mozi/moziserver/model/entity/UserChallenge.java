@@ -1,16 +1,14 @@
 package com.mozi.moziserver.model.entity;
 
 import com.mozi.moziserver.model.PlanDate;
-import com.mozi.moziserver.model.mappedenum.ChallengeTagType;
 import com.mozi.moziserver.model.mappedenum.PlanDateListConverter;
+import com.mozi.moziserver.model.mappedenum.PlanDateResultType;
 import com.mozi.moziserver.model.mappedenum.UserChallengeStateType;
 import lombok.*;
-import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,6 +17,7 @@ import java.util.Optional;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@DynamicUpdate
 @Entity(name = "user_challenge")
 public class UserChallenge extends AbstractTimeEntity {
     @Id
@@ -31,7 +30,7 @@ public class UserChallenge extends AbstractTimeEntity {
     private LocalDate startDate;
 
     @Convert(converter = PlanDateListConverter.class)
-    private List<PlanDate> PlanDateList;
+    private List<PlanDate> planDateList;
 
     private Integer totalConfirmCnt;
 
@@ -47,4 +46,5 @@ public class UserChallenge extends AbstractTimeEntity {
     public void prePersist() {
         this.totalConfirmCnt = Optional.ofNullable(this.totalConfirmCnt).orElse(0);
     }
+
 }

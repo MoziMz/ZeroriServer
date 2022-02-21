@@ -4,11 +4,13 @@ import com.mozi.moziserver.model.entity.Challenge;
 import com.mozi.moziserver.model.entity.QChallenge;
 import com.mozi.moziserver.model.entity.QUserChallenge;
 import com.mozi.moziserver.model.entity.UserChallenge;
+import com.mozi.moziserver.model.mappedenum.PlanDateResultType;
 import com.mozi.moziserver.model.mappedenum.UserChallengeStateType;
 import com.querydsl.core.types.Predicate;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 
 import java.time.LocalDate;
+import java.time.Period;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -105,8 +107,49 @@ public class UserChallengeRepositoryImpl extends QuerydslRepositorySupport imple
                 .stream()
                 .distinct()
                 .collect(Collectors.toList());
+    }
 
+    @Override
+    public List<UserChallenge> findAllByPlanResult(
+            LocalDate date,
+            PlanDateResultType planResult
+    ) {
+        // startDate > date-7 &&startDate <= date
+        final Predicate[] predicates = new Predicate[]{
+                qUserChallenge.state.eq(UserChallengeStateType.DOING),
+                qUserChallenge.startDate.gt(date.minusDays(7)),
+                qUserChallenge.startDate.loe(date)
+        };
 
+        return from(qUserChallenge)
+                .where(predicates)
+                .fetch()
+                .stream()
+                .filter( item -> item.getPlanDateList().get(Period.between(item.getStartDate(), date).getDays()).getResult() == PlanDateResultType.PLAN)
+                .collect(Collectors.toList());
+
+        // TODO
+        // filter 에 걸려서 나오지 않는데도 JSON 내용이 바뀐것으로 인식되고 있음
+        // update 실행됨
+    }
+
+    @Override
+    public Long updateState(
+            LocalDate date,
+            UserChallengeStateType beforeState,
+            UserChallengeStateType afterState
+    ) {
+        final Predicate[] predicates = new Predicate[]{
+                qUserChallenge.state.eq(beforeState),
+                qUserChallenge.startDate.eq(date)
+        };
+
+        long resultCount = update(qUserChallenge)
+                .set(qUserChallenge.state, afterState)
+                .where(predicates)
+                .execute();
+
+        return resultCount;
     }
 
     private <T> Predicate predicateOptional(final Function<T, Predicate> whereFunc, final T value) {

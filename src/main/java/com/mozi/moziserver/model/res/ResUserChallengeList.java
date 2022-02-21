@@ -1,12 +1,9 @@
 package com.mozi.moziserver.model.res;
 
-import com.mozi.moziserver.model.entity.ChallengeTag;
 import com.mozi.moziserver.model.entity.UserChallenge;
 import com.mozi.moziserver.model.mappedenum.ChallengeTagType;
 import com.mozi.moziserver.model.mappedenum.UserChallengeStateType;
 import lombok.Getter;
-import lombok.Setter;
-import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDate;
 import java.util.Collection;

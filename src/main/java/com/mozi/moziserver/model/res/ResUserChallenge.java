@@ -1,6 +1,5 @@
 package com.mozi.moziserver.model.res;
 
-import com.mozi.moziserver.model.PlanDate;
 import com.mozi.moziserver.model.entity.UserChallenge;
 import com.mozi.moziserver.model.mappedenum.UserChallengeStateType;
 import lombok.Getter;
