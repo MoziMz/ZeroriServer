@@ -18,15 +18,13 @@ public class ConfirmSticker extends AbstractTimeEntity{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long seq;
 
-    @Column(name = "user_seq")
-    private Long userSeq;
+    @ManyToOne
+    @JoinColumn(name="confirm_seq")
+    private Confirm confirm;
 
-    @Column(name = "challenge_seq")
-    private Long challengeSeq;
-
-    @Column(name = "date")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date date;
+    @ManyToOne
+    @JoinColumn(name="user_seq")
+    User user;
 
     @ManyToOne
     @JoinColumn(name = "sticker_seq")

@@ -14,10 +14,10 @@ public class ConfirmStickerRepositoryImpl extends QuerydslRepositorySupport impl
     public ConfirmStickerRepositoryImpl() {super(ConfirmSticker.class);}
 
     @Override
-    public List<ConfirmSticker> findByUserAndSeqAndDate(Long userSeq, Long seq, Date date){
+    public List<ConfirmSticker> findAllBySeq(Long seq){
 
         List<ConfirmSticker> confirmStickerList=from(qConfirmSticker)
-                .where(qConfirmSticker.userSeq.in(userSeq),qConfirmSticker.challengeSeq.in(seq),qConfirmSticker.date.in(date))
+                .where(qConfirmSticker.confirm.seq.in(seq))
                 .fetch()
                 .stream()
                 .collect(Collectors.toList());

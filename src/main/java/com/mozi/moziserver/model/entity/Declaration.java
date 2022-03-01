@@ -14,8 +14,13 @@ import javax.persistence.*;
 @Entity(name = "declaration")
 public class Declaration extends AbstractTimeEntity{
 
-    @EmbeddedId
-    private ConfirmId id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long seq;
+
+    @ManyToOne
+    @JoinColumn(name="confirm_seq")
+    private Confirm confirm;
 
     @Enumerated(EnumType.STRING)
     @Column(name="type")

@@ -7,13 +7,13 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.time.LocalDate;
 import java.util.Date;
 
 @Getter
 public class ReqConfirmCreate {
     @NotNull
-    @JsonFormat(shape = JsonFormat.Shape.STRING,pattern="yyyy-MM-dd HH:mm:ss")
-    private Date date;
+    private LocalDate date;
 
     @NotBlank
     private String imgUrl;

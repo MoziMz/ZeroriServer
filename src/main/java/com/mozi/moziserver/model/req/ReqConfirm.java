@@ -2,18 +2,23 @@ package com.mozi.moziserver.model.req;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
+import lombok.Setter;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.time.LocalDate;
 import java.util.Date;
 
 @Getter
+@Setter
 public class ReqConfirm {
 
-    @NotNull
-    private Long confirmSeq;
+    private Long userSeq;
 
     @NotNull
-    @JsonFormat(shape = JsonFormat.Shape.STRING,pattern="yyyy-MM-dd HH:mm:ss")
-    private Date date;
+    private Long challengeSeq;
+
+    @NotNull
+    private LocalDate date;
 }

@@ -23,4 +23,8 @@ public class User extends AbstractTimeEntity {
     @JoinColumn(name="user_seq")
     private List<Confirm> confirmList;
 
+    @OneToMany
+    @JoinColumn(name="user_seq")
+    private List<ConfirmSticker> confirmStickerList;
+
 }

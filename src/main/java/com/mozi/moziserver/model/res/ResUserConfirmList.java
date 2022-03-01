@@ -3,26 +3,29 @@ package com.mozi.moziserver.model.res;
 import com.mozi.moziserver.model.entity.Confirm;
 import lombok.Getter;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 @Getter
 public class ResUserConfirmList {
 
+    private Long seq;
+
     private String challengeName;
 
     private Integer totalCnt;
 
-    private Date date;
+    private LocalDate date;
 
     private String imgUrl;
 
 
     private ResUserConfirmList(Confirm confirm) {
 
-        this.challengeName=confirm.getId().getChallenge().getName();
-        this.totalCnt=CalTotalCnt(confirm.getId().getUser().getConfirmList(),confirm.getId().getChallenge().getSeq());
-        this.date=confirm.getId().getDate();
+        this.seq=confirm.getSeq();
+        this.challengeName=confirm.getChallenge().getName();
+        this.totalCnt=CalTotalCnt(confirm.getUser().getConfirmList(),confirm.getChallenge().getSeq());
+        this.date=confirm.getDate();
         this.imgUrl=confirm.getImgUrl();
 
     }
@@ -30,7 +33,7 @@ public class ResUserConfirmList {
     Integer CalTotalCnt(List<Confirm> confirmList, Long seq){
         Integer cnt=0;
         for(Confirm confirm:confirmList){
-            if(confirm.getId().getChallenge().getSeq()==seq)    cnt++;
+            if(confirm.getChallenge().getSeq()==seq)    cnt++;
         }
         return cnt;
     }

@@ -127,7 +127,8 @@ public interface ResponseError {
     enum NotFound {
         USER_NOT_EXISTS("user not exists"),
         CHALLENGE_NOT_EXISTS("challenge not exists"),
-        USER_CHALLENGE_NOT_EXISTS("user-challenge not exists");
+        USER_CHALLENGE_NOT_EXISTS("user-challenge not exists"),
+        USER_STICKER_NOT_EXISTS("user-sticker not exists");
 
         private final String message;
 

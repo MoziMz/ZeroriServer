@@ -6,6 +6,7 @@ import lombok.Getter;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.NotNull;
+import java.time.LocalDate;
 import java.util.Date;
 
 
@@ -15,8 +16,7 @@ public class ReqDeclarationCreate {
     private Long seq;
 
     @NotNull
-    @JsonFormat(shape = JsonFormat.Shape.STRING,pattern="yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
-    private Date date;
+    private LocalDate date;
 
     @NotNull
     private DeclarationType type;

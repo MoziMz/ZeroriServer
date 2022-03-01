@@ -7,6 +7,6 @@ import java.util.Date;
 import java.util.List;
 
 public interface ConfirmStickerRepositorySupport {
-    List<ConfirmSticker> findByUserAndSeqAndDate(Long userSeq, Long seq, Date date);
+    List<ConfirmSticker> findAllBySeq(Long seq);
 
 }
