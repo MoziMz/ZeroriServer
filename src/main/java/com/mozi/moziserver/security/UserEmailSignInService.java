@@ -1,6 +1,5 @@
-package com.mozi.moziserver.service;
+package com.mozi.moziserver.security;
 
-import com.mozi.moziserver.model.UserAccount;
 import com.mozi.moziserver.model.entity.UserAuth;
 import com.mozi.moziserver.model.mappedenum.UserAuthType;
 import com.mozi.moziserver.repository.UserAuthRepository;
@@ -17,7 +16,7 @@ import static com.mozi.moziserver.common.Constant.EMAIL_DOMAIN_GROUPS;
 
 @Service
 @RequiredArgsConstructor
-public class UserSignService implements UserDetailsService {
+public class UserEmailSignInService implements UserDetailsService {
     private final UserAuthRepository userAuthRepository;
 
 
@@ -44,7 +43,7 @@ public class UserSignService implements UserDetailsService {
         for(String domain : currentDomainGroup) {
             Optional<UserAuth> userAuthOptional = userAuthRepository.findUserAuthByTypeAndId(UserAuthType.EMAIL, emailIdWithAt + domain);
             if(userAuthOptional.isPresent()) {
-                return new UserAccount(userAuthOptional.get());
+                return new ResUserSignIn(userAuthOptional.get());
             }
         }
 

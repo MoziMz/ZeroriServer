@@ -1,5 +1,6 @@
 package com.mozi.moziserver.service;
 
+import com.mozi.moziserver.common.UserState;
 import com.mozi.moziserver.httpException.ResponseError;
 import com.mozi.moziserver.model.entity.User;
 import com.mozi.moziserver.model.entity.UserAuth;
@@ -9,8 +10,9 @@ import com.mozi.moziserver.model.req.ReqUserSignIn;
 import com.mozi.moziserver.model.req.ReqUserSignUp;
 import com.mozi.moziserver.repository.UserAuthRepository;
 import com.mozi.moziserver.repository.UserRepository;
-import com.mozi.moziserver.security.UserAuthToken;
-import com.mozi.moziserver.security.UserAuthenticationProvider;
+import com.mozi.moziserver.security.ReqUserSocialSignIn;
+import com.mozi.moziserver.security.ResUserSignIn;
+import com.mozi.moziserver.security.UserSocialAuthenticationProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -34,7 +36,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserAuthRepository userAuthRepository;
     private final AuthenticationManager authenticationManager;
-    private final UserAuthenticationProvider userAuthenticationProvider;
+    private final UserSocialAuthenticationProvider userSocialAuthenticationProvider;
     private final PasswordEncoder passwordEncoder;
     private final EmailAuthService emailAuthService;
 //    private final KakaoClient kakaoClient;
@@ -105,31 +107,41 @@ public class UserService {
     public Authentication signIn(ReqUserSignIn req) {
 
         Authentication auth = null;
-        String checkQuitUser = userAuthRepository.checkQuitUser(req.getId());
 
-        if((req.getType() == UserAuthType.EMAIL) &&(checkQuitUser.equals("F"))) {
+        if (req.getType() == UserAuthType.EMAIL) {
             auth = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(req.getId(), req.getPw())
             );
         } else {
-            UserAuthToken userAuthToken = new UserAuthToken(req);
+            ReqUserSocialSignIn reqUserSocialSignIn = new ReqUserSocialSignIn(req);
 
-            auth = authenticationManager.authenticate(userAuthToken);
+            auth = authenticationManager.authenticate(reqUserSocialSignIn);
 
             // TODO checkQuitUser 바꿔야한다.
 
-            if ((auth == null || !auth.isAuthenticated()) && checkQuitUser.equals("F") && req.getType().isSocial()) {
-//            if (reqUserSignIn.getType() == UserAuthType.KAKAO) kakaoSignUp(reqUserSignIn);
+            if ((auth == null || !auth.isAuthenticated()) && req.getType().isSocial()) {
+                if (req.getType() == UserAuthType.KAKAO) kakaoSignUp(req);
+                else if(req.getType() == UserAuthType.APPLE) appleSignUp(req);
+
 //            else if(reqUserSignIn.getType() == UserAuthType.FACEBOOK) facebookSignUp(reqUserSignIn);
 //            else if(reqUserSignIn.getType() == UserAuthType.NAVER) naverSignUp(reqUserSignIn);
 //            else if(reqUserSignIn.getType() == UserAuthType.GOOGLE) googleSignUp(reqUserSignIn);
 
-                auth = authenticationManager.authenticate(userAuthToken);
+                auth = authenticationManager.authenticate(reqUserSocialSignIn);
             }
         }
 
         if (auth == null || !auth.isAuthenticated()) {
             throw ResponseError.BadRequest.BAD_REQUEST.getResponseException();
+        }
+
+        if (auth instanceof ResUserSignIn) {
+            User user = userRepository.findById(((ResUserSignIn)auth).getUserSeq())
+                    .orElseThrow(ResponseError.NotFound.USER_NOT_EXISTS::getResponseException);
+
+            if (user.getState() == UserState.DELETED) {
+                throw ResponseError.BadRequest.USER_IS_DELETED.getResponseException();
+            }
         }
 
         return auth;
@@ -138,7 +150,7 @@ public class UserService {
     private void kakaoSignUp(ReqUserSignIn reqUserSignIn) {
         final String accessToken = reqUserSignIn.getId();
 
-        final String kakaoSocialId = userAuthenticationProvider.getKakaoSocialId(accessToken);
+        final String kakaoSocialId = userSocialAuthenticationProvider.getKakaoSocialId(accessToken);
 
         if (kakaoSocialId == null)
             return;
@@ -152,6 +164,28 @@ public class UserService {
         UserAuth userAuth = new UserAuth();
         userAuth.setType(UserAuthType.KAKAO);
         userAuth.setId(kakaoSocialId);
+        userAuth.setUser(user);
+
+        userAuthRepository.save(userAuth);
+    }
+
+    private void appleSignUp(ReqUserSignIn reqUserSignIn) {
+        final String identityToken = reqUserSignIn.getId();
+
+        final String appleSocialId = userSocialAuthenticationProvider.getAppleSocialId(identityToken);
+
+        if (appleSocialId == null)
+            return;
+
+        User user = new User();
+        userRepository.save(user);
+
+        if (user.getSeq() == null)
+            return;
+
+        UserAuth userAuth = new UserAuth();
+        userAuth.setType(UserAuthType.APPLE);
+        userAuth.setId(appleSocialId);
         userAuth.setUser(user);
 
         userAuthRepository.save(userAuth);

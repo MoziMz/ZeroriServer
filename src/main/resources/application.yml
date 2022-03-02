@@ -15,12 +15,17 @@ spring:
           auth: true
           ssl:
             enable: true
+#  jpa:
+#    hibernate:
+#      ddl-auto: validate
 social:
   kakao:
     url: https://kapi.kakao.com
     appId: ${KAKAO_APPID}
     adminKey: ${KAKAO_ADMINKEY}
-  naver:
+  apple:
+    url: https://appleid.apple.com
+    appId: ${APPLE_APPID}
 
 cloud:
   aws:

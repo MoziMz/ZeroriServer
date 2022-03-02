@@ -32,8 +32,6 @@ public class UserAuth extends AbstractTimeEntity {
 
     private String pw;
 
-    private String quit;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_seq")
     private com.mozi.moziserver.model.entity.User user;

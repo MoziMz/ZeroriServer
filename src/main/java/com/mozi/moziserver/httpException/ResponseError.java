@@ -17,11 +17,13 @@ public interface ResponseError {
         ALREADY_CREATED( "already created"),
         ALREADY_DELETED("already deleted"),
         ALREADY_EXISTS_USER_CHALLENGE_IN_PROGRESS("already exists user challenge in progress"),
-        PLAN_DATE_TYPE_NOT_INVALID("plan date type cannot be in success or fail, when creating a user-challenge"),
+        PLAN_DATE_TYPE_NOT_INVALID("plan date type cannot be in complete or fail, when creating a user-challenge"),
         ALREADY_ENDED_USER_CHALLENGE("already ended user-challenge cannot be modified"),
         PAST_DATES_UPDATE_NOT_INVALID("past dates update not invalid"),
         PAST_START_DATE("past start date not invalid"),
-        INVALID_TURN("invalid turn");
+        INVALID_TURN("invalid turn"),
+        INVALID_DATE("invalid date"),
+        USER_IS_DELETED("user is deleted");
 
         // INVALID 는 한가지로 명확하지 않을때 쓴다.
 
@@ -105,6 +107,7 @@ public interface ResponseError {
     }
 
     //403: Be authenticated but has not authorization
+    // 로그인은 했지만 권한이 없음
     @RequiredArgsConstructor
     enum Forbidden {
         NO_AUTHORITY("no authority"),
@@ -127,8 +130,7 @@ public interface ResponseError {
     enum NotFound {
         USER_NOT_EXISTS("user not exists"),
         CHALLENGE_NOT_EXISTS("challenge not exists"),
-        USER_CHALLENGE_NOT_EXISTS("user-challenge not exists"),
-        USER_STICKER_NOT_EXISTS("user-sticker not exists");
+        USER_CHALLENGE_NOT_EXISTS("user-challenge not exists");
 
         private final String message;
 

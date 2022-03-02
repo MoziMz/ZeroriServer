@@ -6,7 +6,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum UserAuthType {
     EMAIL(1),
-    KAKAO(2);
+    KAKAO(2),
+    APPLE(3);
 //    FACEBOOK(3),
 //    GOOGLE(4),
 //    NAVER(5),

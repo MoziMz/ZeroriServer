@@ -1,5 +1,6 @@
 package com.mozi.moziserver.model.entity;
 
+import com.mozi.moziserver.common.UserState;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -22,6 +23,8 @@ public class User extends AbstractTimeEntity {
     @OneToMany
     @JoinColumn(name="user_seq")
     private List<Confirm> confirmList;
+    @Enumerated(EnumType.STRING)
+    private UserState state = UserState.ACTIVE;
 
     @OneToMany
     @JoinColumn(name="user_seq")

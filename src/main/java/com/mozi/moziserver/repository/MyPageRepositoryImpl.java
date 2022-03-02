@@ -1,5 +1,6 @@
 package com.mozi.moziserver.repository;
 
+import com.mozi.moziserver.common.UserState;
 import com.mozi.moziserver.model.entity.*;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
@@ -36,8 +37,8 @@ public class MyPageRepositoryImpl extends QuerydslRepositorySupport implements M
     ) {
         return from(qUserAuth)
                 .innerJoin(qUser).on(qUserAuth.user.seq.eq(qUser.seq))
-                .where(qUserAuth.quit.eq("F"))
-                .where(qUser.nickName.eq(nickName))
+                .where(qUser.state.eq(UserState.ACTIVE)
+                        .and(qUser.nickName.eq(nickName)))
                 .fetchOne();
     }
 
@@ -45,7 +46,7 @@ public class MyPageRepositoryImpl extends QuerydslRepositorySupport implements M
     public UserAuth getAllEmail(User user, String email) {
         return from(qUserAuth)
                 .join(qUser).on(qUserAuth.user.seq.eq(qUser.seq))
-                .where(qUserAuth.quit.eq("F"))
+                .where(qUser.state.eq(UserState.ACTIVE))
                 .where(qUser.email.eq(email).or(qUserAuth.id.eq(email)))
                 .fetchOne();
     }

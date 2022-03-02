@@ -8,13 +8,13 @@ import org.springframework.security.core.GrantedAuthority;
 import java.util.Collection;
 import java.util.Collections;
 
-public class UserAuthToken implements Authentication {
+public class ReqUserSocialSignIn implements Authentication {
 
     private final UserAuthType type;
     private final String id;
     private final String pw;
 
-    public UserAuthToken(ReqUserSignIn reqUserSignIn) {
+    public ReqUserSocialSignIn(ReqUserSignIn reqUserSignIn) {
         type = reqUserSignIn.getType();
         id = reqUserSignIn.getId();
         pw = reqUserSignIn.getPw();

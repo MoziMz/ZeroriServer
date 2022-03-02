@@ -4,9 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mozi.moziserver.common.Constant;
 import com.mozi.moziserver.log.ApiLogFilter;
 import com.mozi.moziserver.repository.RememberMeTokenRepository;
-import com.mozi.moziserver.repository.UserRepository;
 import com.mozi.moziserver.security.*;
-import com.mozi.moziserver.service.UserSignService;
+import com.mozi.moziserver.security.UserEmailSignInService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,12 +25,12 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
-    UserAuthenticationProvider userAuthenticationProvider;
+    UserSocialAuthenticationProvider userSocialAuthenticationProvider;
 
     @Autowired
     private RememberMeTokenRepository rememberMeTokenRepository;
     @Autowired
-    private UserSignService userSignService;
+    private UserEmailSignInService userEmailSignInService;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -43,9 +42,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth
-                .userDetailsService(userSignService)
+                .userDetailsService(userEmailSignInService)
                 .and()
-                .authenticationProvider(userAuthenticationProvider);
+                .authenticationProvider(userSocialAuthenticationProvider);
     }
 
     @Override

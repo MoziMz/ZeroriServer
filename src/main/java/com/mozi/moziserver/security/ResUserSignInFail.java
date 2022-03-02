@@ -1,29 +1,21 @@
 package com.mozi.moziserver.security;
 
-import com.mozi.moziserver.common.Constant;
-import com.mozi.moziserver.model.entity.User;
+import lombok.Getter;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 
 import java.util.Collection;
 import java.util.Collections;
 
-public class UserAuthentication implements Authentication {
+@Getter
+public class ResUserSignInFail implements Authentication {
 
-    User user;
-
-    public UserAuthentication() {
-    }
-
-    public UserAuthentication(User user) {
-        this.user = user;
+    public ResUserSignInFail() {
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return user.getSeq() <= 0L
-                ? Collections.emptyList()
-                : Constant.USER_AUTHORITIES;
+        return Collections.emptyList();
     }
 
     @Override
@@ -38,12 +30,12 @@ public class UserAuthentication implements Authentication {
 
     @Override
     public Object getPrincipal() {
-        return user;
+        return null;
     }
 
     @Override
     public boolean isAuthenticated() {
-        return user != null;
+        return false;
     }
 
     @Override

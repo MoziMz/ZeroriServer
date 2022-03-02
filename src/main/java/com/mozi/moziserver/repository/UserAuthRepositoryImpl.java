@@ -1,5 +1,6 @@
 package com.mozi.moziserver.repository;
 
+import com.mozi.moziserver.common.UserState;
 import com.mozi.moziserver.model.entity.QUser;
 import com.mozi.moziserver.model.entity.QUserAuth;
 import com.mozi.moziserver.model.entity.UserAuth;
@@ -20,15 +21,8 @@ public class UserAuthRepositoryImpl extends QuerydslRepositorySupport implements
 
         return from(qUserAuth)
                 .innerJoin(qUser).on(qUserAuth.user.seq.eq(qUser.seq))
-                .where(qUser.nickName.eq(nickName), qUserAuth.quit.eq("F"))
-                .fetchOne();
-    }
-
-    @Override
-    public String checkQuitUser(String id) {
-        return from(qUserAuth)
-                .select(qUserAuth.quit)
-                .where(qUserAuth.id.eq(id))
+                .where(qUser.nickName.eq(nickName)
+                        .and(qUser.state.eq(UserState.ACTIVE)))
                 .fetchOne();
     }
 }
