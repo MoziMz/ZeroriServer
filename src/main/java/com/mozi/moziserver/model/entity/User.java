@@ -20,14 +20,7 @@ public class User extends AbstractTimeEntity {
 
     private String email;
 
-    @OneToMany
-    @JoinColumn(name="user_seq")
-    private List<Confirm> confirmList;
     @Enumerated(EnumType.STRING)
     private UserState state = UserState.ACTIVE;
-
-    @OneToMany
-    @JoinColumn(name="user_seq")
-    private List<ConfirmSticker> confirmStickerList;
 
 }
