@@ -17,4 +17,6 @@ public interface ConfirmRepositorySupport {
 
     List<Confirm> findAllList(Long prevLastConfirmSeq, Integer pageSize);
 
+    Long findSeq();
+
 }

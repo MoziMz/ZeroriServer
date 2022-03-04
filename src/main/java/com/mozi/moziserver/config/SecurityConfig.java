@@ -29,6 +29,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private RememberMeTokenRepository rememberMeTokenRepository;
+
     @Autowired
     private UserEmailSignInService userEmailSignInService;
 

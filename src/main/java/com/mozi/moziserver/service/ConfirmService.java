@@ -31,6 +31,8 @@ public class ConfirmService {
 
     private final StickerImgRepository stickerImgRepository;
 
+    private final S3ImageService s3ImageService;
+
     //인증 생성
     @Transactional
     public void createConfirm(Long userSeq, Long seq, ReqConfirmCreate reqConfirmCreate){
@@ -44,11 +46,16 @@ public class ConfirmService {
         //신고안됨
         Byte state=0;
 
+        Long filename_seq = confirmRepository.findSeq();
+
+        String imgUrl = s3ImageService.fileUpload(reqConfirmCreate.getImgUrl(), "confirm", filename_seq);
+
+
         Confirm confirm=Confirm.builder()
                 .user(user)
                 .challenge(challenge)
                 .date(reqConfirmCreate.getDate())
-                .imgUrl(reqConfirmCreate.getImgUrl())
+                .imgUrl(imgUrl)
                 .confirmState(state)
                 .build();
 

@@ -138,6 +138,14 @@ public class ConfirmRepositoryImpl extends QuerydslRepositorySupport implements 
         entityManager.clear();
     }
 
+    @Override
+    public Long findSeq() {
+        return from(qConfirm)
+                .select(qConfirm.seq)
+                .orderBy(qConfirm.seq.desc())
+                .fetchFirst();
+    }
+
 
     private <T> Predicate predicateOptional(final Function<T, Predicate> whereFunc, final T value) {
         return value != null ? whereFunc.apply(value) : null;
