@@ -12,11 +12,6 @@ import java.util.Date;
 
 @Getter
 public class ReqDeclarationCreate {
-    @NotNull
-    private Long seq;
-
-    @NotNull
-    private LocalDate date;
 
     @NotNull
     private DeclarationType type;

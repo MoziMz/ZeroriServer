@@ -23,7 +23,8 @@ public interface ResponseError {
         PAST_START_DATE("past start date not invalid"),
         INVALID_TURN("invalid turn"),
         INVALID_DATE("invalid date"),
-        USER_IS_DELETED("user is deleted");
+        USER_IS_DELETED("user is deleted"),
+        INVALID_USER("invalid user");
 
         // INVALID 는 한가지로 명확하지 않을때 쓴다.
 
@@ -130,7 +131,8 @@ public interface ResponseError {
     enum NotFound {
         USER_NOT_EXISTS("user not exists"),
         CHALLENGE_NOT_EXISTS("challenge not exists"),
-        USER_CHALLENGE_NOT_EXISTS("user-challenge not exists");
+        USER_CHALLENGE_NOT_EXISTS("user-challenge not exists"),
+        USER_STICKER_NOT_EXISTS("user sticker not exists");
 
         private final String message;
 

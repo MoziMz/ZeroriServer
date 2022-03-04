@@ -18,15 +18,15 @@ public class ConfirmSticker extends AbstractTimeEntity{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long seq;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="confirm_seq")
     private Confirm confirm;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="user_seq")
     User user;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sticker_seq")
     StickerImg stickerImg;
 

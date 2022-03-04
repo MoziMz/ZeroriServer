@@ -5,7 +5,6 @@ import com.mozi.moziserver.model.entity.QChallenge;
 import com.mozi.moziserver.model.entity.QConfirm;
 import com.mozi.moziserver.model.entity.QUser;
 import com.querydsl.core.types.Predicate;
-import com.querydsl.core.types.dsl.BooleanExpression;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 
 import javax.persistence.EntityManager;
@@ -25,32 +24,6 @@ public class ConfirmRepositoryImpl extends QuerydslRepositorySupport implements 
 
 
     public ConfirmRepositoryImpl() {super(Confirm.class);}
-
-    @Override
-    public List<Confirm> findAllByOrderDesc() {
-
-        List<User> userList=from(qUser)
-                .fetch()
-                .stream()
-                .collect(Collectors.toList());
-
-        List<Challenge> challengeList=from(qChallenge)
-                .fetch()
-                .stream()
-                .collect(Collectors.toList());
-
-        List<Confirm> confirmList = from(qConfirm)
-                .innerJoin(qConfirm.challenge,qChallenge)
-                .innerJoin(qConfirm.user,qUser)
-                .where(qConfirm.user.in(userList),qConfirm.challenge.in(challengeList))
-                .orderBy(qConfirm.createdAt.desc())
-                .fetch()
-                .stream()
-                .collect(Collectors.toList());
-
-        return confirmList;
-
-    }
 
     @Override
     public List<Confirm> findAllList(Long prevLastConfirmSeq,Integer pageSize){
@@ -146,15 +119,10 @@ public class ConfirmRepositoryImpl extends QuerydslRepositorySupport implements 
     }
 
     @Override
-    public Confirm findByUserAndSeq(Long userSeq,Long seq){
-        List<User> user=from(qUser)
-                .where(qUser.seq.eq(userSeq))
-                .fetch()
-                .stream()
-                .collect(Collectors.toList());
+    public Confirm findBySeq(Long seq){
 
         Confirm confirm = from(qConfirm)
-                .where(qConfirm.user.in(user),qConfirm.seq.in(seq))
+                .where(qConfirm.seq.in(seq))
                 .fetchOne();
 
         return confirm;

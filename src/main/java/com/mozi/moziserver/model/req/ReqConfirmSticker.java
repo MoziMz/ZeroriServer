@@ -12,9 +12,6 @@ public class ReqConfirmSticker {
     @NotNull
     private Long stickerSeq;
 
-//    @NotNull
-    private Long userSeq;
-
     @NotNull
     private BigDecimal locationX;
 

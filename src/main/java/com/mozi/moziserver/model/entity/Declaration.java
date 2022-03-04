@@ -18,7 +18,7 @@ public class Declaration extends AbstractTimeEntity{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long seq;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="confirm_seq")
     private Confirm confirm;
 

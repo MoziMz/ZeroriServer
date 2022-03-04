@@ -18,11 +18,11 @@ public class Confirm extends AbstractTimeEntity{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long seq;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="user_seq")
     User user;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "challenge_seq")
     Challenge challenge;
 

@@ -25,4 +25,16 @@ public class ConfirmStickerRepositoryImpl extends QuerydslRepositorySupport impl
         return confirmStickerList;
 
     }
+
+    @Override
+    public Boolean findByUserAndConfirmSeq(Long userSeq, Long confirmSeq){
+        Boolean ret=true;
+        ConfirmSticker confirmSticker=from(qConfirmSticker)
+                .where(qConfirmSticker.confirm.seq.in(confirmSeq),
+                        qConfirmSticker.user.seq.in(userSeq))
+                .fetchOne();
+        if(confirmSticker==null)    ret=false;
+
+        return ret;
+    }
 }

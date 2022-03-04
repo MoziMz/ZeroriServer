@@ -13,11 +13,11 @@ import java.io.Serializable;
 @Builder
 @EqualsAndHashCode(of = {"user"})
 public class UserStickerId implements Serializable {
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="user_seq")
     User user;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sticker_seq")
     StickerImg stickerImg;
 }
