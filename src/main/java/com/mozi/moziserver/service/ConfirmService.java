@@ -3,6 +3,7 @@ package com.mozi.moziserver.service;
 import com.mozi.moziserver.httpException.ResponseError;
 import com.mozi.moziserver.model.entity.*;
 import com.mozi.moziserver.model.mappedenum.DeclarationType;
+import com.mozi.moziserver.model.mappedenum.UserChallengeResultType;
 import com.mozi.moziserver.model.req.*;
 import com.mozi.moziserver.repository.*;
 import lombok.RequiredArgsConstructor;
@@ -10,8 +11,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -33,15 +34,21 @@ public class ConfirmService {
 
     private final S3ImageService s3ImageService;
 
+    private final UserChallengeService userChallengeService;
+
     //인증 생성
     @Transactional
-    public void createConfirm(Long userSeq, Long seq, ReqConfirmCreate reqConfirmCreate){
+    public void createConfirm(Long userSeq, Long challengeSeq, ReqConfirmCreate reqConfirmCreate){
+        LocalDate today = LocalDate.now();
 
         User user = userRepository.findById(userSeq)
                 .orElseThrow(ResponseError.NotFound.USER_NOT_EXISTS::getResponseException);
 
-        Challenge challenge=challengeRepository.findById(seq)
+        Challenge challenge=challengeRepository.findById(challengeSeq)
                 .orElseThrow(ResponseError.BadRequest.INVALID_SEQ::getResponseException);
+
+        UserChallenge userChallenge = userChallengeService.getActiveUserChallenge(userSeq, challenge)
+                .orElseThrow(ResponseError.NotFound.USER_CHALLENGE_NOT_EXISTS::getResponseException);
 
         //신고안됨
         Byte state=0;
@@ -61,6 +68,7 @@ public class ConfirmService {
 
         try {
             confirmRepository.save(confirm);
+            userChallengeService.updateUserChallengeResult(userChallenge, today, UserChallengeResultType.COMPLETE);
         } catch (Exception e) {
             throw ResponseError.BadRequest.ALREADY_CREATED.getResponseException(); // for duplicate exception
         }

@@ -17,7 +17,7 @@ public class ResUserChallengeList {
     private final Long challengeSeq;
     private final UserChallengeStateType state;
     private final LocalDate startDate;
-    private final List<ResPlanDate> planDateList;
+    private final List<ResUserChallengeResult> resultList;
     private final String challengeName;
     private final ChallengeTagType tags;
     private final Integer recommendedCnt;
@@ -27,10 +27,10 @@ public class ResUserChallengeList {
         this.challengeSeq = userChallenge.getChallenge().getSeq();
         this.state = userChallenge.getState();
         this.startDate = userChallenge.getStartDate();
-        this.planDateList = Optional.ofNullable(userChallenge.getPlanDateList())
+        this.resultList = Optional.ofNullable(userChallenge.getResultList())
                 .stream()
                 .flatMap(Collection::stream)
-                .map(ResPlanDate::of)
+                .map(ResUserChallengeResult::of)
                 .collect(Collectors.toList());
         this.challengeName = userChallenge.getChallenge().getName();
         this.tags = userChallenge.getChallenge().getTags();

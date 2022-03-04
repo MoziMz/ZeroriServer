@@ -1,5 +1,6 @@
 package com.mozi.moziserver.model.req;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -18,8 +19,10 @@ public class ReqUserChallengeCreate {
     @NotNull
     private LocalDate startDate;
 
-    @NotNull List<ReqUserChallengePlanDate> planDates = new LinkedList<>();
-
+    // TODO
+    // 파라미터가 들어온 시간을 자동으로 받기 위해서
+    @JsonIgnore
+    LocalDate today = LocalDate.now();
 
 //    @NotBlank
 //    private String name;

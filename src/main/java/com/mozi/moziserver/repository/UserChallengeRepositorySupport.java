@@ -2,7 +2,7 @@ package com.mozi.moziserver.repository;
 
 import com.mozi.moziserver.model.entity.Challenge;
 import com.mozi.moziserver.model.entity.UserChallenge;
-import com.mozi.moziserver.model.mappedenum.PlanDateResultType;
+import com.mozi.moziserver.model.mappedenum.UserChallengeResultType;
 import com.mozi.moziserver.model.mappedenum.UserChallengeStateType;
 
 import java.time.LocalDate;
@@ -29,7 +29,7 @@ public interface UserChallengeRepositorySupport {
 
     List<UserChallenge> findAllByPlanResult(
             LocalDate date,
-            PlanDateResultType planResult
+            UserChallengeResultType planResult
     );
 
     Long updateState(

@@ -1,10 +1,7 @@
 package com.mozi.moziserver.repository;
 
-import com.mozi.moziserver.model.entity.Challenge;
-import com.mozi.moziserver.model.entity.QChallenge;
-import com.mozi.moziserver.model.entity.QUserChallenge;
-import com.mozi.moziserver.model.entity.UserChallenge;
-import com.mozi.moziserver.model.mappedenum.PlanDateResultType;
+import com.mozi.moziserver.model.entity.*;
+import com.mozi.moziserver.model.mappedenum.UserChallengeResultType;
 import com.mozi.moziserver.model.mappedenum.UserChallengeStateType;
 import com.querydsl.core.types.Predicate;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
@@ -20,6 +17,7 @@ import java.util.stream.Collectors;
 public class UserChallengeRepositoryImpl extends QuerydslRepositorySupport implements UserChallengeRepositorySupport {
     private final QUserChallenge qUserChallenge = QUserChallenge.userChallenge;
     private final QChallenge qChallenge = QChallenge.challenge;
+    private final QUser qUser = QUser.user;
 
     public UserChallengeRepositoryImpl() { super(UserChallenge.class); }
 
@@ -112,7 +110,7 @@ public class UserChallengeRepositoryImpl extends QuerydslRepositorySupport imple
     @Override
     public List<UserChallenge> findAllByPlanResult(
             LocalDate date,
-            PlanDateResultType planResult
+            UserChallengeResultType planResult
     ) {
         // startDate > date-7 &&startDate <= date
         final Predicate[] predicates = new Predicate[]{
@@ -125,7 +123,7 @@ public class UserChallengeRepositoryImpl extends QuerydslRepositorySupport imple
                 .where(predicates)
                 .fetch()
                 .stream()
-                .filter( item -> item.getPlanDateList().get(Period.between(item.getStartDate(), date).getDays()).getResult() == PlanDateResultType.PLAN)
+//                .filter( item -> item.getUserChallengeResultList().get(Period.between(item.getStartDate(), date).getDays()).getResult() == UserChallengeResultType.PLAN)
                 .collect(Collectors.toList());
 
         // TODO

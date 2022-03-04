@@ -1,6 +1,6 @@
 package com.mozi.moziserver.model;
 
-import com.mozi.moziserver.model.mappedenum.PlanDateResultType;
+import com.mozi.moziserver.model.mappedenum.UserChallengeResultType;
 import lombok.*;
 
 import javax.persistence.EnumType;
@@ -11,10 +11,10 @@ import javax.persistence.Enumerated;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class PlanDate {
+public class UserChallengeResult {
     private Integer turn;
 
     @Enumerated(EnumType.STRING)
-    private PlanDateResultType result;
+    private UserChallengeResultType result;
 }
 

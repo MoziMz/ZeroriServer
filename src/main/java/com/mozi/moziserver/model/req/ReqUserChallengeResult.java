@@ -1,7 +1,6 @@
 package com.mozi.moziserver.model.req;
-
-import com.mozi.moziserver.model.PlanDate;
-import com.mozi.moziserver.model.mappedenum.PlanDateResultType;
+import com.mozi.moziserver.model.UserChallengeResult;
+import com.mozi.moziserver.model.mappedenum.UserChallengeResultType;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,17 +8,17 @@ import javax.validation.constraints.NotBlank;
 
 @Getter
 @Setter
-public class ReqUserChallengePlanDate {
+public class ReqUserChallengeResult {
     @NotBlank
     private Integer turn;
     @NotBlank
     //@Pattern(regexp = "(http|https)://(\\w+:{0,1}\\w*@)?(\\S+)(:[0-9]+)?(/|/([\\w#!:.?+=&%@!\\-/]))?")
-    private PlanDateResultType planDateType;
+    private UserChallengeResultType resultType;
 
-    public PlanDate toPlanDate() {
-        return PlanDate.builder()
+    public UserChallengeResult toUserChallengeResult() {
+        return UserChallengeResult.builder()
                 .turn(turn)
-                .result(planDateType)
+                .result(resultType)
                 .build();
     }
 }

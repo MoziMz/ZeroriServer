@@ -4,7 +4,7 @@ package com.mozi.moziserver.model.mappedenum;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mozi.moziserver.model.PlanDate;
+import com.mozi.moziserver.model.UserChallengeResult;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
 
@@ -21,35 +21,35 @@ import java.util.List;
 
 @Slf4j
 @Converter
-public class PlanDateListConverter implements AttributeConverter<List<PlanDate>, String> {
+public class ResultListConverter implements AttributeConverter<List<UserChallengeResult>, String> {
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
-    public String convertToDatabaseColumn(final List<PlanDate> planDateList) {
+    public String convertToDatabaseColumn(final List<UserChallengeResult> resultList) {
 
-        if (planDateList == null) {
+        if (resultList == null) {
             return null;
         }
 
         try {
-            return objectMapper.writeValueAsString(planDateList);
+            return objectMapper.writeValueAsString(resultList);
         } catch (JsonProcessingException e) {
-            log.error("PlanDateConverter", e);
+            log.error("UserChallengeResultListConverter", e);
             return null;
         }
     }
 
     @Override
-    public List<PlanDate> convertToEntityAttribute(final String planDateListString) {
+    public List<UserChallengeResult> convertToEntityAttribute(final String resultListString) {
 
-        if (!StringUtils.hasLength(planDateListString)) {
+        if (!StringUtils.hasLength(resultListString)) {
             return null;
         }
 
         try {
-            return objectMapper.readValue(planDateListString, new TypeReference<>() {});
+            return objectMapper.readValue(resultListString, new TypeReference<>() {});
         } catch (JsonProcessingException e) {
-            log.error("UserChallengePlanDateConverter", e);
+            log.error("UserChallengeResultListConverter", e);
             return null;
         }
     }

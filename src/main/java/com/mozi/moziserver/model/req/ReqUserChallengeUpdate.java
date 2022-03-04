@@ -11,6 +11,4 @@ import java.util.List;
 public class ReqUserChallengeUpdate {
     @NotNull
     private LocalDate startDate;
-
-    @NotNull List<ReqUserChallengePlanDate> planDates = new LinkedList<>();
 }

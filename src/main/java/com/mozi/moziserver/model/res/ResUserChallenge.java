@@ -16,8 +16,9 @@ public class ResUserChallenge {
     private final Long seq;
     private final UserChallengeStateType state;
     private final LocalDate startDate;
-    private final List<ResPlanDate> planDateList;
+    private final List<ResUserChallengeResult> resultList;
     private final Integer totalConfirmCnt;
+    private final Integer acquisitionPoints;
     private final ResUser user;
     private final LocalDateTime createdAt;
     private final LocalDateTime updatedAt;
@@ -26,12 +27,13 @@ public class ResUserChallenge {
         this.seq = userChallenge.getSeq();
         this.state = userChallenge.getState();
         this.startDate = userChallenge.getStartDate();
-        this.planDateList = Optional.ofNullable(userChallenge.getPlanDateList())
+        this.resultList = Optional.ofNullable(userChallenge.getResultList())
                 .stream()
                 .flatMap(Collection::stream)
-                .map(ResPlanDate::of)
+                .map(ResUserChallengeResult::of)
                 .collect(Collectors.toList());
         this.totalConfirmCnt = userChallenge.getTotalConfirmCnt();
+        this.acquisitionPoints = userChallenge.getAcquisitionPoints();
         this.user = ResUser.of(userChallenge.getUser());
         this.createdAt = userChallenge.getCreatedAt();
         this.updatedAt = userChallenge.getUpdatedAt();
