@@ -1,5 +1,7 @@
 package com.mozi.moziserver.controller;
 
+import com.mozi.moziserver.httpException.ResponseError;
+import com.mozi.moziserver.model.mappedenum.UserAuthType;
 import com.mozi.moziserver.model.req.ReqUserNickNameAndEmail;
 import com.mozi.moziserver.model.req.ReqUserSignIn;
 import com.mozi.moziserver.model.req.ReqUserSignUp;
@@ -12,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
@@ -48,13 +51,14 @@ public class UserController {
     @ApiOperation("로그인 (ID, 소셜)")
     @PostMapping(value = "/v1/users/signin", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> signInUser(
-            @RequestBody @Valid ReqUserSignIn reqUserSignIn,
+            @RequestBody @Valid ReqUserSignIn req,
             HttpSession session
     ) {
+        if (req.getType() == UserAuthType.EMAIL && !StringUtils.hasLength(req.getPw())) {
+            throw ResponseError.BadRequest.INVALID_EMAIL_OR_PASSWORD.getResponseException();
+        }
 
-        // TODO Param Validation
-
-        Authentication auth = userService.signIn(reqUserSignIn);
+        Authentication auth = userService.signIn(req);
 
         SecurityContext sc = SecurityContextHolder.getContext();
         sc.setAuthentication(auth);

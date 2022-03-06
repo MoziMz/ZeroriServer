@@ -14,6 +14,6 @@ public class ReqUserSignIn {
     private UserAuthType type;
     @NotBlank
     private String id;
-    @NotBlank
+
     private String pw;
 }
