@@ -91,7 +91,7 @@ public class UserSocialAuthenticationProvider implements AuthenticationProvider 
         User user = getUserSeqByTypeAndSocialId(userAuth.getType(), socialId);
         userAuth.setUser(user);
 
-        return user == null ? new ResUserSignInFail() : new ResUserSignIn(userAuth);
+        return user == null ? new ResUserSignInFail() : new ResUserSocialSignIn(userAuth);
     }
 
     @Override
