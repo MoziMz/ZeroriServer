@@ -10,5 +10,5 @@ import java.util.OptionalInt;
 
 @Repository
 public interface ChallengeStatisticsUserUniqCheckRepository extends JpaRepository<ChallengeStatisticsUserUniqCheck, Long> {
-    Optional<ChallengeStatisticsUserUniqCheck> findByChallengeAndStartDateAndUser(Challenge challenge, LocalDate monthFirstDate, User user);
+    Optional<ChallengeStatisticsUserUniqCheck> findByChallengeAndYearAndMonthAndUser(Challenge challenge, Integer year, Integer month, User user);
 }

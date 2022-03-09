@@ -193,13 +193,12 @@ public class UserChallengeService {
             throw ResponseError.BadRequest.INVALID_DATE.getResponseException();
         }
 
-        LocalDate monthFirstDate = LocalDate.of(date.getYear(), date.getMonth(), 1);
-
         ChallengeStatistics challengeStatistics =
-                challengeStatisticsRepository.findByChallengeAndStartDate(userChallenge.getChallenge(), monthFirstDate)
+                challengeStatisticsRepository.findByChallengeAndYearAndMonth(userChallenge.getChallenge(), date.getYear(), date.getMonthValue())
                         .orElseGet(() -> com.mozi.moziserver.model.entity.ChallengeStatistics.builder()
                                 .challenge(userChallenge.getChallenge())
-                                .startDate(monthFirstDate)
+                                .year(date.getYear())
+                                .month(date.getMonthValue())
                                 .build());
 
         challengeStatistics.setPlayerConfirmCnt(challengeStatistics.getPlayerConfirmCnt() + 1);
@@ -209,7 +208,7 @@ public class UserChallengeService {
         // 없으면 만들어서 넣고
         // first_trying_cnt += 1 을 한다.
         Optional<ChallengeStatisticsUserUniqCheck> userUniqCheck =
-                challengeStatisticsUserUniqCheckRepository.findByChallengeAndStartDateAndUser(userChallenge.getChallenge(), monthFirstDate, userChallenge.getUser());
+                challengeStatisticsUserUniqCheckRepository.findByChallengeAndYearAndMonthAndUser(userChallenge.getChallenge(), date.getYear(), date.getMonthValue(), userChallenge.getUser());
 
         // 이번달의 첫 '인증하기' 이면 챌린지통계정보를 업데이트하고 유니크체크를 insert 한다.
         if ( !userUniqCheck.isPresent() && userChallenge.getTotalConfirmCnt() == 1) {
@@ -217,7 +216,8 @@ public class UserChallengeService {
 
             ChallengeStatisticsUserUniqCheck uniqCheck = ChallengeStatisticsUserUniqCheck.builder()
                     .challenge(userChallenge.getChallenge())
-                    .startDate(monthFirstDate)
+                    .year(date.getYear())
+                    .month(date.getMonthValue())
                     .user(userChallenge.getUser())
                     .build();
 

@@ -1,13 +1,17 @@
 package com.mozi.moziserver.model.res;
 
 import com.mozi.moziserver.model.entity.Challenge;
+import com.mozi.moziserver.model.entity.ChallengeStatistics;
 import com.mozi.moziserver.model.entity.UserChallenge;
 import com.mozi.moziserver.model.mappedenum.ChallengeDifficultyType;
 import com.mozi.moziserver.model.mappedenum.ChallengeTagType;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 
 @Getter
@@ -44,8 +48,10 @@ public class ResChallenge {
 
     private ResUserChallenge userChallenge;
 
+    private List<ResChallengeStatistics> statisticsList;
 
-    private ResChallenge(Challenge challenge, Optional<UserChallenge> optionalUserChallenge) {
+
+    private ResChallenge(Challenge challenge, Optional<UserChallenge> optionalUserChallenge, List<ChallengeStatistics> challengeStatisticsList) {
         this.name = challenge.getName();
         this.description = challenge.getDescription();
         this.recommendedCnt = challenge.getRecommendedCnt();
@@ -62,6 +68,11 @@ public class ResChallenge {
         this.userChallenge = optionalUserChallenge
                 .map(ResUserChallenge::of)
                 .orElse(null);
+        this.statisticsList = Optional.ofNullable(challengeStatisticsList)
+                .stream()
+                .flatMap(Collection::stream)
+                .map(ResChallengeStatistics::of)
+                .collect(Collectors.toList());
     }
 
 //    private Integer CalRepeatRate(Integer repeatPlayerCnt, Integer totalPlayerCnt) {
@@ -73,7 +84,7 @@ public class ResChallenge {
 //        else return 0;
 //    }
 
-    public static ResChallenge of(Challenge challenge, Optional<UserChallenge> optionalUserChallenge) {
-        return new ResChallenge(challenge, optionalUserChallenge);
+    public static ResChallenge of(Challenge challenge, Optional<UserChallenge> optionalUserChallenge, List<ChallengeStatistics> challengeStatisticsList) {
+        return new ResChallenge(challenge, optionalUserChallenge, challengeStatisticsList);
     }
 }

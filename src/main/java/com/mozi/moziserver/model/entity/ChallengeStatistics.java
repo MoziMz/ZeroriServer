@@ -12,12 +12,14 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity(name = "challenge_statistics")
-public class ChallengeStatistics extends AbstractTimeEntity {
+public class ChallengeStatistics extends AbstractTimeEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long seq;
 
-    private LocalDate startDate;
+    private Integer year;
+
+    private Integer month;
 
     @Builder.Default
     private Integer playerFirstTryingCnt = 0;
