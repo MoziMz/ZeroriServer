@@ -31,7 +31,7 @@ public class ConfigurationController {
     private final MyPageService myPageService;
 
     @ApiOperation("문의 등록")
-    @PostMapping("/v1/users/v2/question")
+    @PostMapping("/v1/questions")
     public ResponseEntity<Void> createQuestion(
             @ApiParam(hidden = true) @SessionUser Long userSeq,
             @RequestBody @Valid ReqQuestionCreate reqQuestionCreate
