@@ -77,19 +77,19 @@ public class ConfirmService {
     }
 
     @Transactional
-    public List<Confirm> getAll(ReqConfirmList req){
-        return confirmRepository.findAllList(req.getPrevLastConfirmSeq(),req.getPageSize());
+    public List<Confirm> getAllConfirmList(ReqList req){
+        return confirmRepository.findAllConfirmList(req.getPrevLastSeq(),req.getPageSize());
     }
 
     // 챌린지별 인증 조회
     @Transactional
-    public List<Confirm> getConfirmList(Long seq,ReqConfirmList req) {
-        return confirmRepository.findByChallengeByOrderDesc(seq,req.getPrevLastConfirmSeq(),req.getPageSize());
+    public List<Confirm> getConfirmList(Long seq,ReqList req) {
+        return confirmRepository.findByChallengeByOrderDesc(seq,req.getPrevLastSeq(),req.getPageSize());
     }
 
     @Transactional
-    public List<Confirm> getUserConfirmList(Long userSeq,ReqConfirmList req){
-        return confirmRepository.findByUserByOrderDesc(userSeq,req.getPrevLastConfirmSeq(),req.getPageSize());
+    public List<Confirm> getUserConfirmList(Long userSeq,ReqList req){
+        return confirmRepository.findByUserByOrderDesc(userSeq,req.getPrevLastSeq(),req.getPageSize());
     }
 
     //인증 하나 조회

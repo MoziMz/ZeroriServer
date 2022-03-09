@@ -44,10 +44,10 @@ public class ConfirmController {
     @ApiOperation("스토리 전체 조회")
     @GetMapping("/v1/challenges/confirms")
     public List<ResConfirmList> getAllConfirmList(
-            @Valid ReqConfirmList req
+            @Valid ReqList req
     ) {
 
-        return confirmService.getAll(req)
+        return confirmService.getAllConfirmList(req)
                 .stream()
                 .map(ResConfirmList::of)
                 .collect(Collectors.toList());
@@ -57,7 +57,7 @@ public class ConfirmController {
     @GetMapping("/v1/challenges/{seq}/confirms")
     public List<ResConfirmList> getConfirmList(
             @PathVariable Long seq,
-            @Valid ReqConfirmList req
+            @Valid ReqList req
     ) {
 
         return confirmService.getConfirmList(seq,req)
@@ -71,7 +71,7 @@ public class ConfirmController {
     @GetMapping("/v1/users/confirms")
     public List<ResUserConfirmList> getUserConfirmList(
             @ApiParam(hidden = true) @SessionUser Long userSeq,
-            @Valid ReqConfirmList req
+            @Valid ReqList req
     ) {
 
         return confirmService.getUserConfirmList(userSeq,req)

@@ -47,7 +47,7 @@ public class UserChallengeService {
         return userChallengeRepository.findAllByUserSeq(
                 userSeq,
                 req.getPageSize(),
-                req.getPrevLastPostSeq()
+                req.getPrevLastSeq()
         );
     }
 
