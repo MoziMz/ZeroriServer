@@ -68,10 +68,11 @@ public class ConfirmService {
 
         try {
             confirmRepository.save(confirm);
-            userChallengeService.updateUserChallengeResult(userChallenge, today, UserChallengeResultType.COMPLETE);
         } catch (Exception e) {
             throw ResponseError.BadRequest.ALREADY_CREATED.getResponseException(); // for duplicate exception
         }
+
+        userChallengeService.updateUserChallengeResult(userChallenge, today, UserChallengeResultType.COMPLETE);
 
     }
 
