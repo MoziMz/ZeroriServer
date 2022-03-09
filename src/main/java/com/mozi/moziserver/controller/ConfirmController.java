@@ -126,28 +126,6 @@ public class ConfirmController {
                 .collect(Collectors.toList());
     }
 
-    @ApiOperation("유저 스티커 전체 조회")
-    @GetMapping("/v1/user-stickers")
-    public List<ResStickerList> getStickerList(
-            @ApiParam(hidden = true) @SessionUser Long userSeq
-    ) {
-        List<UserStickerImg> userStickerImgList=confirmService.getUserStickerImg(userSeq);
-
-        return userStickerImgList
-                .stream()
-                .map(ResStickerList::of)
-                .collect(Collectors.toList());
-    }
-
-    @ApiOperation("유저 스티커 생성(다운로드)")
-    @PostMapping("/v1/user-stickers")
-    public ResponseEntity<Void> createUserSticker(
-            @ApiParam(hidden = true) @SessionUser Long userSeq,
-            @RequestBody @Valid ReqUserStickerList userStickerList
-    ){
-        confirmService.createUserSticker(userSeq, userStickerList);
-        return new ResponseEntity<>(HttpStatus.OK);
-    }
 
     @ApiOperation("스티커 생성(부착)")
     @PostMapping("/v1/confirms/{confirm_seq}/confirm-stickers")
