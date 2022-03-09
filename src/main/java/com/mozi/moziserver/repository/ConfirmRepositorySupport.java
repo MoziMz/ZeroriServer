@@ -15,7 +15,7 @@ public interface ConfirmRepositorySupport {
 
     void updateDeclarationState(Confirm confirm,Byte state);
 
-    List<Confirm> findAllList(Long prevLastConfirmSeq, Integer pageSize);
+    List<Confirm> findAllConfirmList(Long prevLastConfirmSeq, Integer pageSize);
 
     Long findSeq();
 

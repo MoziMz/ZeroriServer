@@ -80,21 +80,9 @@ public class ConfirmController {
                 .collect(Collectors.toList());
     }
 
-    @ApiOperation("본인 스토리 하나 조회")
+    @ApiOperation("스토리 하나 조회")
     @GetMapping("/v1/confirms/{confirmSeq}")
-    public ResConfirm getMyConfirm(
-            @PathVariable Long confirmSeq
-    ) {
-        Confirm confirm=confirmService.getConfirm(confirmSeq);
-
-        List<ConfirmSticker> confirmStickerList=confirmService.getConfirmStickerList(confirmSeq);
-
-        return ResConfirm.of(confirm,confirmStickerList);
-    }
-
-    @ApiOperation("참여자 스토리 하나 조회")
-    @GetMapping("/v1/challenges/{seq}/confirms/{confirmSeq}")
-    public ResConfirm getUserConfirm(
+    public ResConfirm getConfirm(
             @PathVariable Long confirmSeq
     ) {
         Confirm confirm=confirmService.getConfirm(confirmSeq);
@@ -123,6 +111,19 @@ public class ConfirmController {
     ){
         confirmService.createDeclaration(confirmSeq,req.getType());
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @ApiOperation("스티커 전체 조회")
+    @GetMapping("/v1/stickerImgs")
+    public List<ResStickerImg> getStickerList(
+            @ApiParam(hidden = true) @SessionUser Long userSeq
+    ) {
+        List<StickerImg> stickerImgList=confirmService.getStickerImg(userSeq);
+
+        return stickerImgList
+                .stream()
+                .map(ResStickerImg::of)
+                .collect(Collectors.toList());
     }
 
     @ApiOperation("유저 스티커 전체 조회")

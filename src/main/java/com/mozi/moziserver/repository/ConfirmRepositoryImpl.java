@@ -26,7 +26,7 @@ public class ConfirmRepositoryImpl extends QuerydslRepositorySupport implements 
     public ConfirmRepositoryImpl() {super(Confirm.class);}
 
     @Override
-    public List<Confirm> findAllList(Long prevLastConfirmSeq,Integer pageSize){
+    public List<Confirm> findAllConfirmList(Long prevLastConfirmSeq,Integer pageSize){
         List<User> userList=from(qUser)
                 .fetch()
                 .stream()

@@ -186,6 +186,17 @@ public class ConfirmService {
 
     }
 
+    @Transactional
+    public List<StickerImg> getStickerImg(Long userSeq) {
+
+
+        List<StickerImg> stickerImgList = stickerImgRepository.findAll();
+
+
+        return stickerImgList;
+
+    }
+
     //UserSticker 생성
     @Transactional
     public void createUserSticker(Long userSeq, ReqUserStickerList userStickerList){
