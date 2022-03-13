@@ -105,34 +105,34 @@ public class UserChallengeService {
         // 첫번째 요청인지 확인하고 아니면 에러를 던진다.
     }
 
-    public void updateUserChallenge(Long userSeq, Long userChallengeSeq, ReqUserChallengeUpdate req) {
-
-        UserChallenge curUserChallenge = getUserChallenge(userSeq, userChallengeSeq);
-
-        if (curUserChallenge.getState() == UserChallengeStateType.END) {
-            throw ResponseError.BadRequest.ALREADY_ENDED_USER_CHALLENGE.getResponseException();
-        }
-
-        // TODO 기획 정책을 확인해서 정해야 할 부분
-        // 어떤 시점에 startDate 수정이 가능한지 -> 시작일이 오늘일때, 아직 인증을 한번도 아닌 진행상태일때 (어제 시작되었어도) ..
-
-        // startDate 가 오늘 이전이면 에러
-        LocalDate today = LocalDate.now();
-        LocalDate startDate = req.getStartDate();
-
-        if( startDate.isBefore(today) ) {
-            throw ResponseError.BadRequest.PAST_START_DATE.getResponseException();
-        }
-
-        if (curUserChallenge.getState() == UserChallengeStateType.PLAN && req.getStartDate().isEqual(today)) {
-            UserChallengeStateType stateType = UserChallengeStateType.DOING;
-            curUserChallenge.setState(stateType);
-        }
-
-        curUserChallenge.setStartDate(req.getStartDate());
-
-        userChallengeRepository.save(curUserChallenge);
-    }
+//    public void updateUserChallenge(Long userSeq, Long userChallengeSeq, ReqUserChallengeUpdate req) {
+//
+//        UserChallenge curUserChallenge = getUserChallenge(userSeq, userChallengeSeq);
+//
+//        if (curUserChallenge.getState() == UserChallengeStateType.END) {
+//            throw ResponseError.BadRequest.ALREADY_ENDED_USER_CHALLENGE.getResponseException();
+//        }
+//
+//        // TODO 기획 정책을 확인해서 정해야 할 부분
+//        // 어떤 시점에 startDate 수정이 가능한지 -> 시작일이 오늘일때, 아직 인증을 한번도 아닌 진행상태일때 (어제 시작되었어도) ..
+//
+//        // startDate 가 오늘 이전이면 에러
+//        LocalDate today = LocalDate.now();
+//        LocalDate startDate = req.getStartDate();
+//
+//        if( startDate.isBefore(today) ) {
+//            throw ResponseError.BadRequest.PAST_START_DATE.getResponseException();
+//        }
+//
+//        if (curUserChallenge.getState() == UserChallengeStateType.PLAN && req.getStartDate().isEqual(today)) {
+//            UserChallengeStateType stateType = UserChallengeStateType.DOING;
+//            curUserChallenge.setState(stateType);
+//        }
+//
+//        curUserChallenge.setStartDate(req.getStartDate());
+//
+//        userChallengeRepository.save(curUserChallenge);
+//    }
 
     public void updateUserChallengeResult (UserChallenge userChallenge, LocalDate date, UserChallengeResultType result) {
        // date 가 startDate <= date <startDate+7 범위를 벗어나면 에러
@@ -225,6 +225,25 @@ public class UserChallengeService {
         }
 
         challengeStatisticsRepository.save(challengeStatistics);
+    }
+
+    public void updateUserChallengeStartDate(Long userSeq, Long userChallengeSeq, LocalDate newStartDate) {
+        UserChallenge userChallenge = getUserChallenge(userSeq, userChallengeSeq);
+
+        if ( !UserChallengeStateType.activeTypes.contains(userChallenge.getState()) ) {
+            throw ResponseError.BadRequest.ALREADY_ENDED_USER_CHALLENGE.getResponseException();
+        }
+
+        LocalDate today = LocalDate.now();
+
+        if (userChallenge.getState() == UserChallengeStateType.PLAN
+                && (newStartDate.equals(today) || newStartDate.isBefore(today))) {
+            userChallenge.setState(UserChallengeStateType.DOING);
+        }
+
+        userChallenge.setStartDate(newStartDate);
+
+        userChallengeRepository.save(userChallenge);
     }
 
     // TODO

@@ -4,11 +4,9 @@ import lombok.Getter;
 
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
-import java.util.LinkedList;
-import java.util.List;
 
 @Getter
-public class ReqUserChallengeUpdate {
+public class ReqTestUserChallengeStartDateUpdate {
     @NotNull
     private LocalDate startDate;
 }

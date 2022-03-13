@@ -3,7 +3,6 @@ package com.mozi.moziserver.controller;
 import com.mozi.moziserver.model.req.ReqList;
 import com.mozi.moziserver.model.req.ReqUserChallengeCreate;
 import com.mozi.moziserver.model.req.ReqUserChallengeList;
-import com.mozi.moziserver.model.req.ReqUserChallengeUpdate;
 import com.mozi.moziserver.model.res.ResUserChallengeList;
 import com.mozi.moziserver.repository.ChallengeRepository;
 import com.mozi.moziserver.security.SessionUser;
@@ -39,7 +38,7 @@ public class UserChallengeController {
 //    }
 
     @ApiOperation("유저 챌린지 날짜별 리스트 조회")
-    @GetMapping({"/v1/period/user-challenges"})
+    @GetMapping("/v1/period/user-challenges")
     public List<ResUserChallengeList> getUserChallengeList(
             @ApiParam(hidden = true) @SessionUser Long userSeq,
             /*@Valid*/ ReqUserChallengeList req
@@ -51,7 +50,7 @@ public class UserChallengeController {
     }
 
     @ApiOperation("유저 챌린지 전체 조회")
-    @GetMapping({"/v1/user-challenges"})
+    @GetMapping("/v1/user-challenges")
     public List<ResUserChallengeList> getUserChallengeList(
             @ApiParam(hidden = true) @SessionUser Long userSeq,
             @Valid ReqList req
@@ -63,7 +62,7 @@ public class UserChallengeController {
     }
 
     @ApiOperation("유저 챌린지 생성")
-    @PostMapping({"/v1/user-challenges"})
+    @PostMapping("/v1/user-challenges")
     public ResponseEntity<Void> createUserChallenge(
             @ApiParam(hidden = true) @SessionUser Long userSeq,
             @RequestBody @Valid ReqUserChallengeCreate req
@@ -74,16 +73,16 @@ public class UserChallengeController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @ApiOperation("유저 챌린지 날짜 수정")
-    @PutMapping({"/v1/user-challnges/{seq}"})
-    public ResponseEntity<Void> updateUserChallenge(
-            @ApiParam(hidden = true) @SessionUser Long userSeq,
-            @PathVariable("seq") Long userChallengeSeq,
-            @RequestBody @Valid ReqUserChallengeUpdate req
-    ){
-        userChallengeService.updateUserChallenge(userSeq, userChallengeSeq, req);
-
-        return new ResponseEntity<>(HttpStatus.OK);
-    }
+//    @ApiOperation("유저 챌린지 날짜 수정")
+//    @PutMapping({"/v1/user-challnges/{seq}"})
+//    public ResponseEntity<Void> updateUserChallenge(
+//            @ApiParam(hidden = true) @SessionUser Long userSeq,
+//            @PathVariable("seq") Long userChallengeSeq,
+//            @RequestBody @Valid ReqUserChallengeUpdate req
+//    ){
+//        userChallengeService.updateUserChallenge(userSeq, userChallengeSeq, req);
+//
+//        return new ResponseEntity<>(HttpStatus.OK);
+//    }
 
 }
