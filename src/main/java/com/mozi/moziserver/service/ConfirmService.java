@@ -1,5 +1,6 @@
 package com.mozi.moziserver.service;
 
+import com.mozi.moziserver.common.Constant;
 import com.mozi.moziserver.httpException.ResponseError;
 import com.mozi.moziserver.model.entity.*;
 import com.mozi.moziserver.model.mappedenum.DeclarationType;
@@ -8,9 +9,12 @@ import com.mozi.moziserver.model.req.*;
 import com.mozi.moziserver.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.tika.Tika;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -38,7 +42,7 @@ public class ConfirmService {
 
     //인증 생성
     @Transactional
-    public void createConfirm(Long userSeq, Long challengeSeq, ReqConfirmCreate reqConfirmCreate){
+    public void createConfirm(Long userSeq, Long challengeSeq, MultipartFile image){
         LocalDate today = LocalDate.now();
 
         User user = userRepository.findById(userSeq)
@@ -55,13 +59,40 @@ public class ConfirmService {
 
         Long filename_seq = confirmRepository.findSeq();
 
-        String imgUrl = s3ImageService.fileUpload(reqConfirmCreate.getImgUrl(), "confirm", filename_seq);
+        final Tika tika = new Tika();
+        String mimeTypeString = null;
+        try {
+            // get extension from file content signiture by tika
+            mimeTypeString = tika.detect(image.getInputStream());
+        } catch (IOException e) {
+            throw new RuntimeException(e.getCause());
+        }
 
+        // validate image extension
+        if (Constant.IMAGE_MIME_TYPE_LIST.stream().noneMatch(mimeTypeString::startsWith)) {
+            throw ResponseError.BadRequest.INVALID_IMAGE.getResponseException(
+                    "file type must in (" + String.join(",", Constant.IMAGE_MIME_TYPE_LIST) + ")"
+            );
+        }
+
+        // get file extension ex) png jpeg
+        final String extension = mimeTypeString.substring(mimeTypeString.lastIndexOf('/') + 1);
+
+        final String fileName = System.currentTimeMillis()
+                + "_" + UUID.randomUUID().toString().replaceAll("-", "")
+                + "." + extension;
+
+        String imgUrl = null;
+        try {
+            imgUrl = s3ImageService.fileUpload(image.getInputStream(), image.getSize(), image.getContentType(), "confirm", fileName);
+        } catch (IOException e) {
+            throw new RuntimeException(e.getCause());
+        }
 
         Confirm confirm=Confirm.builder()
                 .user(user)
                 .challenge(challenge)
-                .date(reqConfirmCreate.getDate())
+                .date(today)
                 .imgUrl(imgUrl)
                 .confirmState(state)
                 .build();

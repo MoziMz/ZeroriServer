@@ -150,7 +150,7 @@ public class UserChallengeService {
 //                .count();
 
         // date 에 해당하는 result 바꿔줌
-        Period period = Period.between(date, startDate);
+        Period period = Period.between(startDate, date);
         Integer turn = period.getDays();
 
         userChallenge.getResultList().get(turn).setResult(result);

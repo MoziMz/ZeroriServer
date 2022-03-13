@@ -34,7 +34,7 @@ public class QuestionService {
 
         Long seq = questionRepository.findSeq();
 
-        String imgUrl = s3ImageService.fileUpload(reqQuestionCreate.getImgUrl(), "question", seq);
+        String imgUrl = ""; // TODO s3ImageService.fileUpload(reqQuestionCreate.getImgUrl(), "question", seq);
 
 
         Question question=Question.builder()

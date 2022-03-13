@@ -1,5 +1,6 @@
 package com.mozi.moziserver.controller;
 
+import com.mozi.moziserver.httpException.ResponseError;
 import com.mozi.moziserver.model.entity.*;
 import com.mozi.moziserver.model.mappedenum.DeclarationType;
 import com.mozi.moziserver.model.req.*;
@@ -14,7 +15,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.util.Date;
@@ -34,9 +37,13 @@ public class ConfirmController {
     public ResponseEntity<Void> createConfirm(
             @ApiParam(hidden = true) @SessionUser Long userSeq,
             @PathVariable Long seq,
-            @RequestBody @Valid ReqConfirmCreate reqConfirmCreate
+            @RequestPart MultipartFile image
     ){
-        confirmService.createConfirm(userSeq, seq,reqConfirmCreate);
+        if (image == null) {
+            throw ResponseError.BadRequest.INVALID_IMAGE.getResponseException("need to images");
+        }
+
+        confirmService.createConfirm(userSeq, seq, image);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

@@ -43,6 +43,9 @@ dependencies {
     annotationProcessor 'javax.annotation:javax.annotation-api'
     annotationProcessor 'com.querydsl:querydsl-apt:4.4.0:jpa'
 
+    // image type detect
+    implementation 'org.apache.tika:tika-core:2.3.0'
+
     //Swagger
     implementation 'io.springfox:springfox-boot-starter:3.0.0'
 

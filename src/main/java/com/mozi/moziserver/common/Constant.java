@@ -58,4 +58,6 @@ public interface Constant {
             Arrays.asList("kakao.com"),
             Arrays.asList("icloud.com", "me.com", "mac.com")
     );
+
+    List<String> IMAGE_MIME_TYPE_LIST = List.of("image/png", "image/jpeg");
 }

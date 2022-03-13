@@ -11,6 +11,7 @@ import com.amazonaws.services.s3.AmazonS3Client;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
+import java.io.InputStream;
 
 
 @Service
@@ -24,25 +25,27 @@ public class S3ImageService {
     private String bucketName;
 
     // 파일 업로드 + return URL
-    @Transactional
-    public String fileUpload(String filePath, String folderName, Long seq) {
+    //@Transactional
+    public String fileUpload(InputStream inputStream, long contentLength, String contentType, String folderName, String fileName) {
+        String key = folderName + fileName;
 
-        File file = new File(filePath);
-        String key = fileRename(file.getName(), folderName, seq);
+        ObjectMetadata metadata = new ObjectMetadata();
+        metadata.setContentLength(contentLength);
+        metadata.setContentType(contentType);
 
-        PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, key, file);
+        PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, key, inputStream, metadata);
         amazonS3Client.putObject(putObjectRequest);
 
         return amazonS3Client.getUrl(bucketName, key).toString();
     }
 
     // 파일명 수정
-    private String fileRename(String originalFileName, String folderName, Long seq) {
-
-        String fileExt = FilenameUtils.getExtension(originalFileName);
-        String fileName = FilenameUtils.getBaseName(originalFileName);
-        Long num = seq + 1;
-
-        return folderName + "/" + fileName + num + '.' + fileExt;
-    }
+//    private String fileRename(String originalFileName, String folderName, Long seq) {
+//
+//        String fileExt = FilenameUtils.getExtension(originalFileName);
+//        String fileName = FilenameUtils.getBaseName(originalFileName);
+//        Long num = seq + 1;
+//
+//        return folderName + "/" + fileName + num + '.' + fileExt;
+//    }
 }

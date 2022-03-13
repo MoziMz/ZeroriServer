@@ -24,7 +24,8 @@ public interface ResponseError {
         INVALID_TURN("invalid turn"),
         INVALID_DATE("invalid date"),
         USER_IS_DELETED("user is deleted"),
-        INVALID_USER("invalid user");
+        INVALID_USER("invalid user"),
+        INVALID_IMAGE("invalid image");
 
         // INVALID 는 한가지로 명확하지 않을때 쓴다.
 

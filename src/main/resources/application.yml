@@ -15,6 +15,12 @@ spring:
           auth: true
           ssl:
             enable: true
+  servlet:
+    multipart:
+      enabled: true
+      location: ${java.io.tmpdir}
+      max-file-size: 10485760
+      max-request-size: 10485760
 #  jpa:
 #    hibernate:
 #      ddl-auto: validate
