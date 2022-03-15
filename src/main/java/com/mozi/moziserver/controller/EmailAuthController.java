@@ -65,4 +65,25 @@ public class EmailAuthController {
         return new ResponseEntity<>(httpHeaders, HttpStatus.SEE_OTHER);
     }
 
+    @ApiOperation(value = "", hidden = true)
+    @GetMapping("/pw-check/{token}")
+    public ResponseEntity<Void> authCheckPwEmail(
+            @PathVariable("token")String token
+    ) throws Exception {
+        HttpHeaders httpHeaders = new HttpHeaders();
+
+        switch (emailAuthService.authCheckPwEmail(token)) {
+            case SUCC:
+                httpHeaders.setLocation(new URI("/pw-email-auth-valid.html"));
+                break;
+            case ALREADY_SUCC:
+                httpHeaders.setLocation(new URI("/email-auth-already-valid.html"));
+                break;
+            default:
+                httpHeaders.setLocation(new URI("/email-auth-invalid.html"));
+                break;
+        }
+        return new ResponseEntity<>(httpHeaders, HttpStatus.SEE_OTHER);
+    }
+
 }

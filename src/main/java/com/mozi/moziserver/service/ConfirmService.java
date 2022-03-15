@@ -192,6 +192,7 @@ public class ConfirmService {
         return stickerImgRepository.findAllBySeq(stickerSeqList);
     }
 
+    @Transactional
     public List<UserStickerImg> getUserStickerImg(Long userSeq) {
 
             List<Long> userStickerSeqList=userStickerRepository.stickerSeqfindByUserSeq(userSeq);

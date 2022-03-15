@@ -23,8 +23,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 import static com.mozi.moziserver.common.Constant.EMAIL_DOMAIN_GROUPS;
 import static com.mozi.moziserver.common.Constant.EMAIL_REGEX;
@@ -235,4 +237,45 @@ public class UserService {
         }
         else return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
+
+    // 이메일 인증
+    @Transactional
+    public ResponseEntity<String> sendEmail(String email) {
+
+        User user=userAuthRepository.findUserSeqByEmail(email);
+
+         if (!email.matches(EMAIL_REGEX)){
+            throw ResponseError.BadRequest.INVALID_EMAIL.getResponseException();
+        }
+
+        int atIndex = email.lastIndexOf('@');
+        String emailIdWithAt = email.substring(0, atIndex+1);
+        String emailDomain = email.substring(atIndex+1).toLowerCase();
+        List<String> currentDomainGroup = null;
+
+        for(List<String> domainGroup : EMAIL_DOMAIN_GROUPS) {
+            if(domainGroup.contains(emailDomain)) {
+                currentDomainGroup = domainGroup;
+                break;
+            }
+        }
+
+        if(currentDomainGroup == null) {
+            throw ResponseError.BadRequest.INVALID_EMAIL.getResponseException();
+        }
+
+        String token=emailAuthService.createEmailCheckAuth(user,email);
+
+        return new ResponseEntity<>(token, HttpStatus.OK);
+    }
+
+    public ResponseEntity<Void> findUserAuth(String email){
+
+        User user=userAuthRepository.findUserSeqByEmail(email);
+
+        if(user==null || user.getState()==UserState.DELETED)  throw ResponseError.NotFound.EMAIL_NOT_EXITS.getResponseException();
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
 }

@@ -3,6 +3,7 @@ package com.mozi.moziserver.repository;
 import com.mozi.moziserver.common.UserState;
 import com.mozi.moziserver.model.entity.QUser;
 import com.mozi.moziserver.model.entity.QUserAuth;
+import com.mozi.moziserver.model.entity.User;
 import com.mozi.moziserver.model.entity.UserAuth;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 
@@ -23,6 +24,14 @@ public class UserAuthRepositoryImpl extends QuerydslRepositorySupport implements
                 .innerJoin(qUser).on(qUserAuth.user.seq.eq(qUser.seq))
                 .where(qUser.nickName.eq(nickName)
                         .and(qUser.state.eq(UserState.ACTIVE)))
+                .fetchOne();
+    }
+
+    @Override
+    public User findUserSeqByEmail(String email){
+        return from(qUserAuth)
+                .select(qUserAuth.user)
+                .where(qUserAuth.id.eq(email))
                 .fetchOne();
     }
 }

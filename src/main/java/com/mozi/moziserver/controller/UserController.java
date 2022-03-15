@@ -2,11 +2,13 @@ package com.mozi.moziserver.controller;
 
 import com.mozi.moziserver.httpException.ResponseError;
 import com.mozi.moziserver.model.mappedenum.UserAuthType;
-import com.mozi.moziserver.model.req.ReqUserNickNameAndEmail;
-import com.mozi.moziserver.model.req.ReqUserSignIn;
-import com.mozi.moziserver.model.req.ReqUserSignUp;
+import com.mozi.moziserver.model.req.*;
+import com.mozi.moziserver.model.res.ResConfirmList;
+import com.mozi.moziserver.service.EmailAuthService;
+import com.mozi.moziserver.service.MyPageService;
 import com.mozi.moziserver.service.UserService;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -20,6 +22,9 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import static org.springframework.security.web.context.HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY;
 
 @RestController
@@ -28,6 +33,8 @@ import static org.springframework.security.web.context.HttpSessionSecurityContex
 public class UserController {
 
     private final UserService userService;
+    private final MyPageService myPageService;
+    private final EmailAuthService emailAuthService;
 
     //
 //    @SwaggerResponseError({
@@ -82,4 +89,38 @@ public class UserController {
     ){
         return userService.findUserEmail(req);
     }
+
+    @ApiOperation("비밀번호 찾기(재설성)_이메일 확인")
+    @PostMapping("/v1/users/user-auths")
+    public ResponseEntity<Void> checkUserAuth(
+            @RequestBody @Valid ReqAuthEmail req
+    ) {
+        return userService.findUserAuth(req.getEmail());
+    }
+
+    @ApiOperation("비밀번호 찾기(재설정)_인증 메일 전송")
+    @PostMapping("/v1/users/email-check-auths")
+    public ResponseEntity<String> sendPwEmail(
+            @RequestBody @Valid ReqAuthEmail req
+    ){
+        return userService.sendEmail(req.getEmail());
+    }
+
+    @ApiOperation("비밀번호 찾기(재설성)_이메일 인증 확인")
+    @GetMapping("/v1/users/email-check-auths/{token}")
+    public ResponseEntity<Long> checkEmailAuth(
+            @PathVariable String token
+    ) {
+        return emailAuthService.findUsedDt(token);
+    }
+
+    @ApiOperation("비밀번호 찾기(재설정)_비밀번호 수정")
+    @PutMapping("/v1/users/email-check-auths/user-auths")
+    public ResponseEntity<Void> updateUserPasswordToEmail(
+            @RequestBody @Valid ReqUserSeqAndPw req
+    ) {
+        myPageService.updateUserPassword(req.getUserSeq(),req.getPw());
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
 }

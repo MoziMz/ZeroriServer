@@ -25,7 +25,8 @@ public interface ResponseError {
         INVALID_DATE("invalid date"),
         USER_IS_DELETED("user is deleted"),
         INVALID_USER("invalid user"),
-        INVALID_IMAGE("invalid image");
+        INVALID_IMAGE("invalid image"),
+        INVALID_TOKEN("invalid token");
 
         // INVALID 는 한가지로 명확하지 않을때 쓴다.
 

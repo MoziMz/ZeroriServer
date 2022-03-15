@@ -1,5 +1,6 @@
 package com.mozi.moziserver.service;
 
+import com.amazonaws.services.s3.internal.eventstreaming.Message;
 import com.mozi.moziserver.common.EmailAuthResult;
 import com.mozi.moziserver.common.JpaUtil;
 import com.mozi.moziserver.httpException.ResponseError;
@@ -13,10 +14,15 @@ import com.mozi.moziserver.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import javax.mail.internet.MimeMessage;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -223,6 +229,110 @@ public class EmailAuthService {
             throw ResponseError.InternalServerError.UNEXPECTED_ERROR.getResponseException();
         } catch (Exception e) {
             throw ResponseError.BadRequest.ALREADY_EXISTS_EMAIL.getResponseException();
+        }
+
+        emailCheckAuth.setUsedDt(LocalDateTime.now());
+        emailCheckAuthRepository.save(emailCheckAuth);
+
+        return EmailAuthResult.SUCC;
+    }
+
+    private boolean sendButtonedEmail(String to,String title,String content) {
+        MimeMessage message = emailSender.createMimeMessage();
+        try {
+            MimeMessageHelper messageHelper = new MimeMessageHelper(message, true, "UTF-8");
+            messageHelper.setSubject(title);
+            messageHelper.setTo(to);
+            messageHelper.setFrom(emailAddress);
+            messageHelper.setText(content, true);
+            emailSender.send(message);
+        }catch(Exception e){
+            throw ResponseError.BadRequest.BAD_REQUEST.getResponseException();
+        }
+
+        return true;
+    }
+
+    @Transactional
+    public String createEmailCheckAuth(User user, String email) {
+        EmailCheckAuth emailCheckAuth = new EmailCheckAuth();
+        emailCheckAuth.setType(EmailAuthType.FIND_PW);
+        emailCheckAuth.setEmail(email);
+        emailCheckAuth.setUser(user);
+
+        for(int retry=0;retry<3;retry++) {
+            try {
+                emailCheckAuth.setToken(
+                        UUID.randomUUID().toString().replaceAll("-","")
+                                + UUID.randomUUID().toString().replaceAll("-","")
+                );
+                emailCheckAuthRepository.save(emailCheckAuth);
+                if(emailCheckAuth.getSeq() != null) {
+                    break;
+                }
+            } catch (DataIntegrityViolationException e) {
+                if(JpaUtil.isDuplicateKeyException(e)) {
+                    continue;
+                }
+                throw ResponseError.InternalServerError.UNEXPECTED_ERROR.getResponseException();
+            } catch (Exception e) {
+                throw ResponseError.InternalServerError.UNEXPECTED_ERROR.getResponseException();
+            }
+        }
+
+        if(emailCheckAuth.getSeq() == null) {
+            throw ResponseError.InternalServerError.UNEXPECTED_ERROR.getResponseException();
+        }
+
+        boolean isSend = sendButtonedEmail(
+                email,
+                "비밀번호 찾기 인증메일",
+                "<html> <body><h1></h1>"+"<br/>아래 [인증] 버튼을 눌러주세요."+"<form action=\""+serverDomain+ "/email/auth/pw-check/" + emailCheckAuth.getToken()+"\"> <input type=\"submit\" value=\"인증\" /> </form>"
+                   +"</body></html>"
+        );
+
+        if(!isSend) {
+            throw ResponseError.InternalServerError.UNEXPECTED_ERROR.getResponseException();
+        }
+
+        return emailCheckAuth.getToken();
+    }
+
+    @Transactional
+    public ResponseEntity<Long> findUsedDt(String token){
+        Optional<EmailCheckAuth> emailCheckAuthOptional=emailCheckAuthRepository.findByToken(token);
+
+        if(emailCheckAuthOptional.isEmpty() || emailCheckAuthOptional.get().getUsedDt()==null) {
+            throw ResponseError.BadRequest.INVALID_TOKEN.getResponseException();
+        }
+        Long UserSeq=emailCheckAuthOptional.get().getUser().getSeq();
+        return new ResponseEntity<>(UserSeq,HttpStatus.OK);
+
+    }
+
+    @Transactional
+    public EmailAuthResult authCheckPwEmail(String token) {
+        Optional<EmailCheckAuth> emailCheckAuthOptional = emailCheckAuthRepository.findByToken(token);
+
+        if(emailCheckAuthOptional.isEmpty()) {
+            return EmailAuthResult.INVALID;
+        }
+
+        EmailCheckAuth emailCheckAuth = emailCheckAuthOptional.get();
+
+        if(emailCheckAuth.getType() != EmailAuthType.FIND_PW) {
+            return EmailAuthResult.INVALID;
+        }
+
+        if(emailCheckAuth.getUsedDt() != null) {
+            return EmailAuthResult.ALREADY_SUCC;
+        }
+
+        Duration duration = Duration.between(emailCheckAuth.getCreatedAt(), LocalDateTime.now());
+        boolean isExpired = duration.getSeconds() > emailCheckAuth.getType().getExpiredSeconds();
+
+        if( isExpired ) {
+            return EmailAuthResult.INVALID;
         }
 
         emailCheckAuth.setUsedDt(LocalDateTime.now());
