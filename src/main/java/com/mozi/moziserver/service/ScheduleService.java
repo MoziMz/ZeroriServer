@@ -61,6 +61,8 @@ public class ScheduleService {
         });
 
         withTransaction(() -> {
+            // state 가 DOING 에서 END 로 바뀔 예정인 챌린지에 대한 포인트를 계산해준다.
+
             userChallengeRepository.updateState(today.minusDays(7), UserChallengeStateType.DOING, UserChallengeStateType.END);
         });
     }

@@ -11,12 +11,17 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tika.Tika;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.function.Supplier;
 
 @Slf4j
 @Service
@@ -40,8 +45,11 @@ public class ConfirmService {
 
     private final UserChallengeService userChallengeService;
 
+    private final PlatformTransactionManager transactionManager;
+
+    private final ChallengeRecordRepository challengeRecordRepository;
+
     //인증 생성
-    @Transactional
     public void createConfirm(Long userSeq, Long challengeSeq, MultipartFile image){
         LocalDate today = LocalDate.now();
 
@@ -57,39 +65,14 @@ public class ConfirmService {
         //신고안됨
         Byte state=0;
 
-        Long filename_seq = confirmRepository.findSeq();
-
-        final Tika tika = new Tika();
-        String mimeTypeString = null;
-        try {
-            // get extension from file content signiture by tika
-            mimeTypeString = tika.detect(image.getInputStream());
-        } catch (IOException e) {
-            throw new RuntimeException(e.getCause());
-        }
-
-        // validate image extension
-        if (Constant.IMAGE_MIME_TYPE_LIST.stream().noneMatch(mimeTypeString::startsWith)) {
-            throw ResponseError.BadRequest.INVALID_IMAGE.getResponseException(
-                    "file type must in (" + String.join(",", Constant.IMAGE_MIME_TYPE_LIST) + ")"
-            );
-        }
-
-        // get file extension ex) png jpeg
-        final String extension = mimeTypeString.substring(mimeTypeString.lastIndexOf('/') + 1);
-
-        final String fileName = System.currentTimeMillis()
-                + "_" + UUID.randomUUID().toString().replaceAll("-", "")
-                + "." + extension;
-
         String imgUrl = null;
         try {
-            imgUrl = s3ImageService.fileUpload(image.getInputStream(), image.getSize(), image.getContentType(), "confirm", fileName);
-        } catch (IOException e) {
+            imgUrl = s3ImageService.uploadFile(image, "confirm");
+        } catch (Exception e) {
             throw new RuntimeException(e.getCause());
         }
 
-        Confirm confirm=Confirm.builder()
+        Confirm confirm = Confirm.builder()
                 .user(user)
                 .challenge(challenge)
                 .date(today)
@@ -97,14 +80,20 @@ public class ConfirmService {
                 .confirmState(state)
                 .build();
 
-        try {
-            confirmRepository.save(confirm);
-        } catch (Exception e) {
-            throw ResponseError.BadRequest.ALREADY_CREATED.getResponseException(); // for duplicate exception
-        }
+        withTransaction(() -> {
+            try {
+                confirmRepository.save(confirm);
+            } catch (Exception e) {
+                throw ResponseError.BadRequest.ALREADY_CREATED.getResponseException(); // for duplicate exception
+            }
 
-        userChallengeService.updateUserChallengeResult(userChallenge, today, UserChallengeResultType.COMPLETE);
+            userChallengeService.updateUserChallengeResult(userChallenge, today, UserChallengeResultType.COMPLETE);
 
+            ChallengeRecord challengeRecord = challengeRecordRepository.findByChallenge(challenge);
+
+            challengeRecord.setTotalPlayerConfirmCnt(challengeRecord.getTotalPlayerConfirmCnt() + 1);
+            challengeRecordRepository.save(challengeRecord);
+        });
     }
 
     @Transactional
@@ -300,6 +289,18 @@ public class ConfirmService {
             throw ResponseError.BadRequest.ALREADY_CREATED.getResponseException(); // for duplicate exception
         }
 
+    }
+
+    private void withTransaction(Runnable runnable) {
+        DefaultTransactionDefinition definition = new DefaultTransactionDefinition();
+
+        TransactionStatus status = transactionManager.getTransaction(definition);
+        try {
+            runnable.run();
+            transactionManager.commit(status);
+        } catch (Exception e) {
+            transactionManager.rollback(status);
+        }
     }
 
 }

@@ -23,6 +23,7 @@ public class UserChallengeService {
     private final ChallengeStatisticsRepository challengeStatisticsRepository;
     private final ChallengeStatisticsUserUniqCheckRepository challengeStatisticsUserUniqCheckRepository;
     private final UserRewardRepository userRewardRepository;
+    private final UserChallengeRecordRepository userChallengeRecordRepository;
 
     private UserChallenge getUserChallenge (Long userSeq, Long userChallengeSeq) {
         UserChallenge userChallenge = userChallengeRepository.findById(userChallengeSeq)
@@ -100,6 +101,17 @@ public class UserChallengeService {
         }
 
         userChallengeRepository.save(userChallenge);
+
+        Optional<UserChallengeRecord> optionalUserChallengeRecord = userChallengeRecordRepository.findByChallengeAndUser(challenge.getSeq(), userSeq);
+
+        if( !optionalUserChallengeRecord.isPresent() ) {
+            final UserChallengeRecord userChallengeRecord = UserChallengeRecord.builder()
+                            .challenge(challenge)
+                            .user(user)
+                            .build();
+
+            userChallengeRecordRepository.save(userChallengeRecord);
+        }
 
         // TODO
         // 첫번째 요청인지 확인하고 아니면 에러를 던진다.
@@ -179,7 +191,9 @@ public class UserChallengeService {
         // 저장(업데이트)
         userChallengeRepository.save(userChallenge);
 
-         updateChallengeStatisticsByUserChallenge(userChallenge, date);
+        updateUserChallengeRecord(userChallenge.getChallenge(), userChallenge.getUser(), 1, acquisitionPoints);
+
+        updateChallengeStatisticsByUserChallenge(userChallenge, date);
     }
 
     private void updateChallengeStatisticsByUserChallenge ( UserChallenge userChallenge, LocalDate date ) {
@@ -227,6 +241,26 @@ public class UserChallengeService {
         challengeStatisticsRepository.save(challengeStatistics);
     }
 
+    // TODO
+    // ScheduleService 에서 자동으로 상태가 변경될때 해당 유저챌린지의 포인트를 user_reward 포인트에 더해준다.
+
+    // TODO
+    // 유저챌린지 그만두기를 했을때 추가 포인트를 user_reward 포인트에 더해준다.
+
+    @Transactional
+    public void quitUserChallenge(Long userSeq, Long userChallengeSeq) {
+        UserChallenge userChallenge = getUserChallenge(userSeq, userChallengeSeq);
+
+        if ( !UserChallengeStateType.activeTypes.contains(userChallenge.getState()) ) {
+            throw ResponseError.BadRequest.ALREADY_ENDED_USER_CHALLENGE.getResponseException();
+        }
+
+        userChallenge.setState(UserChallengeStateType.END);
+
+        userChallengeRepository.save(userChallenge);
+    }
+
+    @Transactional
     public void updateUserChallengeStartDate(Long userSeq, Long userChallengeSeq, LocalDate newStartDate) {
         UserChallenge userChallenge = getUserChallenge(userSeq, userChallengeSeq);
 
@@ -246,9 +280,37 @@ public class UserChallengeService {
         userChallengeRepository.save(userChallenge);
     }
 
-    // TODO
-    // ScheduleService 에서 자동으로 상태가 변경될때 해당 유저챌린지의 포인트를 user_reward 포인트에 더해준다.
+    @Transactional
+    public void updateUserChallengeRecord (
+            Challenge challenge,
+            User user,
+            Integer confirmCount,
+            Integer points
+    ) {
+        UserChallengeRecord userChallengeRecord = userChallengeRecordRepository.findByChallengeAndUser(challenge.getSeq(), user.getSeq())
+                .orElseGet(() -> UserChallengeRecord.builder()
+                        .challenge(challenge)
+                        .user(user)
+                        .build());
 
-    // TODO
-    // 유저챌린지 그만두기를 했을때 추가 포인트를 user_reward 포인트에 더해준다.
+        userChallengeRecord.setConfirmCnt(userChallengeRecord.getConfirmCnt() + 1);
+        userChallengeRecord.setAcquisitionPoint(userChallengeRecord.getAcquisitionPoint() + points);
+
+        userChallengeRecordRepository.save(userChallengeRecord);
+    }
+
+    public UserChallengeRecord getUserChallengeRecord(
+            Long userSeq,
+            Challenge challenge
+    ) {
+        User user = userRepository.getById(userSeq);
+
+        UserChallengeRecord userChallengeRecord = userChallengeRecordRepository.findByChallengeAndUser(challenge.getSeq(), userSeq)
+                .orElseGet(() -> UserChallengeRecord.builder()
+                        .challenge(challenge)
+                        .user(user)
+                        .build());
+
+        return userChallengeRecord;
+    }
 }

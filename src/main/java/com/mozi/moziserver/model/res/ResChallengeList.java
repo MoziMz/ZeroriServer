@@ -17,24 +17,17 @@ public class ResChallengeList {
 
     private Integer recommendedCnt;
 
-    private ChallengeTagType tags;
+    private Long themeSeq;
 
-//    private String tags;
-
-    private Integer currentPlayerCnt;
-
-    private String imgUrl; // 가장 최근 인증한 사람의 프로필 이미지
-
-    private Boolean scrab; // 스크랩 여부
-
+    private ChallengeTagType mainTag;
 
     private ResChallengeList(Challenge challenge) {
         this.seq = challenge.getSeq();
         this.name = challenge.getName();
         this.description = challenge.getDescription();
         this.recommendedCnt = challenge.getRecommendedCnt();
-        this.tags = challenge.getTags();
-        this.currentPlayerCnt = challenge.getCurrentPlayerCnt();
+        this.themeSeq = challenge.getThemeSeq();
+        this.mainTag = challenge.getMainTag();
     }
 
     public static ResChallengeList of(Challenge challenge) {return new ResChallengeList(challenge);}

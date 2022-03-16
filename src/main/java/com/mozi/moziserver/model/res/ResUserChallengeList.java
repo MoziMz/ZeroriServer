@@ -19,7 +19,7 @@ public class ResUserChallengeList {
     private final LocalDate startDate;
     private final List<ResUserChallengeResult> resultList;
     private final String challengeName;
-    private final ChallengeTagType tags;
+    private final Long themeSeq;
     private final Integer recommendedCnt;
 
     private ResUserChallengeList(UserChallenge userChallenge) {
@@ -33,11 +33,7 @@ public class ResUserChallengeList {
                 .map(ResUserChallengeResult::of)
                 .collect(Collectors.toList());
         this.challengeName = userChallenge.getChallenge().getName();
-        this.tags = userChallenge.getChallenge().getTags();
-//                Optional.ofNullable(userChallenge.getChallenge().getTagList())
-//                .filter(list -> !CollectionUtils.isEmpty(list))
-//                .flatMap(list -> list.stream().findFirst())
-//                .orElse(null);
+        this.themeSeq = userChallenge.getChallenge().getThemeSeq();
         this.recommendedCnt = userChallenge.getChallenge().getRecommendedCnt();
     }
 

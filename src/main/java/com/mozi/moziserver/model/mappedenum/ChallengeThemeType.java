@@ -6,7 +6,9 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum ChallengeThemeType {
-    실내,
-    실외,
-    하루챌린지
+    REUSE("다시쓰기"),
+    DO_NOT_USE("쓰지않기"),
+    THROW_OUT("잘버리기");
+
+    private final String name;
 }

@@ -9,6 +9,7 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -16,10 +17,61 @@ public class ChallengeRepositoryImpl extends QuerydslRepositorySupport implement
     private final QChallenge qChallenge = QChallenge.challenge;
     private final QChallengeTag qChallengeTag = QChallengeTag.challengeTag;
     private final QChallengeTheme qChallengeTheme = QChallengeTheme.challengeTheme;
+    private final QChallengeRecord qChallengeRecord = QChallengeRecord.challengeRecord;
 
     public ChallengeRepositoryImpl() {
         super(Challenge.class);
     }
+
+    @Override
+    public Optional<Challenge> findBySeq (Long seq ) {
+        return from(qChallenge)
+                .innerJoin(qChallengeRecord)
+                .on(qChallenge.seq.eq(qChallengeRecord.challenge.seq))
+                .fetchJoin()
+                .where(qChallenge.seq.eq(seq))
+                .fetch()
+                .stream()
+                .distinct()
+                .findFirst();
+    }
+
+//    @Override
+//    public List<Challenge> findAll (
+//            Long userSeq,
+////            List<String> tagType,
+//            List<String> themeType,
+//            Integer pageSize,
+//            Long prevLastPostSeq
+//    ) {
+//        final Predicate[] predicates = new Predicate[]{
+//                predicateOptional(qChallenge.seq::lt,prevLastPostSeq),
+//        };
+//
+//        List<ChallengeTagType> tags = new ArrayList<>();
+//        List<ChallengeThemeType> themes = new ArrayList<>();
+//
+//        tags = (tagType != null) ? setTags(tags, tagType) : null;
+//        themes = (themeType != null) ? setThemes(themes, themeType) : null;
+//
+//        List<Challenge> challengeList = from(qChallenge)
+//                .leftJoin(qChallengeTheme).on(qChallenge.seq.eq(qChallengeTheme.id.challenge.seq))
+//                .leftJoin(qChallengeTag).on(qChallenge.seq.eq(qChallengeTag.id.challenge.seq))
+//                .where(predicates)
+//                .where(
+//                        tagNameIn(tags),
+//                        themeNameIn(themes)
+//                )
+//                .groupBy(qChallenge.seq)
+//                .orderBy(qChallenge.seq.asc())
+//                .limit(pageSize)
+//                .fetch()
+//                .stream()
+//                .collect(Collectors.toList());
+//
+//        return challengeList;
+//
+//    }
 
     @Override
     public List<Challenge> findAll (
@@ -29,33 +81,13 @@ public class ChallengeRepositoryImpl extends QuerydslRepositorySupport implement
             Integer pageSize,
             Long prevLastPostSeq
     ) {
-        final Predicate[] predicates = new Predicate[]{
-                predicateOptional(qChallenge.seq::lt,prevLastPostSeq),
-        };
-
-        List<ChallengeTagType> tags = new ArrayList<>();
-        List<ChallengeThemeType> themes = new ArrayList<>();
-
-        tags = (tagType != null) ? setTags(tags, tagType) : null;
-        themes = (themeType != null) ? setThemes(themes, themeType) : null;
-
         List<Challenge> challengeList = from(qChallenge)
-                .leftJoin(qChallengeTheme).on(qChallenge.seq.eq(qChallengeTheme.id.challenge.seq))
-                .leftJoin(qChallengeTag).on(qChallenge.seq.eq(qChallengeTag.id.challenge.seq))
-                .where(predicates)
-                .where(
-                        tagNameIn(tags),
-                        themeNameIn(themes)
-                )
-                .groupBy(qChallenge.seq)
-                .orderBy(qChallenge.seq.asc())
                 .limit(pageSize)
                 .fetch()
                 .stream()
                 .collect(Collectors.toList());
 
         return challengeList;
-
     }
 
     private <T> Predicate predicateOptional(final Function<T, Predicate> whereFunc, final T value) {
@@ -76,9 +108,9 @@ public class ChallengeRepositoryImpl extends QuerydslRepositorySupport implement
         return themes;
     }
 
-    private BooleanExpression tagNameIn(List<ChallengeTagType> tags) {
-        return tags != null ? qChallengeTag.id.tagName.in(tags) : null;
-    }
+//    private BooleanExpression tagNameIn(List<ChallengeTagType> tags) {
+//        return tags != null ? qChallengeTag.id.tagName.in(tags) : null;
+//    }
 
     private BooleanExpression themeNameIn(List<ChallengeThemeType> themes) {
         return themes != null ? qChallengeTheme.id.themeName.in(themes) : null;

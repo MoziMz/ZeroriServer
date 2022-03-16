@@ -7,7 +7,9 @@ import org.hibernate.cfg.Environment;
 @Getter
 @RequiredArgsConstructor
 public enum ChallengeTagType {
-    다시쓰기,
-    쓰지않기,
-    잘버리기
+    INDOOR("실내"),
+    OUTDOOR("실외"),
+    ONEDAY("하루챌린지");
+
+    private final String name;
 }

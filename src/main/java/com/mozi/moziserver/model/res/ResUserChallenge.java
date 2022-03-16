@@ -18,7 +18,7 @@ public class ResUserChallenge {
     private final LocalDate startDate;
     private final List<ResUserChallengeResult> resultList;
     private final Integer totalConfirmCnt;
-    private final Integer acquisitionPoints;
+//    private final Integer acquisitionPoints;
     private final ResUser user;
     private final LocalDateTime createdAt;
     private final LocalDateTime updatedAt;
@@ -33,7 +33,7 @@ public class ResUserChallenge {
                 .map(ResUserChallengeResult::of)
                 .collect(Collectors.toList());
         this.totalConfirmCnt = userChallenge.getTotalConfirmCnt();
-        this.acquisitionPoints = userChallenge.getAcquisitionPoints();
+//        this.acquisitionPoints = userChallenge.getAcquisitionPoints();
         this.user = ResUser.of(userChallenge.getUser());
         this.createdAt = userChallenge.getCreatedAt();
         this.updatedAt = userChallenge.getUpdatedAt();

@@ -11,23 +11,16 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @DynamicUpdate
-@Entity(name = "user_challenge_record")
-public class UserChallengeRecord extends AbstractTimeEntity {
+@Entity(name = "challenge_record")
+public class ChallengeRecord extends AbstractTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long seq;
 
     @Builder.Default
-    private Integer confirmCnt = 0;
+    Integer totalPlayerConfirmCnt = 0;
 
-    @Builder.Default
-    private Integer acquisitionPoint = 0;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_seq")
-    private User user;
-
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "challenge_seq")
     private Challenge challenge;
 }

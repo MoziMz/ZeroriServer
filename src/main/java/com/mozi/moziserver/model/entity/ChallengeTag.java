@@ -2,8 +2,7 @@ package com.mozi.moziserver.model.entity;
 
 import lombok.*;
 
-import javax.persistence.EmbeddedId;
-import javax.persistence.Entity;
+import javax.persistence.*;
 
 @Getter
 @Setter
@@ -12,7 +11,17 @@ import javax.persistence.Entity;
 @Builder
 @Entity(name = "challenge_tag")
 public class ChallengeTag extends AbstractTimeEntity {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long seq;
 
-    @EmbeddedId
-    private ChallengeTagId id;
+    private Integer turn;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "tag_seq")
+    private Tag tag;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "challenge_seq")
+    private Challenge challenge;
 }

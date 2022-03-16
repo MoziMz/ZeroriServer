@@ -1,6 +1,6 @@
 package com.mozi.moziserver.controller;
 
-import com.mozi.moziserver.model.req.ReqAdminChallenge;
+import com.mozi.moziserver.model.req.ReqAdminChallengeCreate;
 import com.mozi.moziserver.service.ChallengeService;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
@@ -21,9 +21,9 @@ public class AdminChallengeController {
     private final ChallengeService challengeService;
 
     @ApiOperation("챌린지 생성")
-    @PostMapping("/v1/admin/challenges")
+    @PostMapping("/admin/challenges")
     public ResponseEntity<Void> createChallenge(
-        @Valid ReqAdminChallenge req
+        @Valid ReqAdminChallengeCreate req
     ){
         challengeService.createChallenge(req);
 

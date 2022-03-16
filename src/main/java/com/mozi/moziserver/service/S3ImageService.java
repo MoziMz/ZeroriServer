@@ -1,17 +1,23 @@
 package com.mozi.moziserver.service;
 
 import com.amazonaws.services.s3.model.*;
+import com.mozi.moziserver.common.Constant;
+import com.mozi.moziserver.httpException.ResponseError;
 import com.mozi.moziserver.repository.QuestionRepository;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.tika.Tika;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import com.amazonaws.services.s3.AmazonS3Client;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
+import java.util.UUID;
 
 
 @Service
@@ -37,6 +43,40 @@ public class S3ImageService {
         amazonS3Client.putObject(putObjectRequest);
 
         return amazonS3Client.getUrl(bucketName, key).toString();
+    }
+
+    public String uploadFile(MultipartFile image, String folderName) {
+        final Tika tika = new Tika();
+        String mimeTypeString = null;
+        try {
+            // get extension from file content signiture by tika
+            mimeTypeString = tika.detect(image.getInputStream());
+        } catch (IOException e) {
+            throw new RuntimeException(e.getCause());
+        }
+
+        // validate image extension
+        if (Constant.IMAGE_MIME_TYPE_LIST.stream().noneMatch(mimeTypeString::startsWith)) {
+            throw ResponseError.BadRequest.INVALID_IMAGE.getResponseException(
+                    "file type must in (" + String.join(",", Constant.IMAGE_MIME_TYPE_LIST) + ")"
+            );
+        }
+
+        // get file extension ex) png jpeg
+        final String extension = mimeTypeString.substring(mimeTypeString.lastIndexOf('/') + 1);
+
+        final String fileName = System.currentTimeMillis()
+                + "_" + UUID.randomUUID().toString().replaceAll("-", "")
+                + "." + extension;
+
+        String imgUrl = null;
+        try {
+            imgUrl = fileUpload(image.getInputStream(), image.getSize(), image.getContentType(), folderName, fileName);
+        } catch (IOException e) {
+            throw new RuntimeException(e.getCause());
+        }
+
+        return imgUrl;
     }
 
     // 파일명 수정

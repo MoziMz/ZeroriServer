@@ -1,8 +1,6 @@
 package com.mozi.moziserver.controller;
 
-import com.mozi.moziserver.model.entity.Challenge;
-import com.mozi.moziserver.model.entity.ChallengeStatistics;
-import com.mozi.moziserver.model.entity.UserChallenge;
+import com.mozi.moziserver.model.entity.*;
 import com.mozi.moziserver.model.req.ReqChallengeList;
 import com.mozi.moziserver.model.res.ResChallenge;
 import com.mozi.moziserver.model.res.ResChallengeList;
@@ -43,9 +41,13 @@ public class ChallengeController {
 
         Optional<UserChallenge> optionalUserChallenge = userChallengeService.getActiveUserChallenge(userSeq, challenge);
 
+        Optional<UserChallengeRecord> optionalUserChallengeRecord = optionalUserChallenge.isPresent() ?
+                Optional.of(userChallengeService.getUserChallengeRecord(userSeq, challenge)) :
+                Optional.empty();
+
         List<ChallengeStatistics> challengeStatisticsList = challengeStatisticsService.getChallengeStatisticsList(challenge);
 
-        return ResChallenge.of(challenge, optionalUserChallenge, challengeStatisticsList);
+        return ResChallenge.of(challenge, optionalUserChallenge, optionalUserChallengeRecord, challengeStatisticsList);
     }
 
     @ApiOperation("챌린지 모두 조회")
