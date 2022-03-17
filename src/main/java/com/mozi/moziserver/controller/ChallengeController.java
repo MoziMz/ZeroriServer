@@ -4,9 +4,12 @@ import com.mozi.moziserver.model.entity.*;
 import com.mozi.moziserver.model.req.ReqChallengeList;
 import com.mozi.moziserver.model.res.ResChallenge;
 import com.mozi.moziserver.model.res.ResChallengeList;
+import com.mozi.moziserver.model.res.ResChallengeTagList;
+import com.mozi.moziserver.repository.ChallengeTagRepository;
 import com.mozi.moziserver.security.SessionUser;
 import com.mozi.moziserver.service.ChallengeService;
 import com.mozi.moziserver.service.ChallengeStatisticsService;
+import com.mozi.moziserver.service.ChallengeTagService;
 import com.mozi.moziserver.service.UserChallengeService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -30,6 +33,7 @@ public class ChallengeController {
     private final ChallengeService challengeService;
     private final UserChallengeService userChallengeService;
     private final ChallengeStatisticsService challengeStatisticsService;
+    private final ChallengeTagService challengeTagService;
 
     @ApiOperation("챌린지 하나 조회")
     @GetMapping("/v1/challenges/{seq}")
@@ -47,7 +51,9 @@ public class ChallengeController {
 
         List<ChallengeStatistics> challengeStatisticsList = challengeStatisticsService.getChallengeStatisticsList(challenge);
 
-        return ResChallenge.of(challenge, optionalUserChallenge, optionalUserChallengeRecord, challengeStatisticsList);
+        List<ResChallengeTagList> challengeTagList = challengeTagService.getChallengeTagList(seq);
+
+        return ResChallenge.of(challenge, optionalUserChallenge, optionalUserChallengeRecord, challengeStatisticsList, challengeTagList);
     }
 
     @ApiOperation("챌린지 모두 조회")

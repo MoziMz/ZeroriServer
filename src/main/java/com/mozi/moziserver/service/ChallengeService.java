@@ -21,7 +21,6 @@ public class ChallengeService {
     private final ChallengeRepository challengeRepository;
     private final UserRepository userRepository;
     private final ChallengeScrapRepository challengeScrapRepository;
-    private final ChallengeTagRepository challengeTagRepository;
     private final ChallengeRecordRepository challengeRecordRepository;
 
     // 챌린지 하나 조회
