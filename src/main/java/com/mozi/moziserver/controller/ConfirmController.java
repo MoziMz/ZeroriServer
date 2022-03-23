@@ -33,17 +33,17 @@ public class ConfirmController {
     private final ConfirmService confirmService;
 
     @ApiOperation("스토리 생성")
-    @PostMapping("/v1/challenges/{seq}/confirms")
+    @PostMapping("/v1/challenges/{challenge_seq}/confirms")
     public ResponseEntity<Void> createConfirm(
             @ApiParam(hidden = true) @SessionUser Long userSeq,
-            @PathVariable Long seq,
+            @PathVariable("challenge_seq") Long challengeSeq,
             @RequestPart MultipartFile image
     ){
         if (image == null) {
             throw ResponseError.BadRequest.INVALID_IMAGE.getResponseException("need to images");
         }
 
-        confirmService.createConfirm(userSeq, seq, image);
+        confirmService.createConfirm(userSeq, challengeSeq, image);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
@@ -61,13 +61,13 @@ public class ConfirmController {
     }
 
     @ApiOperation("챌린지별 스토리 전체 조회")
-    @GetMapping("/v1/challenges/{seq}/confirms")
+    @GetMapping("/v1/challenges/{challenge_seq}/confirms")
     public List<ResConfirmList> getConfirmList(
-            @PathVariable Long seq,
+            @PathVariable("challenge_seq") Long challengeSeq,
             @Valid ReqList req
     ) {
 
-        return confirmService.getConfirmList(seq,req)
+        return confirmService.getConfirmList(challengeSeq,req)
                 .stream()
                 .map(ResConfirmList::of)
                 .collect(Collectors.toList());
@@ -88,9 +88,9 @@ public class ConfirmController {
     }
 
     @ApiOperation("스토리 하나 조회")
-    @GetMapping("/v1/confirms/{confirmSeq}")
+    @GetMapping("/v1/confirms/{confirm_seq}")
     public ResConfirm getConfirm(
-            @PathVariable Long confirmSeq
+            @PathVariable("confirm_seq") Long confirmSeq
     ) {
         Confirm confirm=confirmService.getConfirm(confirmSeq);
 
@@ -100,10 +100,10 @@ public class ConfirmController {
     }
 
     @ApiOperation("스토리 삭제")
-    @DeleteMapping("/v1/confirms/{confirmSeq}")
+    @DeleteMapping("/v1/confirms/{confirm_seq}")
     public ResponseEntity<Void> deleteConfirm(
             @ApiParam(hidden = true) @SessionUser Long mySeq,
-            @PathVariable Long confirmSeq
+            @PathVariable("confirm_seq") Long confirmSeq
     ){
         confirmService.deleteConfirm(mySeq,confirmSeq);
 
@@ -111,9 +111,9 @@ public class ConfirmController {
     }
 
     @ApiOperation("신고 생성")
-    @PostMapping("/v1/confirms/{confirmSeq}/declarations")
+    @PostMapping("/v1/confirms/{confirm_seq}/declarations")
     public ResponseEntity<Void> createDeclaration(
-            @PathVariable Long confirmSeq,
+            @PathVariable("confirm_seq") Long confirmSeq,
             @RequestBody @Valid ReqDeclarationCreate req
     ){
         confirmService.createDeclaration(confirmSeq,req.getType());
@@ -139,9 +139,9 @@ public class ConfirmController {
     public ResponseEntity<Void> createConfirmSticker(
             @ApiParam(hidden = true) @SessionUser Long mySeq,
             @RequestBody @Valid ReqConfirmSticker reqConfirmSticker,
-            @PathVariable Long confirm_seq
+            @PathVariable("confirm_seq") Long confirmSeq
     ){
-        confirmService.createConfirmSticker(mySeq,confirm_seq, reqConfirmSticker);
+        confirmService.createConfirmSticker(mySeq,confirmSeq, reqConfirmSticker);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
