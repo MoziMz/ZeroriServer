@@ -10,7 +10,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.swing.text.html.Option;
 import java.util.List;
+import java.util.Optional;
 
 
 @Slf4j
@@ -41,9 +43,16 @@ public class ChallengeService {
         );
     }
 
+
+    @Transactional
+    public ChallengeScrap getChallengeScrap(Long challengeSeq,Long userSeq){
+        return challengeScrapRepository.findByChallengeSeqAndUserSeq(challengeSeq,userSeq);
+
+    }
+
     //챌린지 스크랩 생성
     @Transactional
-    public void createChallengeScrab(Long userSeq, Long seq){
+    public void createChallengeScrap(Long userSeq, Long seq){
 
         User user = userRepository.findById(userSeq)
                 .orElseThrow(ResponseError.NotFound.USER_NOT_EXISTS::getResponseException);
@@ -65,7 +74,7 @@ public class ChallengeService {
     }
 
     @Transactional
-    public void deleteChallengeScrab(Long userSeq, Long seq){
+    public void deleteChallengeScrap(Long userSeq, Long seq){
         User user = userRepository.findById(userSeq)
                 .orElseThrow(ResponseError.NotFound.USER_NOT_EXISTS::getResponseException);
 

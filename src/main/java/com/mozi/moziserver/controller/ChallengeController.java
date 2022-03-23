@@ -53,7 +53,9 @@ public class ChallengeController {
 
         List<ResChallengeTagList> challengeTagList = challengeTagService.getChallengeTagList(seq);
 
-        return ResChallenge.of(challenge, optionalUserChallenge, optionalUserChallengeRecord, challengeStatisticsList, challengeTagList);
+        ChallengeScrap challengeScrap=challengeService.getChallengeScrap(seq,userSeq);
+
+        return ResChallenge.of(challenge, optionalUserChallenge, optionalUserChallengeRecord, challengeStatisticsList, challengeTagList,challengeScrap);
     }
 
     @ApiOperation("챌린지 모두 조회")
@@ -71,22 +73,22 @@ public class ChallengeController {
 
     @ApiOperation("챌린지 스크랩")
     @PostMapping("/v1/challenges/{seq}/scrabs")
-    public ResponseEntity<Void> createChallengeScrab(
+    public ResponseEntity<Void> createChallengeScrap(
             @ApiParam(hidden = true) @SessionUser Long userSeq,
             @PathVariable Long seq
     ){
-        challengeService.createChallengeScrab(userSeq,seq);
+        challengeService.createChallengeScrap(userSeq,seq);
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @ApiOperation("챌린지 스크랩")
     @DeleteMapping("/v1/challenges/{seq}/scrabs")
-    public ResponseEntity<Void> deleteChallengeScrab(
+    public ResponseEntity<Void> deleteChallengeScrap(
             @ApiParam(hidden = true) @SessionUser Long userSeq,
             @PathVariable Long seq
     ){
-        challengeService.deleteChallengeScrab(userSeq,seq);
+        challengeService.deleteChallengeScrap(userSeq,seq);
 
         return new ResponseEntity<>(HttpStatus.OK);
     }

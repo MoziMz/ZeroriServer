@@ -40,7 +40,9 @@ public class ResChallenge {
 
     private List<ResChallengeTagList> tagList;
 
-    private ResChallenge(Challenge challenge, Optional<UserChallenge> optionalUserChallenge, Optional<UserChallengeRecord> optionalUserChallengeRecord, List<ChallengeStatistics> challengeStatisticsList, List<ResChallengeTagList> challengeTag) {
+    private Boolean isScrap;
+
+    private ResChallenge(Challenge challenge, Optional<UserChallenge> optionalUserChallenge, Optional<UserChallengeRecord> optionalUserChallengeRecord, List<ChallengeStatistics> challengeStatisticsList, List<ResChallengeTagList> challengeTag,ChallengeScrap challengeScrap) {
         this.seq = challenge.getSeq();
         this.name = challenge.getName();
         this.description = challenge.getDescription();
@@ -62,9 +64,10 @@ public class ResChallenge {
                 .orElse(null);
         this.challengeRecord = ResChallengeRecord.of(challenge.getChallengeRecord());
         this.tagList = challenge.getTagList().stream().map(ResChallengeTagList::of).collect(Collectors.toList());
+        this.isScrap=challengeScrap!=null?true:false;
     }
 
-    public static ResChallenge of(Challenge challenge, Optional<UserChallenge> optionalUserChallenge, Optional<UserChallengeRecord> optionalUserChallengeRecord, List<ChallengeStatistics> challengeStatisticsList, List<ResChallengeTagList> challengeTagList) {
-        return new ResChallenge(challenge, optionalUserChallenge, optionalUserChallengeRecord, challengeStatisticsList, challengeTagList);
+    public static ResChallenge of(Challenge challenge, Optional<UserChallenge> optionalUserChallenge, Optional<UserChallengeRecord> optionalUserChallengeRecord, List<ChallengeStatistics> challengeStatisticsList, List<ResChallengeTagList> challengeTagList,ChallengeScrap challengeScrap) {
+        return new ResChallenge(challenge, optionalUserChallenge, optionalUserChallengeRecord, challengeStatisticsList, challengeTagList,challengeScrap);
     }
 }
