@@ -151,7 +151,7 @@ public class EmailAuthService {
 
     public void sendCheckEmail(User user, String email) {
         EmailCheckAuth emailCheckAuth = new EmailCheckAuth();
-        emailCheckAuth.setType(EmailAuthType.JOIN);
+        emailCheckAuth.setType(EmailAuthType.RESET_PW_OR_EMAIL);
         emailCheckAuth.setEmail(email);
         emailCheckAuth.setUser(user);
 
@@ -179,10 +179,11 @@ public class EmailAuthService {
             throw ResponseError.InternalServerError.UNEXPECTED_ERROR.getResponseException();
         }
 
-        boolean isSend = sendEmail(
+        boolean isSend = sendButtonedEmail(
                 email,
-                "가입인증메일",
-                "인증링크 : " + serverDomain + "/email/auth/check" + emailCheckAuth.getToken()
+                "이메일 수정 인증메일",
+                "<html> <body><h1></h1>"+"<br/>아래 [인증] 버튼을 눌러주세요."+"<form action=\""+serverDomain+ "/email/auth/other-check/" + emailCheckAuth.getToken()+"\"> <input type=\"submit\" value=\"인증\" /> </form>"
+                        +"</body></html>"
         );
 
         if(!isSend) {
@@ -256,7 +257,7 @@ public class EmailAuthService {
     @Transactional
     public String createEmailCheckAuth(User user, String email) {
         EmailCheckAuth emailCheckAuth = new EmailCheckAuth();
-        emailCheckAuth.setType(EmailAuthType.FIND_PW);
+        emailCheckAuth.setType(EmailAuthType.RESET_PW_OR_EMAIL);
         emailCheckAuth.setEmail(email);
         emailCheckAuth.setUser(user);
 
@@ -287,7 +288,7 @@ public class EmailAuthService {
         boolean isSend = sendButtonedEmail(
                 email,
                 "비밀번호 찾기 인증메일",
-                "<html> <body><h1></h1>"+"<br/>아래 [인증] 버튼을 눌러주세요."+"<form action=\""+serverDomain+ "/email/auth/pw-check/" + emailCheckAuth.getToken()+"\"> <input type=\"submit\" value=\"인증\" /> </form>"
+                "<html> <body><h1></h1>"+"<br/>아래 [인증] 버튼을 눌러주세요."+"<form action=\""+serverDomain+ "/email/auth/other-check/" + emailCheckAuth.getToken()+"\"> <input type=\"submit\" value=\"인증\" /> </form>"
                    +"</body></html>"
         );
 
@@ -311,7 +312,7 @@ public class EmailAuthService {
     }
 
     @Transactional
-    public EmailAuthResult authCheckPwEmail(String token) {
+    public EmailAuthResult authOtherCheckEmail(String token) {
         Optional<EmailCheckAuth> emailCheckAuthOptional = emailCheckAuthRepository.findByToken(token);
 
         if(emailCheckAuthOptional.isEmpty()) {
@@ -320,7 +321,7 @@ public class EmailAuthService {
 
         EmailCheckAuth emailCheckAuth = emailCheckAuthOptional.get();
 
-        if(emailCheckAuth.getType() != EmailAuthType.FIND_PW) {
+        if(emailCheckAuth.getType() != EmailAuthType.RESET_PW_OR_EMAIL) {
             return EmailAuthResult.INVALID;
         }
 

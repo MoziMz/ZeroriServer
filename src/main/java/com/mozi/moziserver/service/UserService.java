@@ -5,7 +5,7 @@ import com.mozi.moziserver.httpException.ResponseError;
 import com.mozi.moziserver.model.entity.User;
 import com.mozi.moziserver.model.entity.UserAuth;
 import com.mozi.moziserver.model.mappedenum.UserAuthType;
-import com.mozi.moziserver.model.req.ReqUserNickNameAndEmail;
+import com.mozi.moziserver.model.req.ReqUserNickNameAndPw;
 import com.mozi.moziserver.model.req.ReqUserSignIn;
 import com.mozi.moziserver.model.req.ReqUserSignUp;
 import com.mozi.moziserver.repository.UserAuthRepository;
@@ -226,16 +226,17 @@ public class UserService {
         // TODO
     }
 
-    // 유저 id(email) 찾기
-    public ResponseEntity<String> findUserEmail(ReqUserNickNameAndEmail req) {
+    public UserAuth findUserEmail(String nickName,String pw) {
 
-        UserAuth userAuth = userAuthRepository.findUserEmailByNickName(req.getNickName());
-        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        User user=userRepository.findByNickName(nickName);
 
-        if(userAuth != null && encoder.matches(req.getPw(), userAuth.getPw())){
-            return new ResponseEntity<>(userAuth.getId(), HttpStatus.OK);
-        }
-        else return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        if(user==null)  throw ResponseError.NotFound.USER_NOT_EXISTS.getResponseException();
+
+        UserAuth userAuth=userAuthRepository.findByUserSeqAndPw(user);
+
+        if(!passwordEncoder.matches(pw,userAuth.getPw()))   throw ResponseError.NotFound.USER_PW_NOT_EXITS.getResponseException();
+
+        return userAuth;
     }
 
     // 이메일 인증
@@ -276,6 +277,13 @@ public class UserService {
         if(user==null || user.getState()==UserState.DELETED)  throw ResponseError.NotFound.EMAIL_NOT_EXITS.getResponseException();
 
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @Transactional
+    public User findUserByNickName(String nickName){
+        User user=userRepository.findByNickName(nickName);
+
+        return user;
     }
 
 }

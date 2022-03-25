@@ -38,9 +38,12 @@ public interface Constant {
             "/api/*/users/signup",
             "/api/*/users/signout",
             "/api/*/users/find-email",
+            "/api/*/users/user-auths",
             "/api/*/users/email-check-auths",
             "/api/*/users/email-check-auths/{token}",
-            "/api/*/users/email-check-auths/user-auths"
+            "/api/*/users/email-check-auths/user-auths",
+            "/api/*/users/nicknames",
+            "/api/*/users/user-auths/emails"
     };
 
     String[] AUTHENTICATED_PATHS = new String[]{

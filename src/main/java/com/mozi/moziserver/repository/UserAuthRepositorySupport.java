@@ -9,4 +9,6 @@ public interface UserAuthRepositorySupport {
     //String checkQuitUser(String id);
 
     User findUserSeqByEmail(String email);
+
+    UserAuth findByUserSeqAndPw(User user);
 }

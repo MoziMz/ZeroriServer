@@ -77,7 +77,7 @@ public class ConfigurationController {
     @PostMapping("/v1/users/mypage/nicknames")
     public ResponseEntity<Void> updateUserNickName(
             @ApiParam(hidden = true) @SessionUser Long userSeq,
-            @RequestBody @Valid ReqUserNickNameAndEmail req
+            @RequestBody @Valid ReqUserNickNameAndPw req
     ) {
         myPageService.updateUserNickName(userSeq, req.getNickName());
         return new ResponseEntity<>(HttpStatus.OK);
@@ -88,7 +88,7 @@ public class ConfigurationController {
     @PostMapping("/v1/users/mypage/passwords")
     public ResponseEntity<Void> updateUserPassword(
             @ApiParam(hidden = true) @SessionUser Long userSeq,
-            @RequestBody @Valid ReqUserNickNameAndEmail req
+            @RequestBody @Valid ReqUserNickNameAndPw req
     ) {
         myPageService.updateUserPassword(userSeq, req.getPw());
         return new ResponseEntity<>(HttpStatus.OK);

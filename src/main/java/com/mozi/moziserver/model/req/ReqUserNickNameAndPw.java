@@ -7,7 +7,8 @@ import javax.validation.constraints.NotBlank;
 
 @Getter
 @Setter
-public class ReqUserNickNameAndEmail {
+public class ReqUserNickNameAndPw {
     private String nickName;
+
     private String pw;
 }

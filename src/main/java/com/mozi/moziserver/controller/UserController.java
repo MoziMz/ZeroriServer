@@ -1,9 +1,14 @@
 package com.mozi.moziserver.controller;
 
 import com.mozi.moziserver.httpException.ResponseError;
+import com.mozi.moziserver.model.entity.User;
+import com.mozi.moziserver.model.entity.UserAuth;
 import com.mozi.moziserver.model.mappedenum.UserAuthType;
 import com.mozi.moziserver.model.req.*;
 import com.mozi.moziserver.model.res.ResConfirmList;
+import com.mozi.moziserver.model.res.ResDuplicationCheck;
+import com.mozi.moziserver.model.res.ResEmail;
+import com.mozi.moziserver.security.SessionUser;
 import com.mozi.moziserver.service.EmailAuthService;
 import com.mozi.moziserver.service.MyPageService;
 import com.mozi.moziserver.service.UserService;
@@ -82,15 +87,30 @@ public class UserController {
     }
 
 
-    @ApiOperation("이메일 찾기_닉네임, 비밀번호 사용")
-    @PostMapping("/v1/users/find-email")
-    public ResponseEntity<String> findEmail(
-        @RequestBody @Valid ReqUserNickNameAndEmail req
-    ){
-        return userService.findUserEmail(req);
+    //닉네임 확인
+    @ApiOperation("이메일 찾기_닉네임 확인")
+    @PostMapping("/v1/users/nicknames")
+    public Boolean isUserNickName(
+            @RequestBody @Valid ReqNickName req
+    ) {
+        User user=userService.findUserByNickName(req.getNickName());
+        if(user!=null) return Boolean.TRUE;
+        return Boolean.FALSE;
     }
 
-    @ApiOperation("비밀번호 찾기(재설성)_이메일 확인")
+
+    @ApiOperation("이메일 찾기_이메일 보여주기")
+    @PostMapping("/v1/users/user-auths/emails")
+    public ResEmail findUserAuthEmail(
+        @RequestBody @Valid ReqUserNickNameAndPw req
+    ){
+        UserAuth userAuth=userService.findUserEmail(req.getNickName(),req.getPw());
+
+        return ResEmail.of(userAuth);
+
+    }
+
+    @ApiOperation("비밀번호 찾기(재설정)_이메일 확인")
     @PostMapping("/v1/users/user-auths")
     public ResponseEntity<Void> checkUserAuth(
             @RequestBody @Valid ReqAuthEmail req
@@ -106,7 +126,7 @@ public class UserController {
         return userService.sendEmail(req.getEmail());
     }
 
-    @ApiOperation("비밀번호 찾기(재설성)_이메일 인증 확인")
+    @ApiOperation("비밀번호 찾기(재설정)_이메일 인증 확인")
     @GetMapping("/v1/users/email-check-auths/{token}")
     public ResponseEntity<Long> checkEmailAuth(
             @PathVariable String token

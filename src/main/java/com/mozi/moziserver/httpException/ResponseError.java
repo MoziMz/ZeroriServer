@@ -135,7 +135,8 @@ public interface ResponseError {
         CHALLENGE_NOT_EXISTS("challenge not exists"),
         USER_CHALLENGE_NOT_EXISTS("user-challenge not exists"),
         USER_STICKER_NOT_EXISTS("user sticker not exists"),
-        EMAIL_NOT_EXITS("email not exits");
+        EMAIL_NOT_EXITS("email not exits"),
+        USER_PW_NOT_EXITS("user password not exists");
 
         private final String message;
 

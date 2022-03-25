@@ -7,11 +7,13 @@ import com.mozi.moziserver.model.entity.User;
 import com.mozi.moziserver.model.entity.UserAuth;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 
+import javax.persistence.EntityManager;
 import java.util.stream.Collectors;
 
 public class UserAuthRepositoryImpl extends QuerydslRepositorySupport implements UserAuthRepositorySupport {
     private final QUserAuth qUserAuth = QUserAuth.userAuth;
     private final QUser qUser = QUser.user;
+    EntityManager entityManager;
 
     public UserAuthRepositoryImpl() {
         super(UserAuth.class);
@@ -32,6 +34,13 @@ public class UserAuthRepositoryImpl extends QuerydslRepositorySupport implements
         return from(qUserAuth)
                 .select(qUserAuth.user)
                 .where(qUserAuth.id.eq(email))
+                .fetchOne();
+    }
+
+    @Override
+    public UserAuth findByUserSeqAndPw(User user){
+        return from(qUserAuth)
+                .where(qUserAuth.user.eq(user))
                 .fetchOne();
     }
 }

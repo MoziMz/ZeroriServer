@@ -66,15 +66,15 @@ public class EmailAuthController {
     }
 
     @ApiOperation(value = "", hidden = true)
-    @GetMapping("/pw-check/{token}")
-    public ResponseEntity<Void> authCheckPwEmail(
+    @GetMapping("/other-check/{token}")
+    public ResponseEntity<Void> authOtherCheck(
             @PathVariable("token")String token
     ) throws Exception {
         HttpHeaders httpHeaders = new HttpHeaders();
 
-        switch (emailAuthService.authCheckPwEmail(token)) {
+        switch (emailAuthService.authOtherCheckEmail(token)) {
             case SUCC:
-                httpHeaders.setLocation(new URI("/pw-email-auth-valid.html"));
+                httpHeaders.setLocation(new URI("/other-email-auth-valid.html"));
                 break;
             case ALREADY_SUCC:
                 httpHeaders.setLocation(new URI("/email-auth-already-valid.html"));
