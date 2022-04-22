@@ -88,7 +88,7 @@ public class UserController {
 
 
     //닉네임 확인
-    @ApiOperation("이메일 찾기_닉네임 확인")
+    @ApiOperation("닉네임 존재 확인")
     @PostMapping("/v1/users/nicknames")
     public Boolean isUserNickName(
             @RequestBody @Valid ReqNickName req
