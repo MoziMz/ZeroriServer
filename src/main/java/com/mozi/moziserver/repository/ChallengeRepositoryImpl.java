@@ -112,7 +112,7 @@ public class ChallengeRepositoryImpl extends QuerydslRepositorySupport implement
 //        return tags != null ? qChallengeTag.id.tagName.in(tags) : null;
 //    }
 
-    private BooleanExpression themeNameIn(List<ChallengeThemeType> themes) {
-        return themes != null ? qChallengeTheme.id.themeName.in(themes) : null;
-    }
+//    private BooleanExpression themeNameIn(List<ChallengeThemeType> themes) {
+//        return themes != null ? qChallengeTheme.id.themeName.in(themes) : null;
+//    }
 }

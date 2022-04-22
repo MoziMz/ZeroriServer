@@ -24,6 +24,7 @@ public class ChallengeService {
     private final UserRepository userRepository;
     private final ChallengeScrapRepository challengeScrapRepository;
     private final ChallengeRecordRepository challengeRecordRepository;
+    private final ChallengeThemeRepository challengeThemeRepository;
 
     // 챌린지 하나 조회
     public Challenge getChallenge(Long seq) {
@@ -120,6 +121,10 @@ public class ChallengeService {
         }catch (Exception e){
             throw ResponseError.BadRequest.ALREADY_CREATED.getResponseException();
         }
+    }
+
+    public List<ChallengeTheme> getChallengeThemeList () {
+        return challengeThemeRepository.findAll();
     }
 
 }

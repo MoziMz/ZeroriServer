@@ -93,5 +93,11 @@ public class ChallengeController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    @ApiOperation("챌린지 테마 리스트 조회")
+    @GetMapping("/v1/challenge-themes")
+    public List<ChallengeTheme> getChallengeThemeList() {
+        return challengeService.getChallengeThemeList();
+    }
+
 }
 
