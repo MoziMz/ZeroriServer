@@ -13,15 +13,13 @@ public class PostboxMessageAnimal extends AbstractTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long seq;
 
+    private Integer level;
+
+    private String content;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_seq")
     private User user;
-
-    @Column(name = "animal_seq")
-    private Long animalSeq;
-
-    @Column(name = "level")
-    private Integer level;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "animal_seq", insertable = false, updatable = false)

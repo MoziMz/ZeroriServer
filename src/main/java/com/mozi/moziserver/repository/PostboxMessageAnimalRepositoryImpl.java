@@ -24,8 +24,8 @@ public class PostboxMessageAnimalRepositoryImpl extends QuerydslRepositorySuppor
                 .innerJoin(qPostboxMessageAnimal.user, qUser).fetchJoin()
                 .innerJoin(qPostboxMessageAnimal.animal, qAnimal).fetchJoin()
                 .where(qPostboxMessageAnimal.user.eq(user))
-                .where(qPostboxMessageAnimal.animalSeq.eq(
-                        JPAExpressions.select(qPostboxMessageAnimal.animalSeq.max())
+                .where(qPostboxMessageAnimal.animal.seq.eq(
+                        JPAExpressions.select(qPostboxMessageAnimal.animal.seq.max())
                                 .from(qPostboxMessageAnimal)
                 ))
                 .orderBy(qPostboxMessageAnimal.level.desc())
@@ -44,5 +44,16 @@ public class PostboxMessageAnimalRepositoryImpl extends QuerydslRepositorySuppor
 
         return preparationItemList;
 
+    }
+
+    @Override
+    public List<PostboxMessageAnimal> findAllByUser(User user) {
+         return from(qPostboxMessageAnimal)
+                 .innerJoin(qPostboxMessageAnimal.user, qUser).fetchJoin()
+                 .innerJoin(qPostboxMessageAnimal.animal, qAnimal).fetchJoin()
+                 .where(qUser.eq(user))
+                 .fetch()
+                 .stream()
+                 .collect(Collectors.toList());
     }
 }

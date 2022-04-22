@@ -36,4 +36,11 @@ public class PostboxMessageAnimalService {
 
         return postboxMessageAnimalRepository.findItemByUser(user, animalSeq);
     }
+
+    public List<PostboxMessageAnimal> getPostboxMessageAnimalList (Long userSeq) {
+        User user = userRepository.findById(userSeq)
+                .orElseThrow(ResponseError.NotFound.USER_NOT_EXISTS::getResponseException);
+
+        return postboxMessageAnimalRepository.findAllByUser(user);
+    }
 }
