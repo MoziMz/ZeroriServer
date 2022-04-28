@@ -25,7 +25,6 @@ public class ChallengeStatisticsRepositoryImpl extends QuerydslRepositorySupport
             Integer endYear,
             Integer endMonth
     ) {
-        // (year == startYear && month >= startMonth) || (year == endYear && month <= endMonth) || (year < endYear && year > startYear)
 
         final Predicate[] predicates = new Predicate[]{
                 qChallengeStatistics.challenge.seq.eq(challengeSeq),

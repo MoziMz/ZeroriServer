@@ -17,71 +17,49 @@ import java.util.stream.Collectors;
 
 public class ConfirmRepositoryImpl extends QuerydslRepositorySupport implements ConfirmRepositorySupport{
     private final QConfirm qConfirm = QConfirm.confirm;
-    private final QUser qUser= QUser.user;
-    private final QChallenge qChallenge=QChallenge.challenge;
+    private final QUser qUser = QUser.user;
+    private final QChallenge qChallenge = QChallenge.challenge;
+    private final QConfirmSticker qConfirmSticker = QConfirmSticker.confirmSticker;
+
     @PersistenceContext
     private EntityManager entityManager;
 
 
-    public ConfirmRepositoryImpl() {super(Confirm.class);}
+    public ConfirmRepositoryImpl() { super(Confirm.class); }
 
     @Override
-    public List<Confirm> findAllConfirmList(Long prevLastConfirmSeq,Integer pageSize){
-        List<User> userList=from(qUser)
-                .fetch()
-                .stream()
-                .collect(Collectors.toList());
-
-        List<Challenge> challengeList=from(qChallenge)
-                .fetch()
-                .stream()
-                .collect(Collectors.toList());
-
+    public List<Confirm> findAll(Long prevLastConfirmSeq,Integer pageSize){
         Predicate[] predicates = new Predicate[]{
                 predicateOptional(qConfirm.seq::lt,prevLastConfirmSeq),
         };
 
         List<Confirm> confirmList = from(qConfirm)
-                .innerJoin(qConfirm.challenge,qChallenge)
-                .innerJoin(qConfirm.user,qUser)
-                .where(qConfirm.user.in(userList),qConfirm.challenge.in(challengeList))
+                .innerJoin(qConfirm.challenge, qChallenge).fetchJoin()
+                .innerJoin(qConfirm.user, qUser).fetchJoin()
+                .leftJoin(qConfirm.confirmStickerList, qConfirmSticker).fetchJoin()
                 .orderBy(qConfirm.createdAt.desc())
                 .where(predicates)
                 .limit(pageSize)
-                .fetch()
-                .stream()
-                .collect(Collectors.toList());
+                .fetch();
 
         return confirmList;
     }
 
     @Override
-    public List<Confirm> findByChallengeByOrderDesc(Long seq,Long prevLastConfirmSeq, Integer pageSize){
-        List<User> userList=from(qUser)
-                .fetch()
-                .stream()
-                .collect(Collectors.toList());
-
-        List<Challenge> challenge=from(qChallenge)
-                .where(qChallenge.seq.eq(seq))
-                .fetch()
-                .stream()
-                .collect(Collectors.toList());
-
+    public List<Confirm> findAllByChallenge(Challenge challenge, Long prevLastConfirmSeq, Integer pageSize) {
         Predicate[] predicates = new Predicate[]{
                 predicateOptional(qConfirm.seq::lt,prevLastConfirmSeq),
+                predicateOptional(qConfirm.challenge::eq,challenge),
         };
 
         List<Confirm> confirmList = from(qConfirm)
-                .innerJoin(qConfirm.challenge,qChallenge)
-                .innerJoin(qConfirm.user,qUser)
-                .where(qConfirm.user.in(userList),qConfirm.challenge.in(challenge))
-                .where(predicates)
+                .innerJoin(qConfirm.challenge, qChallenge).fetchJoin()
+                .innerJoin(qConfirm.user, qUser).fetchJoin()
+                .leftJoin(qConfirm.confirmStickerList, qConfirmSticker).fetchJoin()
                 .orderBy(qConfirm.createdAt.desc())
+                .where(predicates)
                 .limit(pageSize)
-                .fetch()
-                .stream()
-                .collect(Collectors.toList());
+                .fetch();
 
         return confirmList;
     }

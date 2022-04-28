@@ -19,19 +19,6 @@ public class ReqUserChallengeCreate {
     @NotNull
     private LocalDate startDate;
 
-    // TODO
-    // 파라미터가 들어온 시간을 자동으로 받기 위해서
     @JsonIgnore
     LocalDate today = LocalDate.now();
-
-//    @NotBlank
-//    private String name;
-//    @NotBlank
-//    private String location;
-//    @NotNull
-//    private String operatingTime;
-//    @NotNull
-//    private String menu;
-//    private List<ReqLink> links = new LinkedList<>();
-
 }

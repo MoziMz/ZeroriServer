@@ -20,16 +20,6 @@ public class UserAuthRepositoryImpl extends QuerydslRepositorySupport implements
     }
 
     @Override
-    public UserAuth findUserEmailByNickName(String nickName) {
-
-        return from(qUserAuth)
-                .innerJoin(qUser).on(qUserAuth.user.seq.eq(qUser.seq))
-                .where(qUser.nickName.eq(nickName)
-                        .and(qUser.state.eq(UserState.ACTIVE)))
-                .fetchOne();
-    }
-
-    @Override
     public User findUserSeqByEmail(String email){
         return from(qUserAuth)
                 .select(qUserAuth.user)
@@ -38,7 +28,7 @@ public class UserAuthRepositoryImpl extends QuerydslRepositorySupport implements
     }
 
     @Override
-    public UserAuth findByUserSeqAndPw(User user){
+    public UserAuth findByUser(User user){
         return from(qUserAuth)
                 .where(qUserAuth.user.eq(user))
                 .fetchOne();

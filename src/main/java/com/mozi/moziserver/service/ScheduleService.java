@@ -1,9 +1,10 @@
 package com.mozi.moziserver.service;
 
 import com.mozi.moziserver.model.entity.UserChallenge;
-import com.mozi.moziserver.model.mappedenum.UserChallengeResultType;
 import com.mozi.moziserver.model.mappedenum.UserChallengeStateType;
+import com.mozi.moziserver.repository.UserChallengeRecordRepository;
 import com.mozi.moziserver.repository.UserChallengeRepository;
+import com.mozi.moziserver.repository.UserRewardRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -12,7 +13,6 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import java.time.LocalDate;
-import java.time.Period;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -20,8 +20,13 @@ import java.util.List;
 public class ScheduleService {
     private final UserChallengeRepository userChallengeRepository;
     private final PlatformTransactionManager transactionManager;
+    private final UserChallengeRecordRepository userChallengeRecordRepository;
+    private final UserRewardRepository userRewardRepository;
 
-//      @Transactional
+    // TODO 전역변수로 분리하기
+    final int extraPoints = 5;
+
+    //      @Transactional
     @Scheduled(cron = "0 0 0 * * *")
 //    For test
 //    @Scheduled(initialDelay = 1000L, fixedDelay = 100000000000000L)
@@ -60,11 +65,42 @@ public class ScheduleService {
             userChallengeRepository.updateState(today, UserChallengeStateType.PLAN, UserChallengeStateType.DOING);
         });
 
-        withTransaction(() -> {
-            // state 가 DOING 에서 END 로 바뀔 예정인 챌린지에 대한 포인트를 계산해준다.
+//        withTransaction(() -> {
+//            // state 가 DOING 에서 END 로 바뀔 예정인 챌린지에 대한 포인트를 계산해준다.
+//
+//            userChallengeRepository.updateState(today.minusDays(7), UserChallengeStateType.DOING, UserChallengeStateType.END);
+//        });
 
-            userChallengeRepository.updateState(today.minusDays(7), UserChallengeStateType.DOING, UserChallengeStateType.END);
-        });
+        updateUserChallengeDoingToEnd(today);
+    }
+
+    /**
+     * user challenge state from doing to end
+     *
+     * @param date start date
+     */
+    public void updateUserChallengeDoingToEnd(final LocalDate date) {
+
+        List<UserChallenge> userChallengeList = userChallengeRepository.findAllByStateAndStartDate(UserChallengeStateType.DOING, date.minusDays(7));
+
+        for (UserChallenge userChallenge : userChallengeList) {
+            withTransaction(() -> {
+                UserChallenge curUserChallenge = userChallengeRepository.findBySeq(userChallenge.getSeq())
+                        .orElse(null);
+
+                if (curUserChallenge == null) {
+                    // TODO
+                }
+
+                //
+
+                if (curUserChallenge.getTotalConfirmCnt() >= curUserChallenge.getChallenge().getRecommendedCnt()) {
+                    userRewardRepository.incrementPoint(curUserChallenge.getUser().getSeq(), extraPoints);
+                }
+
+                userChallengeRepository.updateUserChallengeState(curUserChallenge.getSeq(), UserChallengeStateType.DOING, UserChallengeStateType.END);
+            });
+        }
     }
 
     private void withTransaction(Runnable runnable) {

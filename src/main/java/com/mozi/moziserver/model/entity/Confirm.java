@@ -35,12 +35,11 @@ public class Confirm extends AbstractTimeEntity{
     @Column(name="declaration_state")
     private Byte confirmState;
 
-    @OneToMany
+    @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name="confirm_seq")
     private List<ConfirmSticker> confirmStickerList;
 
-    @OneToMany
+    @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name="confirm_seq")
     private List<Declaration> DeclarationList;
-
 }

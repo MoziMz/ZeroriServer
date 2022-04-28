@@ -16,16 +16,6 @@ public class StickerImgRepositoryImpl extends QuerydslRepositorySupport implemen
     }
 
     @Override
-    public List<StickerImg> findAll() {
-        List<StickerImg> stickerImgList = from(qStickerImg)
-                .fetch()
-                .stream()
-                .collect(Collectors.toList());
-
-        return stickerImgList;
-    }
-
-    @Override
     public List<StickerImg> findAllBySeq(List<Long> stickerSeqList){
         BooleanBuilder builder = new BooleanBuilder();
         for(Long seq:stickerSeqList){

@@ -1,9 +1,8 @@
 package com.mozi.moziserver.controller;
 
-import com.mozi.moziserver.security.SessionUser;
+import com.mozi.moziserver.model.EmailAuthResult;
 import com.mozi.moziserver.service.EmailAuthService;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -13,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import springfox.documentation.annotations.ApiIgnore;
+
 import java.net.URI;
 
 @ApiIgnore
@@ -28,9 +28,19 @@ public class EmailAuthController {
     public ResponseEntity<Void> authEmail(@PathVariable String token) throws Exception {
         HttpHeaders httpHeaders = new HttpHeaders();
 
-        switch (emailAuthService.authEmail(token)) {
+        EmailAuthResult result = emailAuthService.authEmail(token);
+
+        switch (result.getStatus()) {
             case SUCC:
-                httpHeaders.setLocation(new URI("/email-auth-valid.html"));
+                switch (result.getType()) {
+                    case JOIN:
+                        httpHeaders.setLocation(new URI("/email-auth-join-valid.html"));
+                    case RESET_PW:
+                        httpHeaders.setLocation(new URI("/email-auth-reset-pw-valid.html"));
+                        // TODO ?JSESSIONID=
+                    case RESET_EMAIL:
+                        httpHeaders.setLocation(new URI("/email-auth-reset-email-valid.html"));
+                }
                 break;
             case ALREADY_SUCC:
                 httpHeaders.setLocation(new URI("/email-auth-already-valid.html"));
@@ -42,48 +52,4 @@ public class EmailAuthController {
 
         return new ResponseEntity<>(httpHeaders, HttpStatus.SEE_OTHER);
     }
-
-    @ApiOperation(value = "", hidden = true)
-    @GetMapping("/check/{token}")
-    public ResponseEntity<Void> authCheckEmail(
-            @PathVariable String token,
-            @ApiParam(hidden = true) @SessionUser Long userSeq
-    ) throws Exception {
-        HttpHeaders httpHeaders = new HttpHeaders();
-
-        switch (emailAuthService.authCheckEmail(userSeq, token)) {
-            case SUCC:
-                httpHeaders.setLocation(new URI("/email-auth-valid.html"));
-                break;
-            case ALREADY_SUCC:
-                httpHeaders.setLocation(new URI("/email-auth-already-valid.html"));
-                break;
-            default:
-                httpHeaders.setLocation(new URI("/email-auth-invalid.html"));
-                break;
-        }
-        return new ResponseEntity<>(httpHeaders, HttpStatus.SEE_OTHER);
-    }
-
-    @ApiOperation(value = "", hidden = true)
-    @GetMapping("/other-check/{token}")
-    public ResponseEntity<Void> authOtherCheck(
-            @PathVariable("token")String token
-    ) throws Exception {
-        HttpHeaders httpHeaders = new HttpHeaders();
-
-        switch (emailAuthService.authOtherCheckEmail(token)) {
-            case SUCC:
-                httpHeaders.setLocation(new URI("/other-email-auth-valid.html"));
-                break;
-            case ALREADY_SUCC:
-                httpHeaders.setLocation(new URI("/email-auth-already-valid.html"));
-                break;
-            default:
-                httpHeaders.setLocation(new URI("/email-auth-invalid.html"));
-                break;
-        }
-        return new ResponseEntity<>(httpHeaders, HttpStatus.SEE_OTHER);
-    }
-
 }

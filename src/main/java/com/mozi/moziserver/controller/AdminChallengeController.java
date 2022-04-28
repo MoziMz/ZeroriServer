@@ -23,8 +23,8 @@ public class AdminChallengeController {
     @ApiOperation("챌린지 생성")
     @PostMapping("/admin/challenges")
     public ResponseEntity<Void> createChallenge(
-        @Valid ReqAdminChallengeCreate req
-    ){
+            @Valid ReqAdminChallengeCreate req
+    ) {
         challengeService.createChallenge(req);
 
         return new ResponseEntity<>(HttpStatus.OK);

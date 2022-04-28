@@ -1,11 +1,9 @@
 package com.mozi.moziserver.service;
 
-import com.amazonaws.services.s3.internal.eventstreaming.Message;
-import com.mozi.moziserver.common.EmailAuthResult;
 import com.mozi.moziserver.common.JpaUtil;
 import com.mozi.moziserver.httpException.ResponseError;
+import com.mozi.moziserver.model.EmailAuthResult;
 import com.mozi.moziserver.model.entity.EmailAuth;
-import com.mozi.moziserver.model.entity.EmailCheckAuth;
 import com.mozi.moziserver.model.entity.User;
 import com.mozi.moziserver.model.entity.UserAuth;
 import com.mozi.moziserver.model.mappedenum.EmailAuthType;
@@ -14,13 +12,9 @@ import com.mozi.moziserver.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.mail.internet.MimeMessage;
 import java.time.Duration;
@@ -35,8 +29,6 @@ public class EmailAuthService {
     private final JavaMailSender emailSender;
     private final EmailAuthRepository emailAuthRepository;
     private final UserAuthRepository userAuthRepository;
-    private final EmailCheckAuthRepository emailCheckAuthRepository;
-    private final MyPageRepository myPageRepository;
     private final UserRepository userRepository;
 
     @Value("${spring.mail.username}")
@@ -45,128 +37,162 @@ public class EmailAuthService {
     @Value("${server.domain}")
     private String serverDomain;
 
+    /**
+     * 가입 이메일 전송
+     * @param userAuth
+     */
     public void sendJoinEmail(UserAuth userAuth) {
+        if (userAuth.getType() != UserAuthType.EMAIL) {
+            throw ResponseError.InternalServerError.UNEXPECTED_ERROR.getResponseException("UserAuth seq = " + userAuth.getSeq());
+        }
+
         EmailAuth emailAuth = new EmailAuth();
         emailAuth.setType(EmailAuthType.JOIN);
         emailAuth.setId(userAuth.getId());
         emailAuth.setPw(userAuth.getPw());
         emailAuth.setUser(userAuth.getUser());
 
-        for(int retry=0;retry<3;retry++) {
-            try {
-                emailAuth.setToken(
-                        UUID.randomUUID().toString().replaceAll("-","")
-                        + UUID.randomUUID().toString().replaceAll("-","")
-                );
-                emailAuthRepository.save(emailAuth);
-                if(emailAuth.getSeq() != null) {
-                    break;
-                }
-            } catch (DataIntegrityViolationException e) {
-                if(JpaUtil.isDuplicateKeyException(e)) {
-                    continue;
-                }
-                throw ResponseError.InternalServerError.UNEXPECTED_ERROR.getResponseException();
-            } catch (Exception e) {
-                throw ResponseError.InternalServerError.UNEXPECTED_ERROR.getResponseException();
-            }
-        }
-
-        if(emailAuth.getSeq() == null) {
-            throw ResponseError.InternalServerError.UNEXPECTED_ERROR.getResponseException();
-        }
+        saveEmailAuth(emailAuth);
 
         boolean isSend = sendEmail(
                 emailAuth.getId(),
-                "가입인증메일",
-                "인증링크 : " + serverDomain + "/email/auth/" + emailAuth.getToken()
+                "가입 인증 메일",
+                "<html> <body><h1></h1>" + "<br/>아래 [인증] 버튼을 눌러주세요." + "<form action=\"" + serverDomain + "/email/auth/" + emailAuth.getToken() + "\"> <input type=\"submit\" value=\"인증\" /> </form>"
+                        + "</body></html>"
+//                "인증링크 : " + serverDomain + "/email/auth/" + emailAuth.getToken()
         );
 
-        if(!isSend) {
+        if (!isSend) {
             throw ResponseError.InternalServerError.UNEXPECTED_ERROR.getResponseException();
         }
     }
 
+    /**
+     * 패스워드 변경 이메일 전송
+     * @param userAuth
+     */
+    public void sendResetPwEmail(UserAuth userAuth) {
+        if (userAuth.getType() != UserAuthType.EMAIL) {
+            throw ResponseError.InternalServerError.UNEXPECTED_ERROR.getResponseException();
+        }
+
+        EmailAuth emailAuth = new EmailAuth();
+        emailAuth.setType(EmailAuthType.RESET_PW);
+        emailAuth.setId(userAuth.getId());
+        emailAuth.setPw(userAuth.getPw());
+        emailAuth.setUser(userAuth.getUser());
+
+        saveEmailAuth(emailAuth);
+
+        boolean isSend = sendEmail(
+                emailAuth.getId(),
+                "비밀번호 찾기 인증메일",
+                "<html> <body><h1></h1>" + "<br/>아래 [인증] 버튼을 눌러주세요." + "<form action=\"" + serverDomain + "/email/auth/" + emailAuth.getToken() + "\"> <input type=\"submit\" value=\"인증\" /> </form>"
+                        + "</body></html>"
+        );
+
+        if (!isSend) {
+            throw ResponseError.InternalServerError.UNEXPECTED_ERROR.getResponseException();
+        }
+    }
+
+    /**
+     * 이메일 변경 이메일 전송
+     * @param userAuth
+     * @param newEmail
+     */
+    public void sendResetEmailEmail(UserAuth userAuth, String newEmail) {
+        if (userAuth.getType() != UserAuthType.EMAIL) {
+            throw ResponseError.InternalServerError.UNEXPECTED_ERROR.getResponseException();
+        }
+
+        EmailAuth emailAuth = new EmailAuth();
+        emailAuth.setType(EmailAuthType.RESET_EMAIL);
+        emailAuth.setId(newEmail);
+        emailAuth.setPw(userAuth.getPw());
+        emailAuth.setUser(userAuth.getUser());
+
+        saveEmailAuth(emailAuth);
+
+        boolean isSend = sendEmail(
+                newEmail,
+                "이메일 변경 인증 메일",
+                "<html> <body><h1></h1>" + "<br/>아래 [인증] 버튼을 눌러주세요." + "<form action=\"" + serverDomain + "/email/auth/" + emailAuth.getToken() + "\"> <input type=\"submit\" value=\"인증\" /> </form>"
+                        + "</body></html>"
+        );
+
+        if (!isSend) {
+            throw ResponseError.InternalServerError.UNEXPECTED_ERROR.getResponseException();
+        }
+    }
+
+    /**
+     * 이메일 인증
+     * @param token
+     * @return
+     */
     public EmailAuthResult authEmail(String token) {
         Optional<EmailAuth> emailAuthOptional = emailAuthRepository.findByToken(token);
 
-        if(emailAuthOptional.isEmpty()) {
-            return EmailAuthResult.INVALID;
+        if (emailAuthOptional.isEmpty()) {
+            return EmailAuthResult.builder()
+                    .status(EmailAuthResult.Status.INVALID)
+                    .build();
         }
 
         EmailAuth emailAuth = emailAuthOptional.get();
 
-        if(emailAuth.getType() != EmailAuthType.JOIN) {
-            return EmailAuthResult.INVALID;
-        }
-
-        if(emailAuth.getUsedDt() != null) {
-            return EmailAuthResult.ALREADY_SUCC;
+        if (emailAuth.getUsedDt() != null) {
+            return EmailAuthResult.builder()
+                    .type(emailAuth.getType())
+                    .status(EmailAuthResult.Status.ALREADY_SUCC)
+                    .build();
         }
 
         Duration duration = Duration.between(emailAuth.getCreatedAt(), LocalDateTime.now());
         boolean isExpired = duration.getSeconds() > emailAuth.getType().getExpiredSeconds();
 
-        if( isExpired ) {
-            return EmailAuthResult.INVALID;
+        if (isExpired) {
+            return EmailAuthResult.builder()
+                    .type(emailAuth.getType())
+                    .status(EmailAuthResult.Status.INVALID)
+                    .build();
         }
 
-        UserAuth userAuth = new UserAuth();
-        userAuth.setType(UserAuthType.EMAIL);
-        userAuth.setId(emailAuth.getId());
-        userAuth.setPw(emailAuth.getPw());
-        userAuth.setUser(emailAuth.getUser());
-
-        try {
-            userAuthRepository.save(userAuth);
-        } catch (DataIntegrityViolationException e) { // TODO
-            if(JpaUtil.isDuplicateKeyException(e)) {
-                throw ResponseError.BadRequest.ALREADY_EXISTS_EMAIL.getResponseException();
-            }
-            throw ResponseError.InternalServerError.UNEXPECTED_ERROR.getResponseException();
-        } catch (Exception e) {
-            throw ResponseError.BadRequest.ALREADY_EXISTS_EMAIL.getResponseException();
-        }
-
-        if(userAuth.getSeq() == null) {
-            throw ResponseError.InternalServerError.UNEXPECTED_ERROR.getResponseException();
+        switch (emailAuth.getType()) {
+            case JOIN:
+                authJoin(emailAuth);
+                break;
+            case RESET_PW: // 로그인X, 앱 로그인 -> 비밀번호 재설정
+                authResetPw(emailAuth);
+                break;
+            case RESET_EMAIL: // 로그인O, 이메일 바뀌어 있으면 됨
+                authResetEmail(emailAuth);
+                break;
         }
 
         emailAuth.setUsedDt(LocalDateTime.now());
         emailAuthRepository.save(emailAuth);
 
-        return EmailAuthResult.SUCC;
+        return EmailAuthResult.builder()
+                .type(emailAuth.getType())
+                .status(EmailAuthResult.Status.SUCC)
+                .build();
     }
 
-    private boolean sendEmail(String to,String title,String content) {
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom(emailAddress);
-        message.setTo(to);
-        message.setSubject(title);
-        message.setText(content);
-        emailSender.send(message); // TODO handling throws MailException
-
-        return true;
-    }
-
-    public void sendCheckEmail(User user, String email) {
-        EmailCheckAuth emailCheckAuth = new EmailCheckAuth();
-        emailCheckAuth.setType(EmailAuthType.RESET_PW_OR_EMAIL);
-        emailCheckAuth.setEmail(email);
-        emailCheckAuth.setUser(user);
-
-        for(int retry=0;retry<3;retry++) {
+    private void saveEmailAuth(EmailAuth emailAuth) {
+        for (int retry = 0; retry < 3; retry++) {
             try {
-                emailCheckAuth.setToken(
-                        UUID.randomUUID().toString().replaceAll("-","")
-                                + UUID.randomUUID().toString().replaceAll("-","")
+                emailAuth.setToken(
+                        UUID.randomUUID().toString().replaceAll("-", "")
+                                + UUID.randomUUID().toString().replaceAll("-", "")
                 );
-                emailCheckAuthRepository.save(emailCheckAuth);
-                if(emailCheckAuth.getSeq() != null) {
+                emailAuthRepository.save(emailAuth);
+                if (emailAuth.getSeq() != null) {
                     break;
                 }
             } catch (DataIntegrityViolationException e) {
-                if(JpaUtil.isDuplicateKeyException(e)) {
+                if (JpaUtil.isDuplicateKeyException(e)) {
                     continue;
                 }
                 throw ResponseError.InternalServerError.UNEXPECTED_ERROR.getResponseException();
@@ -175,70 +201,20 @@ public class EmailAuthService {
             }
         }
 
-        if(emailCheckAuth.getSeq() == null) {
-            throw ResponseError.InternalServerError.UNEXPECTED_ERROR.getResponseException();
-        }
-
-        boolean isSend = sendButtonedEmail(
-                email,
-                "이메일 수정 인증메일",
-                "<html> <body><h1></h1>"+"<br/>아래 [인증] 버튼을 눌러주세요."+"<form action=\""+serverDomain+ "/email/auth/other-check/" + emailCheckAuth.getToken()+"\"> <input type=\"submit\" value=\"인증\" /> </form>"
-                        +"</body></html>"
-        );
-
-        if(!isSend) {
+        if (emailAuth.getSeq() == null) {
             throw ResponseError.InternalServerError.UNEXPECTED_ERROR.getResponseException();
         }
     }
 
-    public EmailAuthResult authCheckEmail(Long userSeq, String token) {
-        Optional<EmailCheckAuth> emailCheckAuthOptional = emailCheckAuthRepository.findByToken(token);
+    /**
+     * 이메일 전송
+     * @param to 받는 이메일
+     * @param title 제목
+     * @param content 내용
+     * @return 메일 전송 요청 성공 여부
+     */
 
-        if(emailCheckAuthOptional.isEmpty()) {
-            return EmailAuthResult.INVALID;
-        }
-
-        EmailCheckAuth emailCheckAuth = emailCheckAuthOptional.get();
-
-        if(emailCheckAuth.getType() != EmailAuthType.JOIN) {
-            return EmailAuthResult.INVALID;
-        }
-
-        if(emailCheckAuth.getUsedDt() != null) {
-            return EmailAuthResult.ALREADY_SUCC;
-        }
-
-        Duration duration = Duration.between(emailCheckAuth.getCreatedAt(), LocalDateTime.now());
-        boolean isExpired = duration.getSeconds() > emailCheckAuth.getType().getExpiredSeconds();
-
-        if( isExpired ) {
-            return EmailAuthResult.INVALID;
-        }
-
-        try {
-            User user = userRepository.findById(userSeq)
-                    .orElseThrow(ResponseError.NotFound.USER_NOT_EXISTS::getResponseException);
-
-            String email = emailCheckAuthRepository.getUserEmail(user).getEmail();
-
-            myPageRepository.updateUserEmail(user, email);
-        }
-        catch (DataIntegrityViolationException e) { // TODO
-            if(JpaUtil.isDuplicateKeyException(e)) {
-                throw ResponseError.BadRequest.ALREADY_EXISTS_EMAIL.getResponseException();
-            }
-            throw ResponseError.InternalServerError.UNEXPECTED_ERROR.getResponseException();
-        } catch (Exception e) {
-            throw ResponseError.BadRequest.ALREADY_EXISTS_EMAIL.getResponseException();
-        }
-
-        emailCheckAuth.setUsedDt(LocalDateTime.now());
-        emailCheckAuthRepository.save(emailCheckAuth);
-
-        return EmailAuthResult.SUCC;
-    }
-
-    private boolean sendButtonedEmail(String to,String title,String content) {
+    private boolean sendEmail(String to, String title, String content) {
         MimeMessage message = emailSender.createMimeMessage();
         try {
             MimeMessageHelper messageHelper = new MimeMessageHelper(message, true, "UTF-8");
@@ -247,98 +223,103 @@ public class EmailAuthService {
             messageHelper.setFrom(emailAddress);
             messageHelper.setText(content, true);
             emailSender.send(message);
-        }catch(Exception e){
+        } catch (Exception e) {
             throw ResponseError.BadRequest.BAD_REQUEST.getResponseException();
         }
 
         return true;
     }
+//    private boolean sendEmail(String to, String title, String content) {
+//        SimpleMailMessage message = new SimpleMailMessage();
+//        message.setFrom(emailAddress);
+//        message.setTo(to);
+//        message.setSubject(title);
+//        message.setText(content);
+//        emailSender.send(message); // TODO handling throws MailException
+//
+//        return true;
+//    }
 
-    @Transactional
-    public String createEmailCheckAuth(User user, String email) {
-        EmailCheckAuth emailCheckAuth = new EmailCheckAuth();
-        emailCheckAuth.setType(EmailAuthType.RESET_PW_OR_EMAIL);
-        emailCheckAuth.setEmail(email);
-        emailCheckAuth.setUser(user);
+    private void authJoin(EmailAuth emailAuth) {
+        UserAuth userAuth = new UserAuth();
+        userAuth.setType(UserAuthType.EMAIL);
+        userAuth.setId(emailAuth.getId());
+        userAuth.setPw(emailAuth.getPw());
+        userAuth.setUser(emailAuth.getUser());
 
-        for(int retry=0;retry<3;retry++) {
-            try {
-                emailCheckAuth.setToken(
-                        UUID.randomUUID().toString().replaceAll("-","")
-                                + UUID.randomUUID().toString().replaceAll("-","")
-                );
-                emailCheckAuthRepository.save(emailCheckAuth);
-                if(emailCheckAuth.getSeq() != null) {
-                    break;
-                }
-            } catch (DataIntegrityViolationException e) {
-                if(JpaUtil.isDuplicateKeyException(e)) {
-                    continue;
-                }
-                throw ResponseError.InternalServerError.UNEXPECTED_ERROR.getResponseException();
-            } catch (Exception e) {
-                throw ResponseError.InternalServerError.UNEXPECTED_ERROR.getResponseException();
+        try {
+            userAuthRepository.save(userAuth);
+
+            User user = userAuth.getUser();
+            user.setEmail(userAuth.getId());
+            userRepository.save(user);
+        } catch (DataIntegrityViolationException e) {
+            if (JpaUtil.isDuplicateKeyException(e)) {
+                throw ResponseError.BadRequest.ALREADY_EXISTS_EMAIL.getResponseException();
             }
+            throw ResponseError.InternalServerError.UNEXPECTED_ERROR.getResponseException();
+        } catch (Exception e) {
+            throw ResponseError.BadRequest.ALREADY_EXISTS_EMAIL.getResponseException();
         }
 
-        if(emailCheckAuth.getSeq() == null) {
+        if (userAuth.getSeq() == null) {
+            throw ResponseError.InternalServerError.UNEXPECTED_ERROR.getResponseException();
+        }
+    }
+
+
+    private void authResetPw(EmailAuth emailAuth) {
+
+        UserAuth userAuth = userAuthRepository.findByUserAndType(emailAuth.getUser(), UserAuthType.EMAIL);
+        if (userAuth == null) {
             throw ResponseError.InternalServerError.UNEXPECTED_ERROR.getResponseException();
         }
 
-        boolean isSend = sendButtonedEmail(
-                email,
-                "비밀번호 찾기 인증메일",
-                "<html> <body><h1></h1>"+"<br/>아래 [인증] 버튼을 눌러주세요."+"<form action=\""+serverDomain+ "/email/auth/other-check/" + emailCheckAuth.getToken()+"\"> <input type=\"submit\" value=\"인증\" /> </form>"
-                   +"</body></html>"
-        );
+        // TODO 로그인 상태로 만들기
 
-        if(!isSend) {
+        try {
+            userAuthRepository.save(userAuth);
+        } catch (DataIntegrityViolationException e) {
+            if (JpaUtil.isDuplicateKeyException(e)) {
+                throw ResponseError.BadRequest.ALREADY_EXISTS_EMAIL.getResponseException();
+            }
+            throw ResponseError.InternalServerError.UNEXPECTED_ERROR.getResponseException();
+        } catch (Exception e) {
+            throw ResponseError.BadRequest.ALREADY_EXISTS_EMAIL.getResponseException();
+        }
+
+        if (userAuth.getSeq() == null) {
+            throw ResponseError.InternalServerError.UNEXPECTED_ERROR.getResponseException();
+        }
+    }
+
+
+    private void authResetEmail(EmailAuth emailAuth) {
+
+        UserAuth userAuth = userAuthRepository.findByUserAndType(emailAuth.getUser(), UserAuthType.EMAIL);
+        if (userAuth == null) {
             throw ResponseError.InternalServerError.UNEXPECTED_ERROR.getResponseException();
         }
 
-        return emailCheckAuth.getToken();
-    }
+        userAuth.setId(emailAuth.getId());
 
-    @Transactional
-    public ResponseEntity<Long> findUsedDt(String token){
-        Optional<EmailCheckAuth> emailCheckAuthOptional=emailCheckAuthRepository.findByToken(token);
+        try {
+            userAuthRepository.save(userAuth);
 
-        if(emailCheckAuthOptional.isEmpty() || emailCheckAuthOptional.get().getUsedDt()==null) {
-            throw ResponseError.BadRequest.INVALID_TOKEN.getResponseException();
-        }
-        Long UserSeq=emailCheckAuthOptional.get().getUser().getSeq();
-        return new ResponseEntity<>(UserSeq,HttpStatus.OK);
-
-    }
-
-    @Transactional
-    public EmailAuthResult authOtherCheckEmail(String token) {
-        Optional<EmailCheckAuth> emailCheckAuthOptional = emailCheckAuthRepository.findByToken(token);
-
-        if(emailCheckAuthOptional.isEmpty()) {
-            return EmailAuthResult.INVALID;
+            User user = userAuth.getUser();
+            user.setEmail(userAuth.getId());
+            userRepository.save(user);
+        } catch (DataIntegrityViolationException e) {
+            if (JpaUtil.isDuplicateKeyException(e)) {
+                throw ResponseError.BadRequest.ALREADY_EXISTS_EMAIL.getResponseException();
+            }
+            throw ResponseError.InternalServerError.UNEXPECTED_ERROR.getResponseException();
+        } catch (Exception e) {
+            throw ResponseError.BadRequest.ALREADY_EXISTS_EMAIL.getResponseException();
         }
 
-        EmailCheckAuth emailCheckAuth = emailCheckAuthOptional.get();
-
-        if(emailCheckAuth.getType() != EmailAuthType.RESET_PW_OR_EMAIL) {
-            return EmailAuthResult.INVALID;
+        if (userAuth.getSeq() == null) {
+            throw ResponseError.InternalServerError.UNEXPECTED_ERROR.getResponseException();
         }
-
-        if(emailCheckAuth.getUsedDt() != null) {
-            return EmailAuthResult.ALREADY_SUCC;
-        }
-
-        Duration duration = Duration.between(emailCheckAuth.getCreatedAt(), LocalDateTime.now());
-        boolean isExpired = duration.getSeconds() > emailCheckAuth.getType().getExpiredSeconds();
-
-        if( isExpired ) {
-            return EmailAuthResult.INVALID;
-        }
-
-        emailCheckAuth.setUsedDt(LocalDateTime.now());
-        emailCheckAuthRepository.save(emailCheckAuth);
-
-        return EmailAuthResult.SUCC;
     }
 }

@@ -26,7 +26,9 @@ public interface ResponseError {
         USER_IS_DELETED("user is deleted"),
         INVALID_USER("invalid user"),
         INVALID_IMAGE("invalid image"),
-        INVALID_TOKEN("invalid token");
+        INVALID_TOKEN("invalid token"),
+        ALREADY_EXISTS_NICKNAME("already exists nickname"),
+        SOCIAL_LOGIN_USER("social login user");
 
         // INVALID 는 한가지로 명확하지 않을때 쓴다.
 
@@ -135,8 +137,8 @@ public interface ResponseError {
         CHALLENGE_NOT_EXISTS("challenge not exists"),
         USER_CHALLENGE_NOT_EXISTS("user-challenge not exists"),
         USER_STICKER_NOT_EXISTS("user sticker not exists"),
-        EMAIL_NOT_EXITS("email not exits"),
-        USER_PW_NOT_EXITS("user password not exists");
+        EMAIL_NOT_EXISTS("email not exists"),
+        NICKNAME_NOT_EXISTS("nickname not exists");
 
         private final String message;
 

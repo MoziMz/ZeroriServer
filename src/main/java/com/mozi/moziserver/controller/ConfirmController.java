@@ -1,26 +1,26 @@
 package com.mozi.moziserver.controller;
 
 import com.mozi.moziserver.httpException.ResponseError;
-import com.mozi.moziserver.model.entity.*;
-import com.mozi.moziserver.model.mappedenum.DeclarationType;
-import com.mozi.moziserver.model.req.*;
-import com.mozi.moziserver.model.res.*;
+import com.mozi.moziserver.model.entity.StickerImg;
+import com.mozi.moziserver.model.req.ReqConfirmSticker;
+import com.mozi.moziserver.model.req.ReqDeclarationCreate;
+import com.mozi.moziserver.model.req.ReqList;
+import com.mozi.moziserver.model.res.ResConfirmList;
+import com.mozi.moziserver.model.res.ResStickerImg;
+import com.mozi.moziserver.model.res.ResStickerList;
+import com.mozi.moziserver.model.res.ResUserConfirmList;
 import com.mozi.moziserver.security.SessionUser;
 import com.mozi.moziserver.service.ConfirmService;
-import com.mozi.moziserver.model.entity.UserStickerImg;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -33,12 +33,12 @@ public class ConfirmController {
     private final ConfirmService confirmService;
 
     @ApiOperation("스토리 생성")
-    @PostMapping("/v1/challenges/{challenge_seq}/confirms")
+    @PostMapping("/v1/challenges/{challengeSeq}/confirms")
     public ResponseEntity<Void> createConfirm(
             @ApiParam(hidden = true) @SessionUser Long userSeq,
-            @PathVariable("challenge_seq") Long challengeSeq,
+            @PathVariable Long challengeSeq,
             @RequestPart MultipartFile image
-    ){
+    ) {
         if (image == null) {
             throw ResponseError.BadRequest.INVALID_IMAGE.getResponseException("need to images");
         }
@@ -50,24 +50,25 @@ public class ConfirmController {
 
     @ApiOperation("스토리 전체 조회")
     @GetMapping("/v1/challenges/confirms")
-    public List<ResConfirmList> getAllConfirmList(
+    public List<ResConfirmList> getConfirmList(
+            @ApiParam(hidden = true) @SessionUser Long userSeq,
             @Valid ReqList req
     ) {
 
-        return confirmService.getAllConfirmList(req)
+        return confirmService.getConfirmList(req)
                 .stream()
                 .map(ResConfirmList::of)
                 .collect(Collectors.toList());
     }
 
     @ApiOperation("챌린지별 스토리 전체 조회")
-    @GetMapping("/v1/challenges/{challenge_seq}/confirms")
-    public List<ResConfirmList> getConfirmList(
-            @PathVariable("challenge_seq") Long challengeSeq,
+    @GetMapping("/v1/challenges/{challengeSeq}/confirms")
+    public List<ResConfirmList> getConfirmListByChallenge(
+            @ApiParam(hidden = true) @SessionUser Long userSeq,
+            @PathVariable Long challengeSeq,
             @Valid ReqList req
     ) {
-
-        return confirmService.getConfirmList(challengeSeq,req)
+        return confirmService.getConfirmListByChallenge(challengeSeq, req)
                 .stream()
                 .map(ResConfirmList::of)
                 .collect(Collectors.toList());
@@ -75,73 +76,64 @@ public class ConfirmController {
 
     //최신순
     @ApiOperation("본인 스토리 전체 조회")
-    @GetMapping("/v1/users/confirms")
+    @GetMapping("/v1/users/me/confirms")
     public List<ResUserConfirmList> getUserConfirmList(
             @ApiParam(hidden = true) @SessionUser Long userSeq,
+            @PathVariable Long seq,
             @Valid ReqList req
     ) {
+        if (!userSeq.equals(seq)) {
+            throw ResponseError.Forbidden.NO_AUTHORITY.getResponseException();
+        }
 
-        return confirmService.getUserConfirmList(userSeq,req)
+        return confirmService.getUserConfirmList(userSeq, req)
                 .stream()
                 .map(ResUserConfirmList::of)
                 .collect(Collectors.toList());
     }
 
-    @ApiOperation("스토리 하나 조회")
-    @GetMapping("/v1/confirms/{confirm_seq}")
-    public ResConfirm getConfirm(
-            @PathVariable("confirm_seq") Long confirmSeq
-    ) {
-        Confirm confirm=confirmService.getConfirm(confirmSeq);
-
-        List<ConfirmSticker> confirmStickerList=confirmService.getConfirmStickerList(confirmSeq);
-
-        return ResConfirm.of(confirm,confirmStickerList);
-    }
-
     @ApiOperation("스토리 삭제")
-    @DeleteMapping("/v1/confirms/{confirm_seq}")
+    @DeleteMapping("/v1/confirms/{seq}")
     public ResponseEntity<Void> deleteConfirm(
-            @ApiParam(hidden = true) @SessionUser Long mySeq,
-            @PathVariable("confirm_seq") Long confirmSeq
-    ){
-        confirmService.deleteConfirm(mySeq,confirmSeq);
+            @ApiParam(hidden = true) @SessionUser Long userSeq,
+            @PathVariable Long seq
+    ) {
+        confirmService.deleteConfirm(userSeq, seq);
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @ApiOperation("신고 생성")
-    @PostMapping("/v1/confirms/{confirm_seq}/declarations")
+    @PostMapping("/v1/confirms/{seq}/declarations")
     public ResponseEntity<Void> createDeclaration(
-            @PathVariable("confirm_seq") Long confirmSeq,
+            @ApiParam(hidden = true) @SessionUser Long userSeq,
+            @PathVariable Long seq,
             @RequestBody @Valid ReqDeclarationCreate req
-    ){
-        confirmService.createDeclaration(confirmSeq,req.getType());
+    ) {
+        confirmService.createDeclaration(seq, req.getType());
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @ApiOperation("스티커 전체 조회")
-    @GetMapping("/v1/stickerImgs")
-    public List<ResStickerImg> getStickerList(
+    @GetMapping("/v1/sticker-imgs")
+    public List<ResStickerList> getStickerList(
             @ApiParam(hidden = true) @SessionUser Long userSeq
     ) {
-        List<StickerImg> stickerImgList=confirmService.getStickerImg(userSeq);
-
-        return stickerImgList
+        return confirmService.getStickerImg()
                 .stream()
-                .map(ResStickerImg::of)
+                .map(ResStickerList::of)
                 .collect(Collectors.toList());
     }
 
 
     @ApiOperation("스티커 생성(부착)")
-    @PostMapping("/v1/confirms/{confirm_seq}/confirm-stickers")
+    @PostMapping("/v1/confirms/{seq}/confirm-stickers")
     public ResponseEntity<Void> createConfirmSticker(
-            @ApiParam(hidden = true) @SessionUser Long mySeq,
+            @ApiParam(hidden = true) @SessionUser Long userSeq,
             @RequestBody @Valid ReqConfirmSticker reqConfirmSticker,
-            @PathVariable("confirm_seq") Long confirmSeq
-    ){
-        confirmService.createConfirmSticker(mySeq,confirmSeq, reqConfirmSticker);
+            @PathVariable Long seq
+    ) {
+        confirmService.createConfirmSticker(userSeq, seq, reqConfirmSticker);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

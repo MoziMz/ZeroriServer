@@ -5,19 +5,25 @@ import lombok.Setter;
 
 import javax.persistence.*;
 
+/**
+ * uniq(deviceId, token)
+ * 멀티 로그인 가능
+ */
 @Getter
 @Setter
-@Entity(name = "postbox_message_admin")
-public class PostboxMessageAdmin extends AbstractTimeEntity {
+@Entity(name = "user_fcm")
+public class UserFcm extends AbstractTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long seq;
 
+    private String deviceId;
+
+    private String token;
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_seq")
+    @JoinColumn(name="user_seq")
     private User user;
-
-    private String sender;
-
-    private String content;
 }
+
+

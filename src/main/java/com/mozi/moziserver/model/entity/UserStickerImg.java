@@ -11,6 +11,4 @@ import lombok.Setter;
 @NoArgsConstructor
 public class UserStickerImg {
    private StickerImg stickerImg;
-
-   private boolean downloaded;
 }

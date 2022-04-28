@@ -12,13 +12,10 @@ import javax.persistence.AttributeConverter;
 import javax.persistence.Converter;
 import java.util.List;
 
-// Mysql post links 타입 JSON
-// JPA Post links 타입 List<Link>
-
-// AttributeConverter = Mysql <-> JPA 간 컬럼 데이터 변환 도구
-// convertToDatabaseColumn = JPA(links List<Link>) -> Mysql(links JSON) = serialize
-// convertToEntityAttribute = Mysql(links JSON) -> JPA(links List<Link>) = deserialize
-
+/**
+ * Mysql post links 타입 JSON
+ * JPA Post links 타입 List<Link>
+ */
 @Slf4j
 @Converter
 public class ResultListConverter implements AttributeConverter<List<UserChallengeResult>, String> {

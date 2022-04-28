@@ -20,11 +20,7 @@ public class StickerImg extends AbstractTimeEntity{
     @Column(name="img_url")
     private String imgUrl;
 
-    @OneToMany
-    @JoinColumn(name="seq")
-    private List<UserSticker> userStickerList;
-
-    @OneToMany
+    @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name="seq")
     private List<ConfirmSticker> confirmStickerList;
 }

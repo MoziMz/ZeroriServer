@@ -22,6 +22,21 @@ public class UserChallengeRepositoryImpl extends QuerydslRepositorySupport imple
     public UserChallengeRepositoryImpl() { super(UserChallenge.class); }
 
     @Override
+    public Optional<UserChallenge> findBySeq(Long seq) {
+        return from(qUserChallenge)
+                .select(qUserChallenge)
+                .innerJoin(qUserChallenge.challenge, qChallenge)
+                .fetchJoin()
+                .where(qUserChallenge.seq.eq(seq))
+                .fetch()
+                .stream()
+                .distinct()
+                .findFirst();
+    }
+
+
+
+    @Override
     public Optional<UserChallenge> findUserChallengeByUserSeqAndChallengeAndStates(Long userSeq, Challenge challenge, Collection<UserChallengeStateType> states){
 
         return from(qUserChallenge)
@@ -81,6 +96,7 @@ public class UserChallengeRepositoryImpl extends QuerydslRepositorySupport imple
                 .collect(Collectors.toList());
 
     }
+
 
     @Override
     public List<UserChallenge> findAllByPeriod(

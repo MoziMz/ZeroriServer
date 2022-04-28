@@ -1,27 +1,23 @@
 package com.mozi.moziserver.service;
 
-import com.mozi.moziserver.common.Constant;
 import com.mozi.moziserver.httpException.ResponseError;
 import com.mozi.moziserver.model.entity.*;
 import com.mozi.moziserver.model.mappedenum.DeclarationType;
-import com.mozi.moziserver.model.mappedenum.UserChallengeResultType;
-import com.mozi.moziserver.model.req.*;
+import com.mozi.moziserver.model.req.ReqConfirmSticker;
+import com.mozi.moziserver.model.req.ReqList;
+import com.mozi.moziserver.model.req.ReqUserStickerList;
 import com.mozi.moziserver.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.tika.Tika;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.time.LocalDate;
 import java.util.*;
-import java.util.function.Supplier;
 
 @Slf4j
 @Service
@@ -50,20 +46,20 @@ public class ConfirmService {
     private final ChallengeRecordRepository challengeRecordRepository;
 
     //인증 생성
-    public void createConfirm(Long userSeq, Long challengeSeq, MultipartFile image){
+    public void createConfirm(Long userSeq, Long challengeSeq, MultipartFile image) {
         LocalDate today = LocalDate.now();
 
         User user = userRepository.findById(userSeq)
                 .orElseThrow(ResponseError.NotFound.USER_NOT_EXISTS::getResponseException);
 
-        Challenge challenge=challengeRepository.findById(challengeSeq)
+        Challenge challenge = challengeRepository.findById(challengeSeq)
                 .orElseThrow(ResponseError.BadRequest.INVALID_SEQ::getResponseException);
 
         UserChallenge userChallenge = userChallengeService.getActiveUserChallenge(userSeq, challenge)
                 .orElseThrow(ResponseError.NotFound.USER_CHALLENGE_NOT_EXISTS::getResponseException);
 
         //신고안됨
-        Byte state=0;
+        Byte state = 0;
 
         String imgUrl = null;
         try {
@@ -81,35 +77,43 @@ public class ConfirmService {
                 .build();
 
         withTransaction(() -> {
+            UserChallenge curUserChallenge = userChallengeService.getActiveUserChallenge(userSeq, challenge)
+                    .orElseThrow(ResponseError.NotFound.USER_CHALLENGE_NOT_EXISTS::getResponseException);
+
             try {
                 confirmRepository.save(confirm);
             } catch (Exception e) {
                 throw ResponseError.BadRequest.ALREADY_CREATED.getResponseException(); // for duplicate exception
             }
 
-            userChallengeService.updateUserChallengeResult(userChallenge, today, UserChallengeResultType.COMPLETE);
+            userChallengeService.updateUserChallengeResultComplete(curUserChallenge, today);
 
             ChallengeRecord challengeRecord = challengeRecordRepository.findByChallenge(challenge);
 
             challengeRecord.setTotalPlayerConfirmCnt(challengeRecord.getTotalPlayerConfirmCnt() + 1);
             challengeRecordRepository.save(challengeRecord);
+
         });
     }
 
     @Transactional
-    public List<Confirm> getAllConfirmList(ReqList req){
-        return confirmRepository.findAllConfirmList(req.getPrevLastSeq(),req.getPageSize());
+    public List<Confirm> getConfirmList(ReqList req) {
+        return confirmRepository.findAll(req.getPrevLastSeq(), req.getPageSize());
     }
 
     // 챌린지별 인증 조회
     @Transactional
-    public List<Confirm> getConfirmList(Long seq,ReqList req) {
-        return confirmRepository.findByChallengeByOrderDesc(seq,req.getPrevLastSeq(),req.getPageSize());
+    public List<Confirm> getConfirmListByChallenge(Long challengeSeq, ReqList req) {
+        final Challenge challenge = challengeRepository.findById(challengeSeq)
+                .orElseThrow(ResponseError.NotFound.CHALLENGE_NOT_EXISTS::getResponseException);
+
+        return confirmRepository.findAllByChallenge(challenge, req.getPrevLastSeq(), req.getPageSize());
+//        return confirmRepository.findByChallengeByOrderDesc(seq, req.getPrevLastSeq(), req.getPageSize());
     }
 
     @Transactional
-    public List<Confirm> getUserConfirmList(Long userSeq,ReqList req){
-        return confirmRepository.findByUserByOrderDesc(userSeq,req.getPrevLastSeq(),req.getPageSize());
+    public List<Confirm> getUserConfirmList(Long userSeq, ReqList req) {
+        return confirmRepository.findByUserByOrderDesc(userSeq, req.getPrevLastSeq(), req.getPageSize());
     }
 
     //인증 하나 조회
@@ -120,7 +124,7 @@ public class ConfirmService {
 
     //confirmSticker 조회
     @Transactional
-    public List<ConfirmSticker> getConfirmStickerList(Long seq){
+    public List<ConfirmSticker> getConfirmStickerList(Long seq) {
         return confirmStickerRepository.findAllBySeq(seq);
     }
 
@@ -129,9 +133,9 @@ public class ConfirmService {
         User user = userRepository.findById(userSeq)
                 .orElseThrow(ResponseError.NotFound.USER_NOT_EXISTS::getResponseException);
 
-        Confirm confirm=getConfirm(confirmSeq);
+        Confirm confirm = getConfirm(confirmSeq);
 
-        if(!confirm.getUser().equals(user)) throw ResponseError.BadRequest.INVALID_USER.getResponseException();
+        if (!confirm.getUser().equals(user)) throw ResponseError.BadRequest.INVALID_USER.getResponseException();
 
         try {
             int deleteCount = confirmRepository.deleteConfirm(confirmSeq);
@@ -145,25 +149,25 @@ public class ConfirmService {
     }
 
     @Transactional
-    public void updateConfirmState(Confirm confirm){
+    public void updateConfirmState(Confirm confirm) {
 
-        Byte state=1;
+        Byte state = 1;
 
         confirmRepository.updateDeclarationState(
-                confirm,state
+                confirm, state
         );
     }
 
     //신고 생성
     @Transactional
-    public void createDeclaration(Long confirmSeq,DeclarationType type){
+    public void createDeclaration(Long confirmSeq, DeclarationType type) {
 
-        Confirm confirm=confirmRepository.findBySeq(confirmSeq);
+        Confirm confirm = confirmRepository.findBySeq(confirmSeq);
 
 
         updateConfirmState(confirm);
 
-        Declaration declaration=Declaration.builder()
+        Declaration declaration = Declaration.builder()
                 .confirm(confirm)
                 .declarationType(type)
                 .build();
@@ -177,66 +181,36 @@ public class ConfirmService {
     }
 
     @Transactional
-    public List<StickerImg> getStickerImgList(List<Long> stickerSeqList){
+    public List<StickerImg> getStickerImgList(List<Long> stickerSeqList) {
         return stickerImgRepository.findAllBySeq(stickerSeqList);
     }
 
     @Transactional
-    public List<UserStickerImg> getUserStickerImg(Long userSeq) {
-
-            List<Long> userStickerSeqList=userStickerRepository.stickerSeqfindByUserSeq(userSeq);
-
-            List<StickerImg> stickerImgList = stickerImgRepository.findAll();
-            Set<Long> downloadedStickers = new HashSet();
-
-            for ( Long userStickerSeq : userStickerSeqList) {
-                downloadedStickers.add(userStickerSeq);
-            }
-
-            List<UserStickerImg> userStickerImgs=new ArrayList<UserStickerImg>();
-            for ( StickerImg stickerImg : stickerImgList ) {
-                if(downloadedStickers.contains(stickerImg.getSeq())) {
-                    userStickerImgs.add(new UserStickerImg(stickerImg, true));
-                }
-                else
-                    userStickerImgs.add(new UserStickerImg(stickerImg, false));
-
-            }
-
-            return userStickerImgs;
-
-    }
-
-    @Transactional
-    public List<StickerImg> getStickerImg(Long userSeq) {
-
-
+    public List<StickerImg> getStickerImg() {
         List<StickerImg> stickerImgList = stickerImgRepository.findAll();
 
-
         return stickerImgList;
-
     }
 
     //UserSticker 생성
     @Transactional
-    public void createUserSticker(Long userSeq, ReqUserStickerList userStickerList){
+    public void createUserSticker(Long userSeq, ReqUserStickerList userStickerList) {
 
         User user = userRepository.findById(userSeq)
                 .orElseThrow(ResponseError.NotFound.USER_NOT_EXISTS::getResponseException);
 
-        List<Long> stickerSeqList=userStickerList.getStickerSeqList();
+        List<Long> stickerSeqList = userStickerList.getStickerSeqList();
 
-        List<UserSticker> newUserStickerList=new ArrayList<UserSticker>();
+        List<UserSticker> newUserStickerList = new ArrayList<UserSticker>();
 
 
-        List<StickerImg> stickerImgList=getStickerImgList(stickerSeqList);
-        for(StickerImg stickerImg:stickerImgList){
-            UserStickerId userStickerId=new UserStickerId(user,stickerImg);
-                 UserSticker userSticker=UserSticker.builder()
-                        .id(userStickerId)
-                        .build();
-                newUserStickerList.add(userSticker);
+        List<StickerImg> stickerImgList = getStickerImgList(stickerSeqList);
+        for (StickerImg stickerImg : stickerImgList) {
+            UserStickerId userStickerId = new UserStickerId(user, stickerImg);
+            UserSticker userSticker = UserSticker.builder()
+                    .id(userStickerId)
+                    .build();
+            newUserStickerList.add(userSticker);
 
 
         }
@@ -250,30 +224,30 @@ public class ConfirmService {
 
     //ConfirmSticker 생성
     @Transactional
-    public void createConfirmSticker(Long userSeq,Long confirmSeq,ReqConfirmSticker reqConfirmSticker){
+    public void createConfirmSticker(Long userSeq, Long confirmSeq, ReqConfirmSticker reqConfirmSticker) {
 
         User user = userRepository.findById(userSeq)
                 .orElseThrow(ResponseError.NotFound.USER_NOT_EXISTS::getResponseException);
 
-        Confirm confirm=confirmRepository.findBySeq(confirmSeq);
+        Confirm confirm = confirmRepository.findBySeq(confirmSeq);
 
         //confirmSticker는 자기 자신에 스토리에 스티커를 붙이지 못한다.
-        if(userSeq==confirm.getUser().getSeq()) throw ResponseError.BadRequest.INVALID_USER.getResponseException();
+        if (userSeq == confirm.getUser().getSeq()) throw ResponseError.BadRequest.INVALID_USER.getResponseException();
 
         //true면 존재한다.
-        Boolean createdCheck=confirmStickerRepository.findByUserAndConfirmSeq(userSeq,confirmSeq);
+        Boolean createdCheck = confirmStickerRepository.findByUserAndConfirmSeq(userSeq, confirmSeq);
 
         //하나만 붙일수있다. confirmSeq가 같고 userSeq가 같으면 못붙인다.
-        if(createdCheck==true)  throw ResponseError.BadRequest.ALREADY_CREATED.getResponseException();
+        if (createdCheck == true) throw ResponseError.BadRequest.ALREADY_CREATED.getResponseException();
 
-        Optional<StickerImg> stickerImg=stickerImgRepository.findById(reqConfirmSticker.getStickerSeq());
+        Optional<StickerImg> stickerImg = stickerImgRepository.findById(reqConfirmSticker.getStickerSeq());
 
-        UserStickerId userStickerId=new UserStickerId(user,stickerImg.get());
+        UserStickerId userStickerId = new UserStickerId(user, stickerImg.get());
 
-        UserSticker userSticker=userStickerRepository.findById(userStickerId)
+        UserSticker userSticker = userStickerRepository.findById(userStickerId)
                 .orElseThrow(ResponseError.NotFound.USER_STICKER_NOT_EXISTS::getResponseException);
 
-        ConfirmSticker confirmSticker=ConfirmSticker.builder()
+        ConfirmSticker confirmSticker = ConfirmSticker.builder()
                 .confirm(confirm)
                 .user(user)
                 .stickerImg(stickerImg.get())

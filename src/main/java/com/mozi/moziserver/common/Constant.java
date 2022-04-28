@@ -63,7 +63,8 @@ public interface Constant {
             Arrays.asList("naver.com"),
             Arrays.asList("daum.net", "hanmail.net"),
             Arrays.asList("kakao.com"),
-            Arrays.asList("icloud.com", "me.com", "mac.com")
+            Arrays.asList("icloud.com", "me.com", "mac.com"),
+            Arrays.asList("devwon.com")
     );
 
     List<String> IMAGE_MIME_TYPE_LIST = List.of("image/png", "image/jpeg");

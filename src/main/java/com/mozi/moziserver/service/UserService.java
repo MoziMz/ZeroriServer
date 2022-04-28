@@ -1,29 +1,27 @@
 package com.mozi.moziserver.service;
 
+import com.mozi.moziserver.common.JpaUtil;
 import com.mozi.moziserver.common.UserState;
 import com.mozi.moziserver.httpException.ResponseError;
 import com.mozi.moziserver.model.entity.User;
 import com.mozi.moziserver.model.entity.UserAuth;
+import com.mozi.moziserver.model.entity.UserFcm;
 import com.mozi.moziserver.model.mappedenum.UserAuthType;
-import com.mozi.moziserver.model.req.ReqUserNickNameAndPw;
 import com.mozi.moziserver.model.req.ReqUserSignIn;
 import com.mozi.moziserver.model.req.ReqUserSignUp;
 import com.mozi.moziserver.repository.UserAuthRepository;
+import com.mozi.moziserver.repository.UserFcmRepository;
 import com.mozi.moziserver.repository.UserRepository;
 import com.mozi.moziserver.security.ReqUserSocialSignIn;
 import com.mozi.moziserver.security.ResUserSignIn;
 import com.mozi.moziserver.security.UserSocialAuthenticationProvider;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -37,21 +35,11 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final UserAuthRepository userAuthRepository;
+    private final UserFcmRepository userFcmRepository;
     private final AuthenticationManager authenticationManager;
     private final UserSocialAuthenticationProvider userSocialAuthenticationProvider;
     private final PasswordEncoder passwordEncoder;
     private final EmailAuthService emailAuthService;
-//    private final KakaoClient kakaoClient;
-
-    @Value("${social.kakao.appid}")
-    Long kakaoAppId;
-    @Value("${social.kakao.adminkey}")
-    String kakaoAdminKey;
-
-//    @Value("${social.facebook.appid}")
-//    String facebookAppId;
-//    @Value("${social.facebook.secret}")
-//    String facebookSecret;
 
     public User signUp(ReqUserSignUp reqUserSignUp) {
 
@@ -60,31 +48,19 @@ public class UserService {
         }
 
         String email = reqUserSignUp.getId();
-
-        if (!email.matches(EMAIL_REGEX)){
+        if (!isValidEmail(email)) {
             throw ResponseError.BadRequest.INVALID_EMAIL.getResponseException();
         }
 
-        int atIndex = email.lastIndexOf('@');
-        String emailIdWithAt = email.substring(0, atIndex+1);
-        String emailDomain = email.substring(atIndex+1).toLowerCase();
-        List<String> currentDomainGroup = null;
-
-        for(List<String> domainGroup : EMAIL_DOMAIN_GROUPS) {
-            if(domainGroup.contains(emailDomain)) {
-                currentDomainGroup = domainGroup;
-                break;
-            }
-        }
-
-        if(currentDomainGroup == null) {
+        String emailId = getEmailId(email);
+        List<String> currentDomainGroup = getCurrentEmailDomainGroup(email);
+        if (emailId == null || currentDomainGroup == null) {
             throw ResponseError.BadRequest.INVALID_EMAIL.getResponseException();
         }
 
-
-        for(String domain : currentDomainGroup) {
-            boolean isExists = userAuthRepository.findUserAuthByTypeAndId(UserAuthType.EMAIL, emailIdWithAt + domain).isPresent();
-            if(isExists) {
+        for (String domain : currentDomainGroup) {
+            boolean isExists = userAuthRepository.findUserAuthByTypeAndId(UserAuthType.EMAIL, emailId + "@" + domain).isPresent();
+            if (isExists) {
                 throw ResponseError.BadRequest.ALREADY_EXISTS_EMAIL.getResponseException();
             }
         }
@@ -92,12 +68,14 @@ public class UserService {
         UserAuth userAuth = new UserAuth();
         userAuth.setId(reqUserSignUp.getId());
         userAuth.setPw(passwordEncoder.encode(reqUserSignUp.getPw()));
+        userAuth.setType(UserAuthType.EMAIL);
 
         User user = new User();
         userRepository.save(user);
 
-        if (user.getSeq() == null)
+        if (user.getSeq() == null) {
             throw ResponseError.InternalServerError.UNEXPECTED_ERROR.getResponseException();
+        }
 
         userAuth.setUser(user);
 
@@ -123,7 +101,7 @@ public class UserService {
 
             if ((auth == null || !auth.isAuthenticated()) && req.getType().isSocial()) {
                 if (req.getType() == UserAuthType.KAKAO) kakaoSignUp(req);
-                else if(req.getType() == UserAuthType.APPLE) appleSignUp(req);
+                else if (req.getType() == UserAuthType.APPLE) appleSignUp(req);
 
 //            else if(reqUserSignIn.getType() == UserAuthType.FACEBOOK) facebookSignUp(reqUserSignIn);
 //            else if(reqUserSignIn.getType() == UserAuthType.NAVER) naverSignUp(reqUserSignIn);
@@ -138,7 +116,7 @@ public class UserService {
         }
 
         if (auth instanceof ResUserSignIn) {
-            User user = userRepository.findById(((ResUserSignIn)auth).getUserSeq())
+            User user = userRepository.findById(((ResUserSignIn) auth).getUserSeq())
                     .orElseThrow(ResponseError.NotFound.USER_NOT_EXISTS::getResponseException);
 
             if (user.getState() == UserState.DELETED) {
@@ -154,14 +132,16 @@ public class UserService {
 
         final String kakaoSocialId = userSocialAuthenticationProvider.getKakaoSocialId(accessToken);
 
-        if (kakaoSocialId == null)
+        if (kakaoSocialId == null) {
             return;
+        }
 
         User user = new User();
         userRepository.save(user);
 
-        if (user.getSeq() == null)
+        if (user.getSeq() == null) {
             return;
+        }
 
         UserAuth userAuth = new UserAuth();
         userAuth.setType(UserAuthType.KAKAO);
@@ -176,14 +156,16 @@ public class UserService {
 
         final String appleSocialId = userSocialAuthenticationProvider.getAppleSocialId(identityToken);
 
-        if (appleSocialId == null)
+        if (appleSocialId == null) {
             return;
+        }
 
         User user = new User();
         userRepository.save(user);
 
-        if (user.getSeq() == null)
+        if (user.getSeq() == null) {
             return;
+        }
 
         UserAuth userAuth = new UserAuth();
         userAuth.setType(UserAuthType.APPLE);
@@ -226,64 +208,148 @@ public class UserService {
         // TODO
     }
 
-    public UserAuth findUserEmail(String nickName,String pw) {
+    public Optional<UserAuth> findUserAuthByTypeAndId(UserAuthType type, String id) {
+        return userAuthRepository.findUserAuthByTypeAndId(type, id);
+    }
 
-        User user=userRepository.findByNickName(nickName);
+    public void updateNickname(User user, String nickname) {
 
-        if(user==null)  throw ResponseError.NotFound.USER_NOT_EXISTS.getResponseException();
+        user.setNickName(nickname);
 
-        UserAuth userAuth=userAuthRepository.findByUserSeqAndPw(user);
+        try {
+            userRepository.save(user);
+        } catch (DataIntegrityViolationException e) {
+            if (JpaUtil.isDuplicateKeyException(e)) {
+                throw ResponseError.BadRequest.ALREADY_EXISTS_NICKNAME.getResponseException();
+            }
+            throw ResponseError.InternalServerError.UNEXPECTED_ERROR.getResponseException();
+        } catch (Exception e) {
+            throw ResponseError.InternalServerError.UNEXPECTED_ERROR.getResponseException();
+        }
+    }
 
-        if(!passwordEncoder.matches(pw,userAuth.getPw()))   throw ResponseError.NotFound.USER_PW_NOT_EXITS.getResponseException();
+    public void updatePw(User user, String pw) {
+
+        UserAuth userAuth = userAuthRepository.findByUserAndType(user, UserAuthType.EMAIL);
+        if (userAuth == null) {
+            throw ResponseError.BadRequest.SOCIAL_LOGIN_USER.getResponseException("social login user cannot change password");
+        }
+
+        userAuth.setPw(passwordEncoder.encode(pw));
+
+        try {
+            userRepository.save(user);
+        } catch (Exception e) {
+            throw ResponseError.InternalServerError.UNEXPECTED_ERROR.getResponseException();
+        }
+    }
+
+    public void updateEmail(User user, String email) {
+        UserAuth userAuth = userAuthRepository.findByUser(user);
+
+        emailAuthService.sendResetEmailEmail(userAuth, email);
+    }
+
+    public UserAuth findUserAuthByNicknameAndPw(String nickName, String pw) {
+
+        User user = userRepository.findByNickName(nickName);
+
+        if (user == null) {
+            throw ResponseError.NotFound.NICKNAME_NOT_EXISTS.getResponseException();
+        }
+
+        UserAuth userAuth = userAuthRepository.findByUser(user);
+
+        if (!passwordEncoder.matches(pw, userAuth.getPw())) {
+            throw ResponseError.NotFound.USER_NOT_EXISTS.getResponseException("password not matched");
+        }
 
         return userAuth;
     }
 
-    // 이메일 인증
-    @Transactional
-    public ResponseEntity<String> sendEmail(String email) {
+    public boolean checkEmailDuplicate(String email) {
 
-        User user=userAuthRepository.findUserSeqByEmail(email);
-
-         if (!email.matches(EMAIL_REGEX)){
+        if (!isValidEmail(email)) {
             throw ResponseError.BadRequest.INVALID_EMAIL.getResponseException();
         }
 
-        int atIndex = email.lastIndexOf('@');
-        String emailIdWithAt = email.substring(0, atIndex+1);
-        String emailDomain = email.substring(atIndex+1).toLowerCase();
-        List<String> currentDomainGroup = null;
+        String emailId = getEmailId(email);
+        List<String> currentDomainGroup = getCurrentEmailDomainGroup(email);
+        if (emailId == null || currentDomainGroup == null) {
+            throw ResponseError.BadRequest.INVALID_EMAIL.getResponseException();
+        }
 
-        for(List<String> domainGroup : EMAIL_DOMAIN_GROUPS) {
-            if(domainGroup.contains(emailDomain)) {
-                currentDomainGroup = domainGroup;
-                break;
+        for (String domain : currentDomainGroup) {
+            boolean isExists = userAuthRepository.findUserAuthByTypeAndId(UserAuthType.EMAIL, emailId + "@" + domain).isPresent();
+            if (isExists) {
+                return true;
             }
         }
 
-        if(currentDomainGroup == null) {
-            throw ResponseError.BadRequest.INVALID_EMAIL.getResponseException();
+        User user = userAuthRepository.findUserSeqByEmail(email);
+
+        return !(user == null || user.getState() == UserState.DELETED);
+    }
+
+    public boolean checkNickNameDuplicate(String nickName) {
+        return userRepository.existsByNickName(nickName);
+    }
+
+    private boolean isValidEmail(String email) {
+        if (!email.matches(EMAIL_REGEX)) {
+            return false;
         }
 
-        String token=emailAuthService.createEmailCheckAuth(user,email);
+        List<String> currentDomainGroup = getCurrentEmailDomainGroup(email);
 
-        return new ResponseEntity<>(token, HttpStatus.OK);
+        return currentDomainGroup != null;
     }
 
-    public ResponseEntity<Void> findUserAuth(String email){
+    private List<String> getCurrentEmailDomainGroup(String email) {
+        int atIndex = email.lastIndexOf('@');
+        String emailDomain = email.substring(atIndex + 1).toLowerCase();
 
-        User user=userAuthRepository.findUserSeqByEmail(email);
+        for (List<String> domainGroup : EMAIL_DOMAIN_GROUPS) {
+            if (domainGroup.contains(emailDomain)) {
+                return domainGroup;
+            }
+        }
 
-        if(user==null || user.getState()==UserState.DELETED)  throw ResponseError.NotFound.EMAIL_NOT_EXITS.getResponseException();
-
-        return new ResponseEntity<>(HttpStatus.OK);
+        return null;
     }
 
-    @Transactional
-    public User findUserByNickName(String nickName){
-        User user=userRepository.findByNickName(nickName);
-
-        return user;
+    private String getEmailId(String email) {
+        int atIndex = email.lastIndexOf('@');
+        if (atIndex < 0) {
+            return null;
+        }
+        return email.substring(0, atIndex);
     }
 
+    public Optional<User> getUserBySeq(Long userSeq) {
+        return userRepository.findById(userSeq);
+    }
+
+    public void upsertUserFcm(User user, String deviceId, String token) {
+        UserFcm userFcm = new UserFcm();
+        userFcm.setDeviceId(deviceId);
+        userFcm.setToken(token);
+        userFcm.setUser(user);
+
+        try {
+            userFcmRepository.save(userFcm);
+            return;
+        } catch (DataIntegrityViolationException e) {
+            if (!JpaUtil.isDuplicateKeyException(e)) {
+                throw ResponseError.InternalServerError.UNEXPECTED_ERROR.getResponseException();
+            }
+        }
+
+        userFcm = userFcmRepository.findUserFcmByDeviceId(deviceId)
+                .orElseThrow(ResponseError.InternalServerError.UNEXPECTED_ERROR::getResponseException);
+        userFcm.setToken(token);
+        userFcm.setUser(user);
+
+        userFcmRepository.save(userFcm);
+    }
 }

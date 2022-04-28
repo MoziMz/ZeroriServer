@@ -49,7 +49,7 @@ public class ApiLogFilter extends OncePerRequestFilter {
         MDC.put(Constant.MDC_KEY_THREAD_ID, threadId);
         apiLogBuilder.threadId(threadId);
 
-        // TODO 로그인 구현 후 손보기
+//         TODO 로그인 구현 후 손보기
 //        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 //        if(auth != null && auth.isAuthenticated()) {
 //            MDC.put(Constant.MDC_KEY_USER_SEQ, ((User)auth.getPrincipal()).getSeq().toString());

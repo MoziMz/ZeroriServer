@@ -9,4 +9,10 @@ import java.util.Optional;
 
 public interface UserChallengeRecordRepositorySupport {
     Optional<UserChallengeRecord> findByChallengeAndUser(Long challengeSeq, Long userSeq);
+
+    void updateAcquisitionPoint(
+            Long challengeSeq,
+            Long userSeq,
+            Integer point
+    );
 }

@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 public class ChallengeStatisticsService {
     private final ChallengeStatisticsRepository challengeStatisticsRepository;
 
-    public List<ChallengeStatistics> getChallengeStatisticsList( Challenge challenge ) {
+    public List<ChallengeStatistics> getChallengeStatisticsList(Challenge challenge) {
         LocalDate today = LocalDate.now();
 
         return getChallengeStatisticsListByPeriod(challenge, today.getYear(), today.getMonthValue(), 5);
@@ -42,7 +42,7 @@ public class ChallengeStatisticsService {
                 month
         );
 
-        if( curChallengeStatisticsList == null) {
+        if (curChallengeStatisticsList == null) {
             curChallengeStatisticsList = new ArrayList<ChallengeStatistics>();
         } else {
             curChallengeStatisticsList = curChallengeStatisticsList.stream()
@@ -54,12 +54,12 @@ public class ChallengeStatisticsService {
         int curYear = startYear;
         int curMonth = startMonth;
 
-        for( int i = 0; i < count; i++ ) {
+        for (int i = 0; i < count; i++) {
             // 챌린지 리스트의 길이가 i와 같거나 작으면
             // i 보다 크더라도 curYear 또는 curMonth 가 다르면
             // 리스트에 추가한다.
 
-            if( curChallengeStatisticsList.size() <= i) {
+            if (curChallengeStatisticsList.size() <= i) {
                 curChallengeStatisticsList.add(i, ChallengeStatistics.builder()
                         .challenge(challenge)
                         .year(curYear)
@@ -67,8 +67,7 @@ public class ChallengeStatisticsService {
                         .playerFirstTryingCnt(0)
                         .playerConfirmCnt(0)
                         .build());
-            }
-            else if ( curChallengeStatisticsList.get(i).getYear() != curYear || curChallengeStatisticsList.get(i).getMonth() != curMonth) {
+            } else if (curChallengeStatisticsList.get(i).getYear() != curYear || curChallengeStatisticsList.get(i).getMonth() != curMonth) {
                 curChallengeStatisticsList.add(i, ChallengeStatistics.builder()
                         .challenge(challenge)
                         .year(curYear)
@@ -79,7 +78,7 @@ public class ChallengeStatisticsService {
             }
 
             curMonth = curMonth % 12 + 1;
-            curYear = curMonth == 1 ? curYear + 1 :  curYear;
+            curYear = curMonth == 1 ? curYear + 1 : curYear;
         }
 
         return curChallengeStatisticsList;

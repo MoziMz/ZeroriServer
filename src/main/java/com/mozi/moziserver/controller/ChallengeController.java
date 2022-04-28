@@ -5,7 +5,6 @@ import com.mozi.moziserver.model.req.ReqChallengeList;
 import com.mozi.moziserver.model.res.ResChallenge;
 import com.mozi.moziserver.model.res.ResChallengeList;
 import com.mozi.moziserver.model.res.ResChallengeTagList;
-import com.mozi.moziserver.repository.ChallengeTagRepository;
 import com.mozi.moziserver.security.SessionUser;
 import com.mozi.moziserver.service.ChallengeService;
 import com.mozi.moziserver.service.ChallengeStatisticsService;
@@ -18,7 +17,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import springfox.documentation.annotations.ApiIgnore;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -53,13 +51,13 @@ public class ChallengeController {
 
         List<ResChallengeTagList> challengeTagList = challengeTagService.getChallengeTagList(seq);
 
-        ChallengeScrap challengeScrap=challengeService.getChallengeScrap(seq,userSeq);
+        ChallengeScrap challengeScrap = challengeService.getChallengeScrap(seq, userSeq);
 
-        return ResChallenge.of(challenge, optionalUserChallenge, optionalUserChallengeRecord, challengeStatisticsList, challengeTagList,challengeScrap);
+        return ResChallenge.of(challenge, optionalUserChallenge, optionalUserChallengeRecord, challengeStatisticsList, challengeTagList, challengeScrap);
     }
 
     @ApiOperation("챌린지 모두 조회")
-    @PostMapping("/v1/challenges")
+    @GetMapping("/v1/challenges")
     public List<ResChallengeList> getChallengeList(
             @ApiParam(hidden = true) @SessionUser Long userSeq,
             @Valid ReqChallengeList req
@@ -72,32 +70,25 @@ public class ChallengeController {
     }
 
     @ApiOperation("챌린지 스크랩")
-    @PostMapping("/v1/challenges/{seq}/scrabs")
+    @PostMapping("/v1/challenges/{seq}/scraps")
     public ResponseEntity<Void> createChallengeScrap(
             @ApiParam(hidden = true) @SessionUser Long userSeq,
             @PathVariable Long seq
-    ){
-        challengeService.createChallengeScrap(userSeq,seq);
+    ) {
+        challengeService.createChallengeScrap(userSeq, seq);
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @ApiOperation("챌린지 스크랩")
-    @DeleteMapping("/v1/challenges/{seq}/scrabs")
+    @DeleteMapping("/v1/challenges/{seq}/scraps")
     public ResponseEntity<Void> deleteChallengeScrap(
             @ApiParam(hidden = true) @SessionUser Long userSeq,
             @PathVariable Long seq
-    ){
-        challengeService.deleteChallengeScrap(userSeq,seq);
+    ) {
+        challengeService.deleteChallengeScrap(userSeq, seq);
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
-
-    @ApiOperation("챌린지 테마 리스트 조회")
-    @GetMapping("/v1/challenge-themes")
-    public List<ChallengeTheme> getChallengeThemeList() {
-        return challengeService.getChallengeThemeList();
-    }
-
 }
 

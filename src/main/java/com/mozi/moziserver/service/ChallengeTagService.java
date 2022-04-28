@@ -1,6 +1,5 @@
 package com.mozi.moziserver.service;
 
-import com.mozi.moziserver.model.entity.ChallengeTag;
 import com.mozi.moziserver.model.res.ResChallengeTagList;
 import com.mozi.moziserver.repository.ChallengeTagRepository;
 import lombok.RequiredArgsConstructor;

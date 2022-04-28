@@ -28,6 +28,26 @@ public class UserChallengeRecordRepositoryImpl extends QuerydslRepositorySupport
                 .findFirst();
     }
 
+    @Override
+    public void updateAcquisitionPoint(
+            Long challengeSeq,
+            Long userSeq,
+            Integer point
+    ) {
+
+        final Predicate[] predicates = new Predicate[]{
+                predicateOptional(qUserChallengeRecord.challenge.seq::eq, challengeSeq),
+                predicateOptional(qUserChallengeRecord.user.seq::eq, userSeq)
+        };
+
+        update(qUserChallengeRecord)
+                .set(qUserChallengeRecord.acquisitionPoint, qUserChallengeRecord.acquisitionPoint.add(point))
+                .where(predicates)
+                .execute();
+
+        return;
+    }
+
     private <T> Predicate predicateOptional(final Function<T, Predicate> whereFunc, final T value) {
         return value != null ? whereFunc.apply(value) : null;
     }

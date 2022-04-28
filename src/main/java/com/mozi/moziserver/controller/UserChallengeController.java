@@ -27,22 +27,12 @@ public class UserChallengeController {
     private final UserChallengeService userChallengeService;
     private final ChallengeRepository challengeRepository;
 
-//    @ApiOperation("유저 챌린지 하나 조회")
-//    @GetMapping({"/v1/challenges/{seq}/user-challenges"})
-//    public ResUserChallenge getUserChallenge(
-//            @ApiParam(hidden = true) @SessionUser Long userSeq,
-//            @PathVariable("seq") Long seq
-//    ){
-//        Challenge challenge = challengeRepository.findById(seq).get();
-//        return ResUserChallenge.of(userChallengeService.getUserChallenge(userSeq, challenge));
-//    }
-
     @ApiOperation("유저 챌린지 날짜별 리스트 조회")
     @GetMapping("/v1/period/user-challenges")
     public List<ResUserChallengeList> getUserChallengeList(
             @ApiParam(hidden = true) @SessionUser Long userSeq,
-            /*@Valid*/ ReqUserChallengeList req
-    ){
+            @Valid ReqUserChallengeList req
+    ) {
         return userChallengeService.getUserChallengeList(userSeq, req)
                 .stream()
                 .map(ResUserChallengeList::of)
@@ -54,7 +44,7 @@ public class UserChallengeController {
     public List<ResUserChallengeList> getUserChallengeList(
             @ApiParam(hidden = true) @SessionUser Long userSeq,
             @Valid ReqList req
-    ){
+    ) {
         return userChallengeService.getUserChallengeList(userSeq, req)
                 .stream()
                 .map(ResUserChallengeList::of)
@@ -66,31 +56,18 @@ public class UserChallengeController {
     public ResponseEntity<Void> createUserChallenge(
             @ApiParam(hidden = true) @SessionUser Long userSeq,
             @RequestBody @Valid ReqUserChallengeCreate req
-    ){
+    ) {
         userChallengeService.createUserChallenge(userSeq, req);
-//        postService.createPost(userSeq, reqPostCreate);
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
-
-//    @ApiOperation("유저 챌린지 날짜 수정")
-//    @PutMapping({"/v1/user-challnges/{seq}"})
-//    public ResponseEntity<Void> updateUserChallenge(
-//            @ApiParam(hidden = true) @SessionUser Long userSeq,
-//            @PathVariable("seq") Long userChallengeSeq,
-//            @RequestBody @Valid ReqUserChallengeUpdate req
-//    ){
-//        userChallengeService.updateUserChallenge(userSeq, userChallengeSeq, req);
-//
-//        return new ResponseEntity<>(HttpStatus.OK);
-//    }
 
     @ApiOperation("유저 챌린지 그만두기")
     @PutMapping("/v1/user-challenges/{seq}/quit")
     public ResponseEntity<Void> quitUserChallenge(
             @ApiParam(hidden = true) @SessionUser Long userSeq,
             @PathVariable("seq") Long userChallengeSeq
-    ){
+    ) {
         userChallengeService.quitUserChallenge(userSeq, userChallengeSeq);
 
         return new ResponseEntity<>(HttpStatus.OK);

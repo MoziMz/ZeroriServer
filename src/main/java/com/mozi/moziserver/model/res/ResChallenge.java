@@ -22,7 +22,7 @@ public class ResChallenge {
 
     private Integer recommendedCnt;
 
-    private ChallengeTagType mainTag;
+    private String mainTag;
 
     private Integer point;
 
@@ -47,7 +47,7 @@ public class ResChallenge {
         this.name = challenge.getName();
         this.description = challenge.getDescription();
         this.recommendedCnt = challenge.getRecommendedCnt();
-        this.mainTag = challenge.getMainTag();
+        this.mainTag = challenge.getMainTag().getName();
         this.point = challenge.getPoint();
         this.themeSeq = challenge.getThemeSeq();
         this.updatedAt = challenge.getUpdatedAt();

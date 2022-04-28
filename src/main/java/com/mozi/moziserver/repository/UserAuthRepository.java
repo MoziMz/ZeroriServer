@@ -1,5 +1,6 @@
 package com.mozi.moziserver.repository;
 
+import com.mozi.moziserver.model.entity.User;
 import com.mozi.moziserver.model.entity.UserAuth;
 import com.mozi.moziserver.model.mappedenum.UserAuthType;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -17,10 +18,5 @@ public interface UserAuthRepository extends JpaRepository<UserAuth, Long>, UserA
 
     Optional<UserAuth> findUserAuthByTypeAndId(@Param("type") UserAuthType type, @Param("id") String id);
 
-//    @AutoPwEncrypt
-//    int insertUserAuth( UserAuth userAuth );
-//
-//    UserAuth findUserAuthByTypeAndId( UserAuth userAuth );
-//
-//    int deleteUserAuthByUserSeq(@Param("userSeq") Integer userSeq);
+    UserAuth findByUserAndType(User user, UserAuthType type);
 }

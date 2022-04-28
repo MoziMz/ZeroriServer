@@ -1,7 +1,5 @@
 package com.mozi.moziserver.model.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.mozi.moziserver.model.mappedenum.ChallengeTagType;
 import lombok.Getter;
 import lombok.Setter;
 

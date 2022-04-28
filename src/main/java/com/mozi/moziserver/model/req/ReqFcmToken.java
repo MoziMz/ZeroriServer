@@ -7,7 +7,9 @@ import javax.validation.constraints.NotBlank;
 
 @Getter
 @Setter
-public class ReqNickName {
+public class ReqFcmToken {
     @NotBlank
-    private String nickName;
+    private String deviceId;
+    @NotBlank
+    private String token;
 }

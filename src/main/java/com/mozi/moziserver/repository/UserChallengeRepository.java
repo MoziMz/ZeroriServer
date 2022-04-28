@@ -26,13 +26,4 @@ public interface UserChallengeRepository extends JpaRepository<UserChallenge, Lo
     );
 
     List<UserChallenge> findAllByStateAndStartDate(UserChallengeStateType stateType, LocalDate startDate);
-
-//    @Transactional
-//    @Modifying(clearAutomatically = true)
-//    @Query("UPDATE booking SET status = :status WHERE id = :id AND status = :prevStatus")
-//    int updateBookingStatus(
-//            @Param("id") Long id,
-//            @Param("prevStatus") BookingStatusType prevStatus,
-//            @Param("status") BookingStatusType status
-//    );
 }
