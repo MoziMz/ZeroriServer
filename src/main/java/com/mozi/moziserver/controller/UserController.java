@@ -71,10 +71,12 @@ public class UserController {
 
     @ApiOperation("닉네임 중복 확인")
     @GetMapping("/v1/users/nicknames/{nickName}/check")
-    public ResponseEntity<Boolean> checkNickNameDuplicate(
+    public ResponseEntity<Void> checkNickNameDuplicate(
             @PathVariable String nickName
     ) {
-        return ResponseEntity.ok(userService.checkNickNameDuplicate(nickName));
+        return new ResponseEntity<>(
+                userService.checkNickNameDuplicate(nickName) ? HttpStatus.OK : HttpStatus.NOT_FOUND
+        );
     }
 
     @ApiOperation("이메일 찾기")
@@ -93,10 +95,12 @@ public class UserController {
 
     @ApiOperation("이메일 중복 확인")
     @GetMapping("/v1/users/emails/{email}/check")
-    public ResponseEntity<Boolean> checkEmailDuplicate(
+    public ResponseEntity<Void> checkEmailDuplicate(
             @PathVariable String email
     ) {
-        return ResponseEntity.ok(userService.checkEmailDuplicate(email));
+        return new ResponseEntity<>(
+                userService.checkEmailDuplicate(email) ? HttpStatus.OK : HttpStatus.NOT_FOUND
+        );
     }
 
     @ApiOperation("비밀번호 재설정 (이메일 인증 필수)")
