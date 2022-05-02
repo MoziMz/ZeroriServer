@@ -104,7 +104,7 @@ public class UserController {
     }
 
     @ApiOperation("비밀번호 재설정 (이메일 인증 필수)")
-    @PostMapping("/v1/users/emails/find-pw")
+    @PostMapping("/v1/users/find-pw")
     public ResponseEntity<Void> sendPwEmail(
             @RequestBody @Valid ReqAuthEmail req
     ) {
