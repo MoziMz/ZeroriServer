@@ -6,10 +6,10 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum AnimalType {
-    사자("사자"),
-    판다("판다"),
-    토끼("토끼"),
-    원숭이("원숭이");
+    LION("사자"),
+    PANDA("판다"),
+    RABBIT("토끼"),
+    MONKEY("원숭이");
 
     private final String name;
 }

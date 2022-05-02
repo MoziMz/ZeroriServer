@@ -4,10 +4,7 @@ import com.mozi.moziserver.model.mappedenum.AnimalType;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Getter
 @Setter
@@ -17,6 +14,7 @@ public class Animal extends AbstractTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long seq;
 
+    @Enumerated(EnumType.STRING)
     private AnimalType animalName;
 
     private String content;
