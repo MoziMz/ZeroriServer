@@ -17,4 +17,3 @@ public class UserChallengeResult {
     @Enumerated(EnumType.STRING)
     private UserChallengeResultType result;
 }
-

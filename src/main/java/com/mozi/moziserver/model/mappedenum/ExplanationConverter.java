@@ -3,13 +3,12 @@ package com.mozi.moziserver.model.mappedenum;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mozi.moziserver.model.UserChallengeResult;
+import com.mozi.moziserver.model.ChallengeExplanation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
 
 import javax.persistence.AttributeConverter;
 import javax.persistence.Converter;
-import java.util.List;
 
 /**
  * Mysql post links 타입 JSON
@@ -17,35 +16,35 @@ import java.util.List;
  */
 @Slf4j
 @Converter
-public class ResultListConverter implements AttributeConverter<List<UserChallengeResult>, String> {
+public class ExplanationConverter implements AttributeConverter<ChallengeExplanation, String> {
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
-    public String convertToDatabaseColumn(final List<UserChallengeResult> resultList) {
+    public String convertToDatabaseColumn(final ChallengeExplanation challengeExplanation) {
 
-        if (resultList == null) {
+        if (challengeExplanation == null) {
             return null;
         }
 
         try {
-            return objectMapper.writeValueAsString(resultList);
+            return objectMapper.writeValueAsString(challengeExplanation);
         } catch (JsonProcessingException e) {
-            log.error("UserChallengeResultListConverter", e);
+            log.error("ChallengeExplanationConverter", e);
             return null;
         }
     }
 
     @Override
-    public List<UserChallengeResult> convertToEntityAttribute(final String resultListString) {
+    public ChallengeExplanation convertToEntityAttribute(final String challengeExplanationString) {
 
-        if (!StringUtils.hasLength(resultListString)) {
+        if (!StringUtils.hasLength(challengeExplanationString)) {
             return null;
         }
 
         try {
-            return objectMapper.readValue(resultListString, new TypeReference<>() {});
+            return objectMapper.readValue(challengeExplanationString, new TypeReference<>() {});
         } catch (JsonProcessingException e) {
-            log.error("UserChallengeResultListConverter", e);
+            log.error("ChallengeExplanationConverter", e);
             return null;
         }
     }

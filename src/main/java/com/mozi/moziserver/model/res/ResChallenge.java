@@ -1,5 +1,6 @@
 package com.mozi.moziserver.model.res;
 
+import com.mozi.moziserver.model.ChallengeExplanation;
 import com.mozi.moziserver.model.entity.*;
 import com.mozi.moziserver.model.mappedenum.ChallengeDifficultyType;
 import com.mozi.moziserver.model.mappedenum.ChallengeTagType;
@@ -19,6 +20,8 @@ public class ResChallenge {
     private String name;
 
     private String description;
+
+    private ChallengeExplanation explanation;
 
     private Integer recommendedCnt;
 
@@ -46,6 +49,7 @@ public class ResChallenge {
         this.seq = challenge.getSeq();
         this.name = challenge.getName();
         this.description = challenge.getDescription();
+        this.explanation = challenge.getExplanation();
         this.recommendedCnt = challenge.getRecommendedCnt();
         this.mainTag = challenge.getMainTag().getName();
         this.point = challenge.getPoint();
