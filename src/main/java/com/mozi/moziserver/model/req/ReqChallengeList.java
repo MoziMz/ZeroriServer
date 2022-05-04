@@ -8,15 +8,16 @@ import lombok.Setter;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 @Getter
 @Setter
 public class ReqChallengeList {
 
-    private List<String> challengeTagType;
+    private List<ChallengeTagType> challengeTagType;
 
-    private List<String> challengeThemeType;
+    private List<Long> themeSeq;
 
     @Min(1L)
     private Long prevLastPostSeq;

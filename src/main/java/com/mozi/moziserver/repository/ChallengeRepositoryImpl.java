@@ -36,56 +36,24 @@ public class ChallengeRepositoryImpl extends QuerydslRepositorySupport implement
                 .findFirst();
     }
 
-//    @Override
-//    public List<Challenge> findAll (
-//            Long userSeq,
-////            List<String> tagType,
-//            List<String> themeType,
-//            Integer pageSize,
-//            Long prevLastPostSeq
-//    ) {
-//        final Predicate[] predicates = new Predicate[]{
-//                predicateOptional(qChallenge.seq::lt,prevLastPostSeq),
-//        };
-//
-//        List<ChallengeTagType> tags = new ArrayList<>();
-//        List<ChallengeThemeType> themes = new ArrayList<>();
-//
-//        tags = (tagType != null) ? setTags(tags, tagType) : null;
-//        themes = (themeType != null) ? setThemes(themes, themeType) : null;
-//
-//        List<Challenge> challengeList = from(qChallenge)
-//                .leftJoin(qChallengeTheme).on(qChallenge.seq.eq(qChallengeTheme.id.challenge.seq))
-//                .leftJoin(qChallengeTag).on(qChallenge.seq.eq(qChallengeTag.id.challenge.seq))
-//                .where(predicates)
-//                .where(
-//                        tagNameIn(tags),
-//                        themeNameIn(themes)
-//                )
-//                .groupBy(qChallenge.seq)
-//                .orderBy(qChallenge.seq.asc())
-//                .limit(pageSize)
-//                .fetch()
-//                .stream()
-//                .collect(Collectors.toList());
-//
-//        return challengeList;
-//
-//    }
-
     @Override
     public List<Challenge> findAll (
             Long userSeq,
-            List<String> tagType,
-            List<String> themeType,
+            List<ChallengeTagType> tagTypeList,
+            List<Long> themeSeqList,
             Integer pageSize,
             Long prevLastPostSeq
     ) {
+        final Predicate[] predicates = new Predicate[]{
+                predicateOptional(qChallenge.seq::lt,prevLastPostSeq),
+                !themeSeqList.isEmpty() ? predicateOptional(qChallenge.themeSeq::in,themeSeqList) : null,
+                !tagTypeList.isEmpty() ? predicateOptional(qChallenge.mainTag::in, tagTypeList) : null
+        };
+
         List<Challenge> challengeList = from(qChallenge)
+                .where(predicates)
                 .limit(pageSize)
-                .fetch()
-                .stream()
-                .collect(Collectors.toList());
+                .fetch();
 
         return challengeList;
     }
@@ -93,26 +61,4 @@ public class ChallengeRepositoryImpl extends QuerydslRepositorySupport implement
     private <T> Predicate predicateOptional(final Function<T, Predicate> whereFunc, final T value) {
         return value != null ? whereFunc.apply(value) : null;
     }
-
-    private List<ChallengeTagType> setTags(List<ChallengeTagType> tags, List<String> tagType) {
-        for (int i = 0; i < tagType.size(); i++) {
-            tags.add(ChallengeTagType.valueOf(tagType.get(i)));
-        }
-        return tags;
-    }
-
-    private List<ChallengeThemeType> setThemes(List<ChallengeThemeType> themes, List<String> themeType) {
-        for (int i = 0; i < themeType.size(); i++) {
-            themes.add(ChallengeThemeType.valueOf(themeType.get(i)));
-        }
-        return themes;
-    }
-
-//    private BooleanExpression tagNameIn(List<ChallengeTagType> tags) {
-//        return tags != null ? qChallengeTag.id.tagName.in(tags) : null;
-//    }
-
-//    private BooleanExpression themeNameIn(List<ChallengeThemeType> themes) {
-//        return themes != null ? qChallengeTheme.id.themeName.in(themes) : null;
-//    }
 }

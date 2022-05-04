@@ -15,8 +15,8 @@ public interface ChallengeRepositorySupport {
 
     List<Challenge> findAll (
             Long userSeq,
-            List<String> tagType,
-            List<String> themeType,
+            List<ChallengeTagType> tagTypeList,
+            List<Long> themeSeqList,
             Integer pageSize,
             Long prevLastPostSeq
     );
