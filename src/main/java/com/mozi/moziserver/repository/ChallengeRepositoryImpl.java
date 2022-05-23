@@ -46,8 +46,8 @@ public class ChallengeRepositoryImpl extends QuerydslRepositorySupport implement
     ) {
         final Predicate[] predicates = new Predicate[]{
                 predicateOptional(qChallenge.seq::lt,prevLastPostSeq),
-                !themeSeqList.isEmpty() ? predicateOptional(qChallenge.themeSeq::in,themeSeqList) : null,
-                !tagTypeList.isEmpty() ? predicateOptional(qChallenge.mainTag::in, tagTypeList) : null
+                predicateOptional(qChallenge.themeSeq::in,themeSeqList),
+                predicateOptional(qChallenge.mainTag::in, tagTypeList)
         };
 
         List<Challenge> challengeList = from(qChallenge)
