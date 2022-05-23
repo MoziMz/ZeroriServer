@@ -16,6 +16,8 @@ public class PreparationItem extends AbstractTimeEntity {
     @Id
     private Integer turn;
 
+    private String name;
+
     private String colorImgUrl;
 
     private String blackImgUrl;

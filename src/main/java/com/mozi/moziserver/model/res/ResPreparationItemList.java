@@ -6,11 +6,13 @@ import lombok.Getter;
 @Getter
 public class ResPreparationItemList {
     private Integer turn;
+    private String name;
     private String colorImgUrl;
     private String blackImgUrl;
 
     private ResPreparationItemList(PreparationItem preparationItem) {
         this.turn = preparationItem.getTurn();
+        this.name = preparationItem.getName();
         this.colorImgUrl = preparationItem.getColorImgUrl();
         this.blackImgUrl = preparationItem.getBlackImgUrl();
     }

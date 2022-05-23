@@ -4,7 +4,7 @@ import com.mozi.moziserver.model.entity.PostboxMessageAnimal;
 import com.mozi.moziserver.model.entity.PreparationItem;
 import com.mozi.moziserver.model.req.ReqBasic;
 import com.mozi.moziserver.model.res.ResPostboxAdminList;
-import com.mozi.moziserver.model.res.ResPostboxAnimalList;
+import com.mozi.moziserver.model.res.ResPostboxMessageAnimal;
 import com.mozi.moziserver.model.res.ResPostboxMessageAnimalList;
 import com.mozi.moziserver.security.SessionUser;
 import com.mozi.moziserver.service.PostboxMessageAdminService;
@@ -54,14 +54,14 @@ public class PostboxMessageController {
     }
 
     // TODO 메서드명 변경
-    @ApiOperation("동물 이미지와 준비물")
+    @ApiOperation("동물의 편지 하나 조회")
     @GetMapping("/v1/postbox-message-animals/{seq}")
-    public ResPostboxAnimalList getAnimalAndItemsIfSuccess(
+    public ResPostboxMessageAnimal getAnimalAndItemsIfSuccess(
             @ApiParam(hidden = true) @SessionUser Long userSeq
     ) {
         PostboxMessageAnimal postboxMessageAnimal = postboxMessageAnimalService.getAnimalInfo(userSeq);
         List<PreparationItem> preparationItemList = postboxMessageAnimalService.getItemList(userSeq, postboxMessageAnimal.getAnimal().getSeq());
 
-        return ResPostboxAnimalList.of(postboxMessageAnimal, preparationItemList);
+        return ResPostboxMessageAnimal.of(postboxMessageAnimal, preparationItemList);
     }
 }
