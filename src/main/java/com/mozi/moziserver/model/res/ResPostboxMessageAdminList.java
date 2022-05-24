@@ -4,16 +4,16 @@ import com.mozi.moziserver.model.entity.PostboxMessageAdmin;
 import lombok.Getter;
 
 @Getter
-public class ResPostboxAdminList {
+public class ResPostboxMessageAdminList {
     private String sender;
     private String content;
 
-    private ResPostboxAdminList(PostboxMessageAdmin postboxMessageAdmin) {
+    private ResPostboxMessageAdminList(PostboxMessageAdmin postboxMessageAdmin) {
         this.sender = postboxMessageAdmin.getSender();
         this.content = postboxMessageAdmin.getContent();
     }
 
-    public static ResPostboxAdminList of(PostboxMessageAdmin postboxMessageAdmin) {
-        return new ResPostboxAdminList(postboxMessageAdmin);
+    public static ResPostboxMessageAdminList of(PostboxMessageAdmin postboxMessageAdmin) {
+        return new ResPostboxMessageAdminList(postboxMessageAdmin);
     }
 }

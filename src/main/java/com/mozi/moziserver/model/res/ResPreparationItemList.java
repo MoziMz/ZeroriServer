@@ -10,14 +10,17 @@ public class ResPreparationItemList {
     private String colorImgUrl;
     private String blackImgUrl;
 
-    private ResPreparationItemList(PreparationItem preparationItem) {
+    private boolean colored_state;
+
+    private ResPreparationItemList(PreparationItem preparationItem, Integer level) {
         this.turn = preparationItem.getTurn();
         this.name = preparationItem.getName();
         this.colorImgUrl = preparationItem.getColorImgUrl();
         this.blackImgUrl = preparationItem.getBlackImgUrl();
+        this.colored_state = turn <= level;
     }
 
-    public static ResPreparationItemList of(PreparationItem preparationItem) {
-        return new ResPreparationItemList(preparationItem);
+    public static ResPreparationItemList of(PreparationItem preparationItem, Integer level) {
+        return new ResPreparationItemList(preparationItem, level);
     }
 }

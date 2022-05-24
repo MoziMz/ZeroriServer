@@ -3,7 +3,7 @@ package com.mozi.moziserver.controller;
 import com.mozi.moziserver.model.entity.PostboxMessageAnimal;
 import com.mozi.moziserver.model.entity.PreparationItem;
 import com.mozi.moziserver.model.req.ReqBasic;
-import com.mozi.moziserver.model.res.ResPostboxAdminList;
+import com.mozi.moziserver.model.res.ResPostboxMessageAdminList;
 import com.mozi.moziserver.model.res.ResPostboxMessageAnimal;
 import com.mozi.moziserver.model.res.ResPostboxMessageAnimalList;
 import com.mozi.moziserver.security.SessionUser;
@@ -32,13 +32,13 @@ public class PostboxMessageController {
 
     @ApiOperation("관리자의 편지 리스트 조회")
     @GetMapping("/v1/postbox-message-admins")
-    public List<ResPostboxAdminList> getPostboxMessageAdminList(
+    public List<ResPostboxMessageAdminList> getPostboxMessageAdminList(
             @ApiParam(hidden = true) @SessionUser Long userSeq,
             @Valid ReqBasic req
     ) {
         return postboxMessageAdminService.getPostboxMessageAdminList(userSeq, req)
                 .stream()
-                .map(ResPostboxAdminList::of)
+                .map(ResPostboxMessageAdminList::of)
                 .collect(Collectors.toList());
     }
 
@@ -53,15 +53,17 @@ public class PostboxMessageController {
                 .collect(Collectors.toList());
     }
 
-    // TODO 메서드명 변경
     @ApiOperation("동물의 편지 하나 조회")
     @GetMapping("/v1/postbox-message-animals/{seq}")
     public ResPostboxMessageAnimal getAnimalAndItemsIfSuccess(
             @ApiParam(hidden = true) @SessionUser Long userSeq
     ) {
+        // TODO 동물의 편지 읽음 상태 변경
         PostboxMessageAnimal postboxMessageAnimal = postboxMessageAnimalService.getAnimalInfo(userSeq);
         List<PreparationItem> preparationItemList = postboxMessageAnimalService.getItemList(userSeq, postboxMessageAnimal.getAnimal().getSeq());
 
         return ResPostboxMessageAnimal.of(postboxMessageAnimal, preparationItemList);
     }
+
+    // TODO 관리자 편지 읽음 확인
 }
