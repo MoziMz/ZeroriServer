@@ -28,7 +28,8 @@ public interface ResponseError {
         INVALID_IMAGE("invalid image"),
         INVALID_TOKEN("invalid token"),
         ALREADY_EXISTS_NICKNAME("already exists nickname"),
-        SOCIAL_LOGIN_USER("social login user");
+        SOCIAL_LOGIN_USER("social login user"),
+        INVALID_USER_CHALLANGE("invalid user challenge");
 
         // INVALID 는 한가지로 명확하지 않을때 쓴다.
 

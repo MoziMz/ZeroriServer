@@ -29,6 +29,10 @@ public interface UserChallengeRepositorySupport {
             Long challengeSeq
     );
 
+    List<UserChallenge> findAllByStateAndCheckedState(
+            Long userSeq
+    );
+
     List<UserChallenge> findAllByPlanResult(
             LocalDate date,
             UserChallengeResultType planResult

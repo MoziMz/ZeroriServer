@@ -7,6 +7,7 @@ import com.mozi.moziserver.model.res.ResUserChallengeList;
 import com.mozi.moziserver.repository.ChallengeRepository;
 import com.mozi.moziserver.security.SessionUser;
 import com.mozi.moziserver.service.UserChallengeService;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
@@ -69,6 +70,28 @@ public class UserChallengeController {
             @PathVariable("seq") Long userChallengeSeq
     ) {
         userChallengeService.quitUserChallenge(userSeq, userChallengeSeq);
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @ApiOperation("완료한 유저 챌린지 리스트 조회 (유저가 확인 안한 것만)")
+    @GetMapping("/v1/user-challenges/end")
+    public List<ResUserChallengeList> getEndUserChallengeList(
+            @ApiParam(hidden = true) @SessionUser Long userSeq
+    ) {
+        return userChallengeService.getEndUserChallengeList(userSeq)
+                .stream()
+                .map(ResUserChallengeList::of)
+                .collect(Collectors.toList());
+    }
+
+    @ApiOperation("완료한 유저 챌린지 확인 완료")
+    @PutMapping("/v1/user-challenges/{seq}/checked")
+    public ResponseEntity<Void> checkedUserChallenge(
+            @ApiParam(hidden = true) @SessionUser Long userSeq,
+            @PathVariable("seq") Long userChallengeSeq
+    ) {
+        userChallengeService.checkedUserChallenge(userSeq, userChallengeSeq);
 
         return new ResponseEntity<>(HttpStatus.OK);
     }

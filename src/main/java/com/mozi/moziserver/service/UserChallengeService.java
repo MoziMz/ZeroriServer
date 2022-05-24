@@ -69,6 +69,14 @@ public class UserChallengeService {
         );
     }
 
+    public List<UserChallenge> getEndUserChallengeList(Long userSeq) {
+        return userChallengeRepository.findAllByStateAndCheckedState(
+                userSeq
+        );
+    }
+
+
+
     @Transactional
     public void createUserChallenge(Long userSeq, ReqUserChallengeCreate req) {
 
@@ -212,6 +220,7 @@ public class UserChallengeService {
 
     // TODO 유저챌린지 그만두기를 했을때 추가 포인트를 user_reward 포인트에 더해준다.
 
+
     @Transactional
     public void quitUserChallenge(Long userSeq, Long userChallengeSeq) {
         UserChallenge userChallenge = getUserChallenge(userSeq, userChallengeSeq);
@@ -221,6 +230,19 @@ public class UserChallengeService {
         }
 
         userChallenge.setState(UserChallengeStateType.END);
+
+        userChallengeRepository.save(userChallenge);
+    }
+
+    @Transactional
+    public void checkedUserChallenge(Long userSeq, Long userChallengeSeq) {
+        UserChallenge userChallenge = getUserChallenge(userSeq, userChallengeSeq);
+
+        if (UserChallengeStateType.activeTypes.contains(userChallenge.getState())) {
+            throw ResponseError.BadRequest.INVALID_USER_CHALLANGE.getResponseException();
+        }
+
+        userChallenge.setCheckedState(true);
 
         userChallengeRepository.save(userChallenge);
     }

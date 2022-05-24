@@ -124,6 +124,26 @@ public class UserChallengeRepositoryImpl extends QuerydslRepositorySupport imple
     }
 
     @Override
+    public List<UserChallenge> findAllByStateAndCheckedState(
+            Long userSeq
+    ) {
+        final Predicate[] predicates = new Predicate[]{
+                qUserChallenge.user.seq.eq(userSeq),
+                qUserChallenge.checkedState.eq(false),
+                qUserChallenge.state.eq(UserChallengeStateType.END)
+        };
+
+        return from(qUserChallenge)
+                .innerJoin(qChallenge)
+                .on(qUserChallenge.challenge.seq.eq(qChallenge.seq))
+                .where(predicates)
+                .fetch()
+                .stream()
+                .distinct()
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public List<UserChallenge> findAllByPlanResult(
             LocalDate date,
             UserChallengeResultType planResult

@@ -45,6 +45,8 @@ public class UserChallenge extends AbstractTimeEntity {
     @Builder.Default
     private Integer acquisitionPoints = 0;
 
+    private boolean checkedState;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_seq")
     private User user;
