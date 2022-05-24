@@ -139,7 +139,9 @@ public interface ResponseError {
         USER_CHALLENGE_NOT_EXISTS("user-challenge not exists"),
         USER_STICKER_NOT_EXISTS("user sticker not exists"),
         EMAIL_NOT_EXISTS("email not exists"),
-        NICKNAME_NOT_EXISTS("nickname not exists");
+        NICKNAME_NOT_EXISTS("nickname not exists"),
+        POSTBOX_MESSAGE_ADMIN_NOT_EXISTS("postbox message admin not exists"),
+        POSTBOX_MESSAGE_ANIMAL_NOT_EXISTS("postbox message animal not exists");
 
         private final String message;
 

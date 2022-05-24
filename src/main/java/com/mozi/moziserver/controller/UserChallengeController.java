@@ -26,7 +26,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class UserChallengeController {
     private final UserChallengeService userChallengeService;
-    private final ChallengeRepository challengeRepository;
 
     @ApiOperation("유저 챌린지 날짜별 리스트 조회")
     @GetMapping("/v1/period/user-challenges")
@@ -91,7 +90,7 @@ public class UserChallengeController {
             @ApiParam(hidden = true) @SessionUser Long userSeq,
             @PathVariable("seq") Long userChallengeSeq
     ) {
-        userChallengeService.checkedUserChallenge(userSeq, userChallengeSeq);
+        userChallengeService.checkUserChallenge(userSeq, userChallengeSeq);
 
         return new ResponseEntity<>(HttpStatus.OK);
     }

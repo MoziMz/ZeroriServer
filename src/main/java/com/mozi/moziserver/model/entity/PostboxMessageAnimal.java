@@ -17,6 +17,8 @@ public class PostboxMessageAnimal extends AbstractTimeEntity {
 
     private String content;
 
+    private boolean checkedState;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_seq")
     private User user;

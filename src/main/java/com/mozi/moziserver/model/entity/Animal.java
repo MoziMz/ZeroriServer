@@ -17,7 +17,7 @@ public class Animal extends AbstractTimeEntity {
     @Enumerated(EnumType.STRING)
     private AnimalType animalName;
 
-    private String content;
+    private String explanation;
 
     private String imgUrl;
 

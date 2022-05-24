@@ -13,9 +13,9 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -44,7 +44,7 @@ public class PostboxMessageController {
 
     @ApiOperation("동물의 편지 리스트 조회")
     @GetMapping("/v1/postbox-message-animals")
-    public List<ResPostboxMessageAnimalList> getPostboxAnimalList(
+    public List<ResPostboxMessageAnimalList> getPostboxMessageAnimalList(
             @ApiParam(hidden = true) @SessionUser Long userSeq
     ) {
         return postboxMessageAnimalService.getPostboxMessageAnimalList(userSeq)
@@ -55,15 +55,27 @@ public class PostboxMessageController {
 
     @ApiOperation("동물의 편지 하나 조회")
     @GetMapping("/v1/postbox-message-animals/{seq}")
-    public ResPostboxMessageAnimal getAnimalAndItemsIfSuccess(
-            @ApiParam(hidden = true) @SessionUser Long userSeq
+    public ResPostboxMessageAnimal getPostboxMessageAnimal(
+            @ApiParam(hidden = true) @SessionUser Long userSeq,
+            @PathVariable("seq") Long seq
+
     ) {
-        // TODO 동물의 편지 읽음 상태 변경
-        PostboxMessageAnimal postboxMessageAnimal = postboxMessageAnimalService.getAnimalInfo(userSeq);
+        PostboxMessageAnimal postboxMessageAnimal = postboxMessageAnimalService.getPostboxMessageAnimal(userSeq, seq);
         List<PreparationItem> preparationItemList = postboxMessageAnimalService.getItemList(userSeq, postboxMessageAnimal.getAnimal().getSeq());
+
+        postboxMessageAnimalService.checkMessage(userSeq, postboxMessageAnimal.getSeq());
 
         return ResPostboxMessageAnimal.of(postboxMessageAnimal, preparationItemList);
     }
 
-    // TODO 관리자 편지 읽음 확인
+    @ApiOperation("관리자 편지 확인 완료")
+    @PutMapping("/v1/postbox-message-admins/{seq}/checked")
+    public ResponseEntity<Void> checkedUserChallenge(
+            @ApiParam(hidden = true) @SessionUser Long userSeq,
+            @PathVariable("seq") Long seq
+    ) {
+        postboxMessageAdminService.checkMessage(userSeq, seq);
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 }

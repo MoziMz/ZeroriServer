@@ -235,7 +235,7 @@ public class UserChallengeService {
     }
 
     @Transactional
-    public void checkedUserChallenge(Long userSeq, Long userChallengeSeq) {
+    public void checkUserChallenge(Long userSeq, Long userChallengeSeq) {
         UserChallenge userChallenge = getUserChallenge(userSeq, userChallengeSeq);
 
         if (UserChallengeStateType.activeTypes.contains(userChallenge.getState())) {

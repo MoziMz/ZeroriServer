@@ -20,4 +20,6 @@ public class PostboxMessageAdmin extends AbstractTimeEntity {
     private String sender;
 
     private String content;
+
+    private boolean checkedState;
 }

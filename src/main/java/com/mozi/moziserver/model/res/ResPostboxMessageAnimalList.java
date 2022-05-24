@@ -10,6 +10,7 @@ public class ResPostboxMessageAnimalList {
     private Long seq;
     private String animalName;
     private String content;
+    private boolean checkedState;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -17,6 +18,7 @@ public class ResPostboxMessageAnimalList {
         this.seq = postboxMessageAnimal.getSeq();
         this.animalName = postboxMessageAnimal.getAnimal().getAnimalName().getName();
         this.content = postboxMessageAnimal.getContent();
+        this.checkedState = postboxMessageAnimal.isCheckedState();
         this.createdAt = postboxMessageAnimal.getCreatedAt();
         this.updatedAt = postboxMessageAnimal.getUpdatedAt();
     }
