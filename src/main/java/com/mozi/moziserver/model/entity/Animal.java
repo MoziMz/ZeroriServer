@@ -1,24 +1,24 @@
 package com.mozi.moziserver.model.entity;
 
 import com.mozi.moziserver.model.mappedenum.AnimalType;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 
 @Getter
 @Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity(name = "animal")
 public class Animal extends AbstractTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long seq;
 
-    @Enumerated(EnumType.STRING)
-    private AnimalType animalName;
+    private String name;
 
     private String explanation;
 
     private String imgUrl;
-
 }

@@ -29,7 +29,9 @@ public interface ResponseError {
         INVALID_TOKEN("invalid token"),
         ALREADY_EXISTS_NICKNAME("already exists nickname"),
         SOCIAL_LOGIN_USER("social login user"),
-        INVALID_USER_CHALLANGE("invalid user challenge");
+        INVALID_USER_CHALLANGE("invalid user challenge"),
+        INVALID_NAME("invalid name"),
+        ALREADY_EXISTS_ANIMAL_NAME("already exists animal name");
 
         // INVALID 는 한가지로 명확하지 않을때 쓴다.
 
@@ -141,7 +143,8 @@ public interface ResponseError {
         EMAIL_NOT_EXISTS("email not exists"),
         NICKNAME_NOT_EXISTS("nickname not exists"),
         POSTBOX_MESSAGE_ADMIN_NOT_EXISTS("postbox message admin not exists"),
-        POSTBOX_MESSAGE_ANIMAL_NOT_EXISTS("postbox message animal not exists");
+        POSTBOX_MESSAGE_ANIMAL_NOT_EXISTS("postbox message animal not exists"),
+        ANIMAL_NOT_EXISTS("animal not exists");
 
         private final String message;
 

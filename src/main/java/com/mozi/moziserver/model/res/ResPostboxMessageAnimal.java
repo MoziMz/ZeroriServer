@@ -19,7 +19,7 @@ public class ResPostboxMessageAnimal {
     private LocalDateTime updatedAt;
 
     private ResPostboxMessageAnimal(PostboxMessageAnimal postboxMessageAnimal, List<PreparationItem> preparationItemList) {
-        this.animalName = postboxMessageAnimal.getAnimal().getAnimalName().getName();
+        this.animalName = postboxMessageAnimal.getAnimal().getName();
         this.content = postboxMessageAnimal.getContent();
         this.imgUrl = postboxMessageAnimal.getAnimal().getImgUrl();
         this.preparationItemList = preparationItemList.stream().map(e -> ResPreparationItemList.of(e, postboxMessageAnimal.getLevel())).collect(Collectors.toList());

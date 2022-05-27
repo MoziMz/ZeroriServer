@@ -16,7 +16,7 @@ public class ResPostboxMessageAnimalList {
 
     private ResPostboxMessageAnimalList (PostboxMessageAnimal postboxMessageAnimal) {
         this.seq = postboxMessageAnimal.getSeq();
-        this.animalName = postboxMessageAnimal.getAnimal().getAnimalName().getName();
+        this.animalName = postboxMessageAnimal.getAnimal().getName();
         this.content = postboxMessageAnimal.getContent();
         this.checkedState = postboxMessageAnimal.isCheckedState();
         this.createdAt = postboxMessageAnimal.getCreatedAt();
