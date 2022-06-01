@@ -6,10 +6,7 @@ import com.mozi.moziserver.model.res.ResChallenge;
 import com.mozi.moziserver.model.res.ResChallengeList;
 import com.mozi.moziserver.model.res.ResChallengeTagList;
 import com.mozi.moziserver.security.SessionUser;
-import com.mozi.moziserver.service.ChallengeService;
-import com.mozi.moziserver.service.ChallengeStatisticsService;
-import com.mozi.moziserver.service.ChallengeTagService;
-import com.mozi.moziserver.service.UserChallengeService;
+import com.mozi.moziserver.service.*;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -32,6 +30,7 @@ public class ChallengeController {
     private final UserChallengeService userChallengeService;
     private final ChallengeStatisticsService challengeStatisticsService;
     private final ChallengeTagService challengeTagService;
+    private final ChallengeScrapService challengeScrapService;
 
     @ApiOperation("챌린지 하나 조회")
     @GetMapping("/v1/challenges/{seq}")
@@ -63,10 +62,24 @@ public class ChallengeController {
             @Valid ReqChallengeList req
     ) {
 
-        return challengeService.getChallengeList(userSeq, req)
-                .stream()
-                .map(ResChallengeList::of)
-                .collect(Collectors.toList());
+        List<ChallengeScrap> challengeScrapList=challengeScrapService.getChallengeScrapList(userSeq);
+
+        List<Challenge> challengeList=challengeService.getChallengeList(userSeq, req);
+
+        List<ResChallengeList> challengeLists=new ArrayList<ResChallengeList>();
+
+        for(Challenge challenge: challengeList){
+            Boolean flag=false;
+            for(ChallengeScrap cs: challengeScrapList){
+                if(cs.getChallengeSeq()==challenge.getSeq()){
+                    challengeLists.add(ResChallengeList.of(challenge,true));
+                    flag=true;
+                }
+            }
+            if(!flag) challengeLists.add(ResChallengeList.of(challenge,false));
+        }
+
+        return challengeLists;
     }
 
     @ApiOperation("챌린지 스크랩")

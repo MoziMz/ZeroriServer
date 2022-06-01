@@ -1,6 +1,7 @@
 package com.mozi.moziserver.model.res;
 
 import com.mozi.moziserver.model.entity.Challenge;
+import com.mozi.moziserver.model.entity.ChallengeScrap;
 import com.mozi.moziserver.model.mappedenum.ChallengeTagType;
 import lombok.Getter;
 
@@ -21,14 +22,17 @@ public class ResChallengeList {
 
     private ChallengeTagType mainTag;
 
-    private ResChallengeList(Challenge challenge) {
+    private Boolean scraped;
+
+    private ResChallengeList(Challenge challenge,Boolean scrapStatus) {
         this.seq = challenge.getSeq();
         this.name = challenge.getName();
         this.description = challenge.getDescription();
         this.recommendedCnt = challenge.getRecommendedCnt();
         this.themeSeq = challenge.getThemeSeq();
         this.mainTag = challenge.getMainTag();
+        this.scraped=scrapStatus;
     }
 
-    public static ResChallengeList of(Challenge challenge) {return new ResChallengeList(challenge);}
+    public static ResChallengeList of(Challenge challenge,Boolean isScrap) {return new ResChallengeList(challenge,isScrap);}
 }
