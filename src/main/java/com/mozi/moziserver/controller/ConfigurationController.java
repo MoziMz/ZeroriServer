@@ -2,7 +2,7 @@ package com.mozi.moziserver.controller;
 
 import com.mozi.moziserver.httpException.ResponseError;
 import com.mozi.moziserver.model.entity.User;
-import com.mozi.moziserver.model.req.ReqBasic;
+import com.mozi.moziserver.model.req.ReqList;
 import com.mozi.moziserver.model.req.ReqQuestionCreate;
 import com.mozi.moziserver.model.req.ReqSuggestionCreate;
 import com.mozi.moziserver.model.res.ResBoardList;
@@ -50,7 +50,7 @@ public class ConfigurationController {
     @GetMapping("/v1/boards")
     public List<ResBoardList> getBoardListByCreatedAt(
             @ApiParam(hidden = true) @SessionUser Long userSeq,
-            @Valid ReqBasic req
+            @Valid ReqList req
     ) {
         return boardService.getAllBoardListByCreatedAt(userSeq, req)
                 .stream()

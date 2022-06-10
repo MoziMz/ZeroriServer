@@ -2,7 +2,7 @@ package com.mozi.moziserver.controller;
 
 import com.mozi.moziserver.model.entity.PostboxMessageAnimal;
 import com.mozi.moziserver.model.entity.PreparationItem;
-import com.mozi.moziserver.model.req.ReqBasic;
+import com.mozi.moziserver.model.req.ReqList;
 import com.mozi.moziserver.model.res.ResPostboxMessageAdminList;
 import com.mozi.moziserver.model.res.ResPostboxMessageAnimal;
 import com.mozi.moziserver.model.res.ResPostboxMessageAnimalList;
@@ -34,7 +34,7 @@ public class PostboxMessageController {
     @GetMapping("/v1/postbox-message-admins")
     public List<ResPostboxMessageAdminList> getPostboxMessageAdminList(
             @ApiParam(hidden = true) @SessionUser Long userSeq,
-            @Valid ReqBasic req
+            @Valid ReqList req
     ) {
         return postboxMessageAdminService.getPostboxMessageAdminList(userSeq, req)
                 .stream()
@@ -45,9 +45,10 @@ public class PostboxMessageController {
     @ApiOperation("동물의 편지 리스트 조회")
     @GetMapping("/v1/postbox-message-animals")
     public List<ResPostboxMessageAnimalList> getPostboxMessageAnimalList(
-            @ApiParam(hidden = true) @SessionUser Long userSeq
+            @ApiParam(hidden = true) @SessionUser Long userSeq,
+            @Valid ReqList req
     ) {
-        return postboxMessageAnimalService.getPostboxMessageAnimalList(userSeq)
+        return postboxMessageAnimalService.getPostboxMessageAnimalList(userSeq, req)
                 .stream()
                 .map(ResPostboxMessageAnimalList::of)
                 .collect(Collectors.toList());

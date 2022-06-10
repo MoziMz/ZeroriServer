@@ -9,7 +9,6 @@ import javax.validation.constraints.Min;
 @Getter
 @Setter
 public class ReqList {
-
     @Min(1L)
     private Long prevLastSeq;
 

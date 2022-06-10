@@ -9,15 +9,14 @@ public class ResPreparationItemList {
     private String name;
     private String colorImgUrl;
     private String blackImgUrl;
-
-    private boolean colored_state;
+    private boolean coloredState;
 
     private ResPreparationItemList(PreparationItem preparationItem, Integer level) {
         this.turn = preparationItem.getTurn();
         this.name = preparationItem.getName();
         this.colorImgUrl = preparationItem.getColorImgUrl();
         this.blackImgUrl = preparationItem.getBlackImgUrl();
-        this.colored_state = turn <= level;
+        this.coloredState = turn <= level;
     }
 
     public static ResPreparationItemList of(PreparationItem preparationItem, Integer level) {

@@ -4,7 +4,7 @@ import com.mozi.moziserver.httpException.ResponseError;
 import com.mozi.moziserver.model.entity.PostboxMessageAdmin;
 import com.mozi.moziserver.model.entity.User;
 import com.mozi.moziserver.model.entity.UserChallenge;
-import com.mozi.moziserver.model.req.ReqBasic;
+import com.mozi.moziserver.model.req.ReqList;
 import com.mozi.moziserver.repository.PostboxMessageAdminRepository;
 import com.mozi.moziserver.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -32,14 +32,14 @@ public class PostboxMessageAdminService {
         return postboxMessageAdmin;
     }
 
-    public List<PostboxMessageAdmin> getPostboxMessageAdminList(Long userSeq, ReqBasic req) {
+    public List<PostboxMessageAdmin> getPostboxMessageAdminList(Long userSeq, ReqList req) {
         User user = userRepository.findById(userSeq)
                 .orElseThrow(ResponseError.NotFound.USER_NOT_EXISTS::getResponseException);
 
         return postboxMessageAdminRepository.findAllByUser(
                 user,
                 req.getPageSize(),
-                req.getPrevLastPostSeq()
+                req.getPrevLastSeq()
         );
     }
 

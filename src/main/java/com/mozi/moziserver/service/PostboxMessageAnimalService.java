@@ -5,6 +5,7 @@ import com.mozi.moziserver.model.entity.PostboxMessageAdmin;
 import com.mozi.moziserver.model.entity.PostboxMessageAnimal;
 import com.mozi.moziserver.model.entity.PreparationItem;
 import com.mozi.moziserver.model.entity.User;
+import com.mozi.moziserver.model.req.ReqList;
 import com.mozi.moziserver.repository.PostboxMessageAnimalRepository;
 import com.mozi.moziserver.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -41,11 +42,11 @@ public class PostboxMessageAnimalService {
         return postboxMessageAnimalRepository.findItemByUser(user, animalSeq);
     }
 
-    public List<PostboxMessageAnimal> getPostboxMessageAnimalList(Long userSeq) {
+    public List<PostboxMessageAnimal> getPostboxMessageAnimalList(Long userSeq, ReqList req) {
         User user = userRepository.findById(userSeq)
                 .orElseThrow(ResponseError.NotFound.USER_NOT_EXISTS::getResponseException);
 
-        return postboxMessageAnimalRepository.findAllByUser(user);
+        return postboxMessageAnimalRepository.findAllByUser(user, req.getPageSize(), req.getPrevLastSeq());
     }
 
     @Transactional

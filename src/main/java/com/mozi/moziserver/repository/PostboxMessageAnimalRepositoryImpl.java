@@ -1,11 +1,13 @@
 package com.mozi.moziserver.repository;
 
 import com.mozi.moziserver.model.entity.*;
+import com.querydsl.core.types.Predicate;
 import com.querydsl.jpa.JPAExpressions;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class PostboxMessageAnimalRepositoryImpl extends QuerydslRepositorySupport implements PostboxMessageAnimalRepositorySupport {
@@ -47,13 +49,24 @@ public class PostboxMessageAnimalRepositoryImpl extends QuerydslRepositorySuppor
     }
 
     @Override
-    public List<PostboxMessageAnimal> findAllByUser(User user) {
+    public List<PostboxMessageAnimal> findAllByUser(User user, Integer pageSize, Long prevLastSeq) {
+        final Predicate[] predicates = new Predicate[]{
+                predicateOptional(qPostboxMessageAnimal.seq::lt, prevLastSeq),
+                predicateOptional(qPostboxMessageAnimal.user::eq, user)
+        };
+
          return from(qPostboxMessageAnimal)
                  .innerJoin(qPostboxMessageAnimal.user, qUser).fetchJoin()
                  .innerJoin(qPostboxMessageAnimal.animal, qAnimal).fetchJoin()
-                 .where(qUser.eq(user))
+                 .where(predicates)
+                 .orderBy(qPostboxMessageAnimal.updatedAt.desc())
+                 .limit(pageSize)
                  .fetch()
                  .stream()
                  .collect(Collectors.toList());
+    }
+
+    private <T> Predicate predicateOptional(final Function<T, Predicate> whereFunc, final T value) {
+        return value != null ? whereFunc.apply(value) : null;
     }
 }
