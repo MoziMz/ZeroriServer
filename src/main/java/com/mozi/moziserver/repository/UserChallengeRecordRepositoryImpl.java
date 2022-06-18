@@ -4,8 +4,10 @@ import com.mozi.moziserver.model.entity.*;
 import com.querydsl.core.types.Predicate;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class UserChallengeRecordRepositoryImpl extends QuerydslRepositorySupport implements UserChallengeRecordRepositorySupport {
     private final QUserChallengeRecord qUserChallengeRecord = QUserChallengeRecord.userChallengeRecord;
@@ -48,7 +50,24 @@ public class UserChallengeRecordRepositoryImpl extends QuerydslRepositorySupport
         return;
     }
 
+    @Override
+    public List<UserChallengeRecord> findByUser(Long userSeq,Long prevLastChallengeSeq, Integer pageSize){
+        final Predicate[] predicates = new Predicate[]{
+                predicateOptional(qUserChallengeRecord.challenge.seq::lt,prevLastChallengeSeq),
+        };
+
+        return from(qUserChallengeRecord)
+                .where(qUser.seq.eq(userSeq))
+                .orderBy(qChallenge.name.asc())
+                .where(predicates)
+                .limit(pageSize)
+                .fetch()
+                .stream()
+                .collect(Collectors.toList());
+    }
+
     private <T> Predicate predicateOptional(final Function<T, Predicate> whereFunc, final T value) {
         return value != null ? whereFunc.apply(value) : null;
     }
+
 }

@@ -3,11 +3,10 @@ package com.mozi.moziserver.controller;
 import com.mozi.moziserver.model.req.ReqList;
 import com.mozi.moziserver.model.req.ReqUserChallengeCreate;
 import com.mozi.moziserver.model.req.ReqUserChallengeList;
+import com.mozi.moziserver.model.res.ResConfirmedUserChallenge;
 import com.mozi.moziserver.model.res.ResUserChallengeList;
-import com.mozi.moziserver.repository.ChallengeRepository;
 import com.mozi.moziserver.security.SessionUser;
 import com.mozi.moziserver.service.UserChallengeService;
-import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -93,5 +93,17 @@ public class UserChallengeController {
         userChallengeService.checkUserChallenge(userSeq, userChallengeSeq);
 
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @ApiOperation("인증한 제로 활동-활동별 (마이페이지)")
+    @GetMapping("/v1/user-challenges/confirmed")
+    public List<ResConfirmedUserChallenge> getUserChallengeRecordList(
+            @ApiParam(hidden = true) @SessionUser Long userSeq,
+            @Valid ReqList req
+    ) {
+        return userChallengeService.getUserChallengeRecordListByUserSeq(userSeq, req)
+                .stream()
+                .map(ResConfirmedUserChallenge::of)
+                .collect(Collectors.toList());
     }
 }

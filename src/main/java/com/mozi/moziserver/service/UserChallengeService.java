@@ -14,9 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.Period;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -299,5 +297,14 @@ public class UserChallengeService {
                         .build());
 
         return userChallengeRecord;
+    }
+
+    public List<UserChallengeRecord> getUserChallengeRecordListByUserSeq(
+            Long userSeq,
+            ReqList reqList
+    ) {
+
+        return userChallengeRecordRepository.findByUser(userSeq,reqList.getPrevLastSeq(),reqList.getPageSize());
+
     }
 }

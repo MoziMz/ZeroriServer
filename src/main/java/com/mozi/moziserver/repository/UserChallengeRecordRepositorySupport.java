@@ -5,6 +5,7 @@ import com.mozi.moziserver.model.entity.User;
 import com.mozi.moziserver.model.entity.UserChallenge;
 import com.mozi.moziserver.model.entity.UserChallengeRecord;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface UserChallengeRecordRepositorySupport {
@@ -15,4 +16,6 @@ public interface UserChallengeRecordRepositorySupport {
             Long userSeq,
             Integer point
     );
+
+    List<UserChallengeRecord> findByUser(Long userSeq,Long prevLastSeq, Integer pageSize);
 }
