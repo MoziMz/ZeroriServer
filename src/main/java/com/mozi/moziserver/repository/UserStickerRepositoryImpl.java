@@ -36,7 +36,7 @@ public class UserStickerRepositoryImpl extends QuerydslRepositorySupport impleme
                 .fetchOne();
 
         List<Long> userStickerSeqList = from(qUserSticker)
-                .select(qUserSticker.id.stickerImg.seq)
+                .select(qUserSticker.id.sticker.seq)
                 .where(qUserSticker.id.user.in(user))
                 .fetch()
                 .stream()

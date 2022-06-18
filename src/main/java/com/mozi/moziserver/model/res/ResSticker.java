@@ -4,14 +4,17 @@ import com.mozi.moziserver.model.entity.Sticker;
 import lombok.Getter;
 
 @Getter
-public class ResStickerList {
+public class ResSticker {
     private String imgUrl;
+
     private Long seq;
 
-    private ResStickerList(Sticker sticker) {
+    private ResSticker(Sticker sticker) {
         this.imgUrl=sticker.getImgUrl();
+
         this.seq=sticker.getSeq();
     }
 
-    public static ResStickerList of(Sticker sticker) { return new ResStickerList(sticker); }
+
+    public static ResSticker of(Sticker sticker) {return new ResSticker(sticker);}
 }

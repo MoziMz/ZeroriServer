@@ -1,12 +1,11 @@
 package com.mozi.moziserver.controller;
 
 import com.mozi.moziserver.httpException.ResponseError;
-import com.mozi.moziserver.model.entity.StickerImg;
+import com.mozi.moziserver.model.entity.Sticker;
 import com.mozi.moziserver.model.req.ReqConfirmSticker;
 import com.mozi.moziserver.model.req.ReqDeclarationCreate;
 import com.mozi.moziserver.model.req.ReqList;
 import com.mozi.moziserver.model.res.ResConfirmList;
-import com.mozi.moziserver.model.res.ResStickerImg;
 import com.mozi.moziserver.model.res.ResStickerList;
 import com.mozi.moziserver.model.res.ResUserConfirmList;
 import com.mozi.moziserver.security.SessionUser;
@@ -115,11 +114,11 @@ public class ConfirmController {
     }
 
     @ApiOperation("스티커 전체 조회")
-    @GetMapping("/v1/sticker-imgs")
+    @GetMapping("/v1/stickers")
     public List<ResStickerList> getStickerList(
             @ApiParam(hidden = true) @SessionUser Long userSeq
     ) {
-        return confirmService.getStickerImg()
+        return confirmService.getSticker()
                 .stream()
                 .map(ResStickerList::of)
                 .collect(Collectors.toList());

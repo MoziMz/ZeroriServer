@@ -144,7 +144,8 @@ public interface ResponseError {
         NICKNAME_NOT_EXISTS("nickname not exists"),
         POSTBOX_MESSAGE_ADMIN_NOT_EXISTS("postbox message admin not exists"),
         POSTBOX_MESSAGE_ANIMAL_NOT_EXISTS("postbox message animal not exists"),
-        ANIMAL_NOT_EXISTS("animal not exists");
+        ANIMAL_NOT_EXISTS("animal not exists"),
+        STICKER_NOT_EXISTS("sticker not exists");
 
         private final String message;
 

@@ -19,5 +19,5 @@ public class UserStickerId implements Serializable {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sticker_seq")
-    StickerImg stickerImg;
+    Sticker sticker;
 }

@@ -1,12 +1,14 @@
 package com.mozi.moziserver.model.entity;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 
 @Getter
 @Setter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity(name = "preparation_item")
 @IdClass(PreparationItemId.class)
 public class PreparationItem extends AbstractTimeEntity {

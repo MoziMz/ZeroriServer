@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.websocket.server.PathParam;
 import java.util.List;
@@ -72,4 +74,22 @@ public class AdminAnimalController {
     }
 
     // TODO 동물의 아이템 등록 URI /admin/animals/{seq}/items
+    @ApiOperation("동물의 준비물 아이템 등록")
+    @PostMapping("/admin/animals/{seq}/preparation-items")
+    public ResponseEntity<Void> createPreparationItem(
+            @ApiParam(hidden = true) @SessionUser Long userSeq,
+            @PathVariable("seq") Long animalSeq,
+            @RequestParam("turn") @Min(1L) @Max(2L) Integer turn,
+            @RequestParam("name") String name,
+            @RequestPart("colorImage") MultipartFile colorImage,
+            @RequestPart("blackImage") MultipartFile blackImage
+    ) {
+        if (colorImage == null || colorImage == null) {
+            throw ResponseError.BadRequest.INVALID_IMAGE.getResponseException("need to images");
+        }
+
+        animalService.createPreparationItem(animalSeq, turn, name, colorImage, blackImage);
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 }

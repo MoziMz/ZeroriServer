@@ -1,7 +1,7 @@
 package com.mozi.moziserver.model.res;
 
 import com.mozi.moziserver.model.entity.ConfirmSticker;
-import com.mozi.moziserver.model.entity.StickerImg;
+import com.mozi.moziserver.model.entity.Sticker;
 import lombok.Getter;
 
 import javax.persistence.*;
@@ -23,7 +23,7 @@ public class ResConfirmStickerList {
 
     private ResConfirmStickerList(ConfirmSticker confirmSticker) {
 
-        this.imgUrl=confirmSticker.getStickerImg().getImgUrl();
+        this.imgUrl=confirmSticker.getSticker().getImgUrl();
         this.locationX=confirmSticker.getLocationX();
         this.locationY=confirmSticker.getLocationY();
         this.angle=confirmSticker.getAngle();

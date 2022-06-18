@@ -10,8 +10,8 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity(name = "sticker_img")
-public class StickerImg extends AbstractTimeEntity{
+@Entity(name = "sticker")
+public class Sticker extends AbstractTimeEntity{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

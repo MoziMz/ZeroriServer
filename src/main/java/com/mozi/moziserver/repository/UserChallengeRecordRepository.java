@@ -1,6 +1,6 @@
 package com.mozi.moziserver.repository;
 
-import com.mozi.moziserver.model.entity.StickerImg;
+import com.mozi.moziserver.model.entity.Sticker;
 import com.mozi.moziserver.model.entity.UserChallengeRecord;
 import com.mozi.moziserver.model.mappedenum.UserChallengeStateType;
 import org.springframework.data.jpa.repository.JpaRepository;

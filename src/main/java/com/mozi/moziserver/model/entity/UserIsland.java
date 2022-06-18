@@ -27,9 +27,9 @@ public class UserIsland extends AbstractTimeEntity {
             @JoinColumn(name = "type", insertable = false, updatable = false),
             @JoinColumn(name = "reward_level", insertable = false, updatable = false)
     })
-    private IslandReward islandReward;
+    private IslandImg islandImg;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "type", insertable = false, updatable = false)
-    private IslandType islandType;
+    private Island island;
 }

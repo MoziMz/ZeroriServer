@@ -35,7 +35,7 @@ public class ConfirmService {
 
     private final UserStickerRepository userStickerRepository;
 
-    private final StickerImgRepository stickerImgRepository;
+    private final StickerRepository stickerRepository;
 
     private final S3ImageService s3ImageService;
 
@@ -181,15 +181,15 @@ public class ConfirmService {
     }
 
     @Transactional
-    public List<StickerImg> getStickerImgList(List<Long> stickerSeqList) {
-        return stickerImgRepository.findAllBySeq(stickerSeqList);
+    public List<Sticker> getStickerList(List<Long> stickerSeqList) {
+        return stickerRepository.findAllBySeq(stickerSeqList);
     }
 
     @Transactional
-    public List<StickerImg> getStickerImg() {
-        List<StickerImg> stickerImgList = stickerImgRepository.findAll();
+    public List<Sticker> getSticker() {
+        List<Sticker> stickerList = stickerRepository.findAll();
 
-        return stickerImgList;
+        return stickerList;
     }
 
     //UserSticker 생성
@@ -204,9 +204,9 @@ public class ConfirmService {
         List<UserSticker> newUserStickerList = new ArrayList<UserSticker>();
 
 
-        List<StickerImg> stickerImgList = getStickerImgList(stickerSeqList);
-        for (StickerImg stickerImg : stickerImgList) {
-            UserStickerId userStickerId = new UserStickerId(user, stickerImg);
+        List<Sticker> stickerList = getStickerList(stickerSeqList);
+        for (Sticker sticker : stickerList) {
+            UserStickerId userStickerId = new UserStickerId(user, sticker);
             UserSticker userSticker = UserSticker.builder()
                     .id(userStickerId)
                     .build();
@@ -240,9 +240,9 @@ public class ConfirmService {
         //하나만 붙일수있다. confirmSeq가 같고 userSeq가 같으면 못붙인다.
         if (createdCheck == true) throw ResponseError.BadRequest.ALREADY_CREATED.getResponseException();
 
-        Optional<StickerImg> stickerImg = stickerImgRepository.findById(reqConfirmSticker.getStickerSeq());
+        Optional<Sticker> sticker = stickerRepository.findById(reqConfirmSticker.getStickerSeq());
 
-        UserStickerId userStickerId = new UserStickerId(user, stickerImg.get());
+        UserStickerId userStickerId = new UserStickerId(user, sticker.get());
 
         UserSticker userSticker = userStickerRepository.findById(userStickerId)
                 .orElseThrow(ResponseError.NotFound.USER_STICKER_NOT_EXISTS::getResponseException);
@@ -250,7 +250,7 @@ public class ConfirmService {
         ConfirmSticker confirmSticker = ConfirmSticker.builder()
                 .confirm(confirm)
                 .user(user)
-                .stickerImg(stickerImg.get())
+                .sticker(sticker.get())
                 .locationX(reqConfirmSticker.getLocationX())
                 .locationY(reqConfirmSticker.getLocationY())
                 .angle(reqConfirmSticker.getAngle())

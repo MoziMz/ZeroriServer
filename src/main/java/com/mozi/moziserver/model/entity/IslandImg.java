@@ -7,9 +7,9 @@ import javax.persistence.*;
 
 @Getter
 @Setter
-@Entity(name = "island_reward")
-@IdClass(IslandRewardId.class)
-public class IslandReward extends AbstractTimeEntity {
+@Entity(name = "island_img")
+@IdClass(IslandImgId.class)
+public class IslandImg extends AbstractTimeEntity {
     @Id
     private Integer type;
 

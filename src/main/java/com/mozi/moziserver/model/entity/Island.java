@@ -8,13 +8,16 @@ import javax.persistence.Id;
 
 @Getter
 @Setter
-@Entity(name = "island_type")
-public class IslandType extends AbstractTimeEntity {
+@Entity(name = "island")
+public class Island extends AbstractTimeEntity {
     @Id
     private Integer type;
 
     private String name;
 
+    private Integer maxPoint;
+
     private Integer maxRewardLevel;
 
+    private String description;
 }

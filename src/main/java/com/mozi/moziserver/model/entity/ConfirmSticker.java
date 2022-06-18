@@ -27,7 +27,7 @@ public class ConfirmSticker extends AbstractTimeEntity{
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sticker_seq")
-    StickerImg stickerImg;
+    Sticker sticker;
 
     @Column(name = "location_x")
     private BigDecimal locationX;
