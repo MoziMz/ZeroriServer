@@ -25,6 +25,7 @@ public class UserChallengeRecordRepositoryImpl extends QuerydslRepositorySupport
         return from(qUserChallengeRecord)
                 .innerJoin(qChallenge)
                 .on(qUserChallengeRecord.challenge.seq.eq(qChallenge.seq))
+                .where(predicates)
                 .fetch()
                 .stream()
                 .findFirst();
