@@ -5,6 +5,7 @@ import com.mozi.moziserver.model.entity.Confirm;
 import com.mozi.moziserver.model.entity.ConfirmSticker;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ConfirmRepositorySupport {
 
@@ -19,5 +20,7 @@ public interface ConfirmRepositorySupport {
     List<Confirm> findAllByChallenge(Challenge challenge, Long prevLastConfirmSeq, Integer pageSize);
 
     Long findSeq();
+
+    Optional<Confirm> findByChallenge(Challenge challenge);
 
 }

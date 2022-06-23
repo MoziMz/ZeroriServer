@@ -32,6 +32,8 @@ public class ChallengeController {
     private final ChallengeTagService challengeTagService;
     private final ChallengeScrapService challengeScrapService;
 
+    private final ConfirmService confirmService;
+
     @ApiOperation("챌린지 하나 조회")
     @GetMapping("/v1/challenges/{seq}")
     public ResChallenge getChallenge(
@@ -52,7 +54,9 @@ public class ChallengeController {
 
         ChallengeScrap challengeScrap = challengeService.getChallengeScrap(seq, userSeq);
 
-        return ResChallenge.of(challenge, optionalUserChallenge, optionalUserChallengeRecord, challengeStatisticsList, challengeTagList, challengeScrap);
+        Optional<Confirm> optionalConfirm=confirmService.getConfirmByChallenge(challenge);
+
+        return ResChallenge.of(challenge, optionalUserChallenge, optionalUserChallengeRecord, challengeStatisticsList, challengeTagList, challengeScrap,optionalConfirm);
     }
 
     @ApiOperation("챌린지 모두 조회")

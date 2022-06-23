@@ -112,6 +112,13 @@ public class ConfirmService {
     }
 
     @Transactional
+    public Optional<Confirm> getConfirmByChallenge(Challenge challenge) {
+
+        return confirmRepository.findByChallenge(challenge);
+
+    }
+
+    @Transactional
     public List<Confirm> getUserConfirmList(Long userSeq, ReqList req) {
         return confirmRepository.findByUserByOrderDesc(userSeq, req.getPrevLastSeq(), req.getPageSize());
     }

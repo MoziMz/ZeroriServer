@@ -124,6 +124,18 @@ public class ConfirmRepositoryImpl extends QuerydslRepositorySupport implements 
                 .fetchFirst();
     }
 
+    @Override
+    public Optional<Confirm> findByChallenge(Challenge challenge){
+        return from(qConfirm)
+                .select(qConfirm)
+                .where(qConfirm.challenge.eq(challenge))
+                .orderBy(qConfirm.createdAt.asc())
+                .fetch()
+                .stream()
+                .distinct()
+                .findFirst();
+    }
+
 
     private <T> Predicate predicateOptional(final Function<T, Predicate> whereFunc, final T value) {
         return value != null ? whereFunc.apply(value) : null;

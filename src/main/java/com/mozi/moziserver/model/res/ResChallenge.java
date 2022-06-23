@@ -29,7 +29,7 @@ public class ResChallenge {
 
     private Long themeSeq;
 
-    private LocalDateTime updatedAt;  // 가장 최신 인증 시간 (몇 분 전에 인증했어요)
+    private LocalDateTime updatedAt;
 
     private ResUserChallenge userChallenge;
 
@@ -43,7 +43,9 @@ public class ResChallenge {
 
     private Boolean isScrap;
 
-    private ResChallenge(Challenge challenge, Optional<UserChallenge> optionalUserChallenge, Optional<UserChallengeRecord> optionalUserChallengeRecord, List<ChallengeStatistics> challengeStatisticsList, List<ResChallengeTagList> challengeTag,ChallengeScrap challengeScrap) {
+    private LocalDateTime recentConfirmDateTime;
+
+    private ResChallenge(Challenge challenge, Optional<UserChallenge> optionalUserChallenge, Optional<UserChallengeRecord> optionalUserChallengeRecord, List<ChallengeStatistics> challengeStatisticsList, List<ResChallengeTagList> challengeTag,ChallengeScrap challengeScrap,Optional<Confirm> optionalConfirm) {
         this.seq = challenge.getSeq();
         this.name = challenge.getName();
         this.description = challenge.getDescription();
@@ -67,9 +69,10 @@ public class ResChallenge {
         this.challengeRecord = ResChallengeRecord.of(challenge.getChallengeRecord());
         this.tagList = challenge.getTagList().stream().map(ResChallengeTagList::of).collect(Collectors.toList());
         this.isScrap=challengeScrap!=null?true:false;
+        this.recentConfirmDateTime = optionalConfirm.isPresent()? optionalConfirm.get().getCreatedAt(): null;
     }
 
-    public static ResChallenge of(Challenge challenge, Optional<UserChallenge> optionalUserChallenge, Optional<UserChallengeRecord> optionalUserChallengeRecord, List<ChallengeStatistics> challengeStatisticsList, List<ResChallengeTagList> challengeTagList,ChallengeScrap challengeScrap) {
-        return new ResChallenge(challenge, optionalUserChallenge, optionalUserChallengeRecord, challengeStatisticsList, challengeTagList,challengeScrap);
+    public static ResChallenge of(Challenge challenge, Optional<UserChallenge> optionalUserChallenge, Optional<UserChallengeRecord> optionalUserChallengeRecord, List<ChallengeStatistics> challengeStatisticsList, List<ResChallengeTagList> challengeTagList,ChallengeScrap challengeScrap,Optional<Confirm> optionalConfirm) {
+        return new ResChallenge(challenge, optionalUserChallenge, optionalUserChallengeRecord, challengeStatisticsList, challengeTagList,challengeScrap,optionalConfirm);
     }
 }
