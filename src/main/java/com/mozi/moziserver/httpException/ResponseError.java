@@ -145,7 +145,11 @@ public interface ResponseError {
         POSTBOX_MESSAGE_ADMIN_NOT_EXISTS("postbox message admin not exists"),
         POSTBOX_MESSAGE_ANIMAL_NOT_EXISTS("postbox message animal not exists"),
         ANIMAL_NOT_EXISTS("animal not exists"),
-        STICKER_NOT_EXISTS("sticker not exists");
+        STICKER_NOT_EXISTS("sticker not exists"),
+
+        ISLAND_NOT_EXISTS("island not exists"),
+
+        ISLAND_IMG_NOT_EXISTS("islandImg not exists");
 
         private final String message;
 

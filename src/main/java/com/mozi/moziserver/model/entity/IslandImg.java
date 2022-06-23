@@ -1,12 +1,14 @@
 package com.mozi.moziserver.model.entity;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 
 @Getter
 @Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity(name = "island_img")
 @IdClass(IslandImgId.class)
 public class IslandImg extends AbstractTimeEntity {
