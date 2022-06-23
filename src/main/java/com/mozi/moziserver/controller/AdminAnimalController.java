@@ -84,7 +84,7 @@ public class AdminAnimalController {
             @RequestPart("colorImage") MultipartFile colorImage,
             @RequestPart("blackImage") MultipartFile blackImage
     ) {
-        if (colorImage == null || colorImage == null) {
+        if (colorImage == null || blackImage == null) {
             throw ResponseError.BadRequest.INVALID_IMAGE.getResponseException("need to images");
         }
 
