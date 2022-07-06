@@ -16,7 +16,7 @@ public class ResConfirmList {
     private LocalDate date;
     private String imgUrl;
     private String challengeName;
-    private Long challengeTheme ;
+    private Long challengeThemeSeq ;
     private List<ResConfirmStickerList> resConfirmStickerList;
 
     private ResConfirmList(Confirm confirm) {
@@ -27,7 +27,7 @@ public class ResConfirmList {
         this.date=confirm.getDate();
         this.imgUrl=confirm.getImgUrl();
         this.challengeName=confirm.getChallenge().getName();
-        this.challengeTheme = confirm.getChallenge().getThemeSeq();
+        this.challengeThemeSeq = confirm.getChallenge().getThemeSeq();
         this.resConfirmStickerList = confirm.getConfirmStickerList()
                 .stream()
                 .map(ResConfirmStickerList::of)
