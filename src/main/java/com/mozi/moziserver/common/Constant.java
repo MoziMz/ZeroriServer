@@ -18,7 +18,7 @@ public interface Constant {
     String ROLE_USER = "USER";
     Collection<SimpleGrantedAuthority> USER_AUTHORITIES = Collections.singleton(new SimpleGrantedAuthority("ROLE_" + ROLE_USER));
 
-    //FIXME
+    //TODO fix
     String ID_REGEX = "[A-Za-z0-9]{5,}$";
 
 //    Integer DEFAULT_PAGE = 1;
@@ -68,4 +68,8 @@ public interface Constant {
     );
 
     List<String> IMAGE_MIME_TYPE_LIST = List.of("image/png", "image/jpeg");
+
+    int challengeExtraPoints = 5;
+
+    int islandMaxPoionts = 450;
 }

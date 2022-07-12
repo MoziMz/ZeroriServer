@@ -5,6 +5,7 @@ import com.mozi.moziserver.model.entity.UserIsland;
 import com.mozi.moziserver.model.res.ResUserIslandList;
 import com.mozi.moziserver.security.SessionUser;
 import com.mozi.moziserver.service.IslandService;
+import com.mozi.moziserver.service.UserRewardService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +24,7 @@ import java.util.List;
 public class UserIslandController {
 
     private final IslandService islandService;
+    private final UserRewardService userRewardService;
 
     @ApiOperation("섬리스트 조회")
     @GetMapping("/v1/users/me/user-islands")
@@ -32,13 +34,15 @@ public class UserIslandController {
         List<UserIsland> userIslandList = islandService.getUserIslandList(userSeq);
         List<Island> islandList = islandService.getIslandList();
 
+        int currentUserPoint = userRewardService.getUserPoint(userSeq);
+        int finalUserIsland = userIslandList.size();
         List<ResUserIslandList> resUserIslandLists = new LinkedList<ResUserIslandList>();
         for (int i = 0; i < islandList.size(); i++) {
             UserIsland userIsland = null;
             if (i < userIslandList.size())
                 userIsland = userIslandList.get(i);
 
-            resUserIslandLists.add(ResUserIslandList.of(islandList.get(i), userIsland));
+            resUserIslandLists.add(ResUserIslandList.of(islandList.get(i), userIsland, finalUserIsland, currentUserPoint));
         }
 
         return resUserIslandLists;

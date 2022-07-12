@@ -159,10 +159,7 @@ public class UserChallengeService {
 
         userChallenge.setAcquisitionPoints(acquisitionPoints);
 
-        UserReward userReward = userRewardRepository.findByUser(userChallenge.getUser())
-                .orElseGet(() -> UserReward.builder()
-                        .user(userChallenge.getUser())
-                        .build());
+        UserReward userReward = userRewardRepository.findByUser(userChallenge.getUser());
 
         userReward.setPoint(userReward.getPoint() + userChallenge.getChallenge().getPoint());
 

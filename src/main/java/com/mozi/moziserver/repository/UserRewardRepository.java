@@ -15,7 +15,7 @@ import java.util.Optional;
 
 @Repository
 public interface UserRewardRepository extends JpaRepository<UserReward, Long> {
-    Optional<UserReward> findByUser(User user);
+    UserReward findByUser(User user); // TODO 유저 생성시 UserReward 동시 생성?
 
 //    @Transactional
 //    @Modifying
@@ -29,6 +29,4 @@ public interface UserRewardRepository extends JpaRepository<UserReward, Long> {
             @Param("userSeq") Long userSeq,
             @Param("point") int point
     );
-
-
 }
