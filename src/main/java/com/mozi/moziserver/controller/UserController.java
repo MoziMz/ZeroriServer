@@ -3,11 +3,15 @@ package com.mozi.moziserver.controller;
 import com.mozi.moziserver.httpException.ResponseError;
 import com.mozi.moziserver.model.entity.User;
 import com.mozi.moziserver.model.entity.UserAuth;
+import com.mozi.moziserver.model.entity.UserReward;
 import com.mozi.moziserver.model.mappedenum.UserAuthType;
 import com.mozi.moziserver.model.req.*;
 import com.mozi.moziserver.model.res.ResEmail;
+import com.mozi.moziserver.model.res.ResUserPoint;
+import com.mozi.moziserver.repository.UserRepository;
 import com.mozi.moziserver.security.SessionUser;
 import com.mozi.moziserver.service.EmailAuthService;
+import com.mozi.moziserver.service.UserRewardService;
 import com.mozi.moziserver.service.UserService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -30,9 +34,9 @@ import static org.springframework.security.web.context.HttpSessionSecurityContex
 @RequestMapping("/api")
 @RequiredArgsConstructor
 public class UserController {
-
     private final UserService userService;
     private final EmailAuthService emailAuthService;
+    private final UserRewardService userRewardService;
 
     @ApiOperation("가입 (ID)")
     @PostMapping(value = "/v1/users/signup", consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -117,21 +121,29 @@ public class UserController {
     }
 
     @ApiOperation("FCM 토큰 등록")
-    @PostMapping("/v1/users/{seq}/fcm")
+    @PostMapping("/v1/users/me/fcm")
     public ResponseEntity<Void> updateFcmToken(
             @ApiParam(hidden = true) @SessionUser Long userSeq,
-            @PathVariable Long seq,
             @RequestBody @Valid ReqFcmToken reqFcmToken
     ) {
-        if (!userSeq.equals(seq)) {
+        if (!userSeq.equals(userSeq)) {
             throw ResponseError.Forbidden.NO_AUTHORITY.getResponseException();
         }
 
-        User user = userService.getUserBySeq(seq)
+        User user = userService.getUserBySeq(userSeq)
                 .orElseThrow(ResponseError.InternalServerError.UNEXPECTED_ERROR::getResponseException);
 
         userService.upsertUserFcm(user, reqFcmToken.getDeviceId(), reqFcmToken.getToken());
 
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @ApiOperation("내 포인트 조회")
+    @GetMapping("/v1/users/me/point")
+    public ResUserPoint getUserPoint(
+            @ApiParam(hidden = true) @SessionUser Long userSeq
+    ) {
+        UserReward userReward = userRewardService.getUserReward(userSeq);
+        return ResUserPoint.of(userReward);
     }
 }

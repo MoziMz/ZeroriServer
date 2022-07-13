@@ -13,6 +13,10 @@ public class UserRewardService {
     final UserRewardRepository userRewardRepository;
     final UserRepository userRepository;
 
+    public UserReward getUserReward(Long userSeq) {
+        User user = userRepository.getById(userSeq);
+        return userRewardRepository.findByUser(user);
+    }
     public int getUserPoint(Long userSeq) {
         User user = userRepository.getById(userSeq);
         UserReward userReward = userRewardRepository.findByUser(user);
