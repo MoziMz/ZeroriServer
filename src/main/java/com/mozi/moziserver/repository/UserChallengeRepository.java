@@ -22,7 +22,7 @@ public interface UserChallengeRepository extends JpaRepository<UserChallenge, Lo
     int updateUserChallengeState(
             @Param("seq") Long seq,
             @Param("beforeState") UserChallengeStateType beforeState,
-            @Param("beforeState") UserChallengeStateType afterState
+            @Param("afterState") UserChallengeStateType afterState
     );
 
     List<UserChallenge> findAllByStateAndStartDate(UserChallengeStateType stateType, LocalDate startDate);

@@ -25,8 +25,8 @@ public class UserChallengeRepositoryImpl extends QuerydslRepositorySupport imple
     public Optional<UserChallenge> findBySeq(Long seq) {
         return from(qUserChallenge)
                 .select(qUserChallenge)
-                .innerJoin(qUserChallenge.challenge, qChallenge)
-                .fetchJoin()
+                .innerJoin(qUserChallenge.challenge, qChallenge).fetchJoin()
+                .innerJoin(qUserChallenge.user, qUser).fetchJoin()
                 .where(qUserChallenge.seq.eq(seq))
                 .fetch()
                 .stream()

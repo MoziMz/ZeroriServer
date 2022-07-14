@@ -33,23 +33,6 @@ public class ScheduleService {
     public void updateUserChallenge() {
         final LocalDate today = LocalDate.now();
 
-        // 아래 코드에서 중간에 에러가 나면 로그로 남기고 실행이 안된 시점부터 재실행 한다.
-
-//        withTransaction(() -> {
-//            // PlanResult 에서 PLAN 을 FAIL 로 바꾸기
-//            LocalDate yesterday = today.minusDays(1);
-//            List<UserChallenge> userChallengeList =
-//                    userChallengeRepository.findAllByPlanResult(yesterday, UserChallengeResultType.PLAN);
-//
-//            userChallengeList.stream()
-//                    .forEach(item -> item.getPlanDateList()
-//                            .get(Period.between(item.getStartDate(), yesterday).getDays())
-//                            .setResult(UserChallengeResultType.FAIL));
-//
-//            userChallengeRepository.saveAll(userChallengeList);
-//        });
-
-
 //        TODO 트렌젝션 지연시간 줄이기 위해 변화시킬 방향
 //        try{
 //            전체 조회 ( 조건에 맞는 대상만 가져옴 ) -- 트렌젝션 X
@@ -81,10 +64,9 @@ public class ScheduleService {
      */
     public void updateUserChallengeDoingToEnd(final LocalDate date) {
 
-        List<UserChallenge> userChallengeList = userChallengeRepository.findAllByStateAndStartDate(UserChallengeStateType.DOING, date.minusDays(7));
+        List<UserChallenge> endedUserChallengeList = userChallengeRepository.findAllByStateAndStartDate(UserChallengeStateType.DOING, date.minusDays(7));
 
-        for (UserChallenge userChallenge : userChallengeList) {
-            withTransaction(() -> {
+        for (UserChallenge userChallenge : endedUserChallengeList) {
                 UserChallenge curUserChallenge = userChallengeRepository.findBySeq(userChallenge.getSeq())
                         .orElse(null);
 
@@ -92,14 +74,11 @@ public class ScheduleService {
                     // TODO
                 }
 
-                //
-
                 if (curUserChallenge.getTotalConfirmCnt() >= curUserChallenge.getChallenge().getRecommendedCnt()) {
                     userRewardRepository.incrementPoint(curUserChallenge.getUser().getSeq(), extraPoints);
                 }
 
                 userChallengeRepository.updateUserChallengeState(curUserChallenge.getSeq(), UserChallengeStateType.DOING, UserChallengeStateType.END);
-            });
         }
     }
 
