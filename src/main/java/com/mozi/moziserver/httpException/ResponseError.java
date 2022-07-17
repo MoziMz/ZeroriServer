@@ -149,7 +149,9 @@ public interface ResponseError {
 
         ISLAND_NOT_EXISTS("island not exists"),
 
-        ISLAND_IMG_NOT_EXISTS("islandImg not exists");
+        ISLAND_IMG_NOT_EXISTS("islandImg not exists"),
+
+        PREPARATIONITEM_NOT_EXISTS("preparationItem not exists");
 
         private final String message;
 

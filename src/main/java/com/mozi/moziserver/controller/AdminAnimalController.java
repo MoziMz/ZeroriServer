@@ -92,4 +92,21 @@ public class AdminAnimalController {
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+    @ApiOperation("동물의 준비물 아이템 수정")
+    @PutMapping("/admin/animals/{seq}/preparation-items")
+    public ResponseEntity<Void> updatePreparationItem(
+            @ApiParam(hidden = true) @SessionUser Long userSeq,
+            @PathVariable("seq") Long animalSeq,
+            @RequestParam("turn") @Min(1L) @Max(2L) Integer turn,
+            @RequestParam(name="name",required = false) String name,
+            @RequestPart(name = "colorImage",required = false) MultipartFile colorImage,
+            @RequestPart(name = "blackImage",required = false) MultipartFile blackImage
+    ) {
+        if ((animalSeq != null && turn != null)&&( name != null || colorImage != null || blackImage != null)) {
+            animalService.updatePreparationItem(animalSeq, turn, name, colorImage, blackImage);
+        }
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 }
