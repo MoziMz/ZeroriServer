@@ -127,7 +127,7 @@ public class AnimalService {
 
         String blackImgUrl = null;
         try {
-            blackImgUrl = s3ImageService.uploadFile(colorImage, "preparationItem");
+            blackImgUrl = s3ImageService.uploadFile(blackImage, "preparationItem");
         } catch (Exception e) {
             throw new RuntimeException(e.getCause());
         }
