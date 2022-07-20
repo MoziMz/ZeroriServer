@@ -3,6 +3,7 @@ package com.mozi.moziserver.service;
 import com.mozi.moziserver.httpException.ResponseError;
 import com.mozi.moziserver.model.entity.*;
 import com.mozi.moziserver.model.mappedenum.DeclarationType;
+import com.mozi.moziserver.model.mappedenum.PointReasonType;
 import com.mozi.moziserver.model.req.ReqConfirmSticker;
 import com.mozi.moziserver.model.req.ReqList;
 import com.mozi.moziserver.model.req.ReqUserStickerList;
@@ -44,6 +45,8 @@ public class ConfirmService {
     private final PlatformTransactionManager transactionManager;
 
     private final ChallengeRecordRepository challengeRecordRepository;
+
+    private final UserRewardService userRewardService;
 
     //인증 생성
     public void createConfirm(Long userSeq, Long challengeSeq, MultipartFile image) {
@@ -92,6 +95,8 @@ public class ConfirmService {
 
             challengeRecord.setTotalPlayerConfirmCnt(challengeRecord.getTotalPlayerConfirmCnt() + 1);
             challengeRecordRepository.save(challengeRecord);
+
+            userRewardService.createUserPointRecord(user, PointReasonType.CHALLENGE_CONFIRM,challenge.getPoint());
 
         });
     }
