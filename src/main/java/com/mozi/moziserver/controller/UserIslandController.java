@@ -10,7 +10,10 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -46,5 +49,15 @@ public class UserIslandController {
         }
 
         return resUserIslandLists;
+    }
+
+    @ApiOperation("섬 오픈하기")
+    @PostMapping("/v1/users/me/user-islands/open")
+    public ResponseEntity<Void> openUserIsland(
+        @ApiParam(hidden = true) @SessionUser Long userSeq
+    ) {
+        islandService.openUserIsland(userSeq);
+
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

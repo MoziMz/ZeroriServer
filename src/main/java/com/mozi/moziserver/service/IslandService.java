@@ -1,12 +1,10 @@
 package com.mozi.moziserver.service;
 
 
+import com.mozi.moziserver.common.Constant;
 import com.mozi.moziserver.httpException.ResponseError;
 import com.mozi.moziserver.model.entity.*;
-import com.mozi.moziserver.repository.IslandImgRepository;
-import com.mozi.moziserver.repository.IslandRepository;
-import com.mozi.moziserver.repository.UserIslandRepository;
-import com.mozi.moziserver.repository.UserRepository;
+import com.mozi.moziserver.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -16,8 +14,10 @@ import org.springframework.transaction.support.DefaultTransactionDefinition;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -27,6 +27,7 @@ public class IslandService {
     private final IslandRepository islandRepository;
     private final UserIslandRepository userIslandRepository;
     private final IslandImgRepository islandImgRepository;
+    private final UserRewardRepository userRewardRepository;
     private final S3ImageService s3ImageService;
     private final PlatformTransactionManager transactionManager;
 
@@ -51,7 +52,46 @@ public class IslandService {
         User user = userRepository.findById(userSeq)
                 .orElseThrow(ResponseError.NotFound.USER_NOT_EXISTS::getResponseException);
 
-        return userIslandRepository.findAllByUser(user);
+        return userIslandRepository.findAllByUserOrderByType(user);
+    }
+
+    @Transactional
+    public void openUserIsland(Long userSeq) {
+        User user = userRepository.findById(userSeq)
+                .orElseThrow(ResponseError.NotFound.USER_NOT_EXISTS::getResponseException);
+
+        // 현재 최고 레벨 섬의 다음 레벨의 섬이 존재하는지 확인한다.
+        List<UserIsland> userIslandList = userIslandRepository.findAllByUserOrderByType(user);
+        UserIsland lastUserIsland =  userIslandList.get(userIslandList.size()-1);
+        if (lastUserIsland.getType() == Constant.lastIslandType) {
+            throw ResponseError.BadRequest.INVALID_USER_ISLAND_OPEN.getResponseException();
+        }
+
+        // 유저 포인트가 450점 이상인지 확인한다.
+        int nextIslandType = lastUserIsland.getType() + 1;
+        Island nextIsland = islandRepository.getById(nextIslandType);
+        UserReward userReward = userRewardRepository.findByUser(user);
+        if (userReward.getPoint() < nextIsland.getMaxPoint()) {
+            throw ResponseError.BadRequest.INVALID_USER_ISLAND_OPEN.getResponseException();
+        }
+
+        // 현재 존재하는 섬이 맥스레벨에 도달했는지 확인한다.
+        if (lastUserIsland.getRewardLevel() != lastUserIsland.getIsland().getMaxRewardLevel()) {
+            throw ResponseError.BadRequest.INVALID_USER_ISLAND_OPEN.getResponseException();
+        }
+
+        // 다음 섬을 오픈한다.
+        // UserIsland 생성
+        // UserReward 450차감
+        UserIsland nextUserIsland = UserIsland.builder()
+                .type(nextIslandType)
+                .user(user)
+                .rewardLevel(1)
+                .build();
+
+        userIslandRepository.save(nextUserIsland);
+
+        userRewardRepository.decrementPoint(user.getSeq(), lastUserIsland.getIsland().getMaxPoint());
     }
 
     public List<Island> getIslandList() {

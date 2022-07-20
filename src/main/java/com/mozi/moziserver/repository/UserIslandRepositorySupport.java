@@ -6,5 +6,5 @@ import com.mozi.moziserver.model.entity.UserIsland;
 import java.util.List;
 
 public interface UserIslandRepositorySupport {
-    List<UserIsland> findAllByUser(User user);
+    List<UserIsland> findAllByUserOrderByType(User user);
 }

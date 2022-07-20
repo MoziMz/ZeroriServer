@@ -234,7 +234,7 @@ public class UserChallengeService {
         UserChallenge userChallenge = getUserChallenge(userSeq, userChallengeSeq);
 
         if (UserChallengeStateType.activeTypes.contains(userChallenge.getState())) {
-            throw ResponseError.BadRequest.INVALID_USER_CHALLANGE.getResponseException();
+            throw ResponseError.BadRequest.INVALID_USER_CHALLENGE.getResponseException();
         }
 
         userChallenge.setCheckedState(true);

@@ -29,9 +29,11 @@ public interface ResponseError {
         INVALID_TOKEN("invalid token"),
         ALREADY_EXISTS_NICKNAME("already exists nickname"),
         SOCIAL_LOGIN_USER("social login user"),
-        INVALID_USER_CHALLANGE("invalid user challenge"),
+        INVALID_USER_CHALLENGE("invalid user challenge"),
         INVALID_NAME("invalid name"),
-        ALREADY_EXISTS_ANIMAL_NAME("already exists animal name");
+        ALREADY_EXISTS_ANIMAL_NAME("already exists animal name"),
+        INVALID_USER_ISLAND_OPEN("invalid user island open");
+
 
         // INVALID 는 한가지로 명확하지 않을때 쓴다.
 

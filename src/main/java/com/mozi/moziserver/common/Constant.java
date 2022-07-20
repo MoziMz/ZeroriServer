@@ -71,5 +71,7 @@ public interface Constant {
 
     int challengeExtraPoints = 5;
 
-    int islandMaxPoionts = 450;
+    int islandMaxPoint = 450;
+
+    int lastIslandType = 6;
 }

@@ -22,10 +22,10 @@ public class ResUserIslandList {
         this.currentRequiredPoint = 0;
         if (island.getType() >= finalUserIsland) {
             if (island.getType() == finalUserIsland) {
-                currentRequiredPoint = Constant.islandMaxPoionts - currentUserPoint < 0 ? 0 : Constant.islandMaxPoionts - currentUserPoint;
+                currentRequiredPoint = Constant.islandMaxPoint - currentUserPoint < 0 ? 0 : Constant.islandMaxPoint - currentUserPoint;
             }
             else
-                currentRequiredPoint = Constant.islandMaxPoionts;
+                currentRequiredPoint = Constant.islandMaxPoint;
         }
         if (userIsland != null) {
             this.existenceState = true;

@@ -24,9 +24,13 @@ public interface UserRewardRepository extends JpaRepository<UserReward, Long> {
 
     @Transactional
     @Modifying
-    @Query("UPDATE user_reward SET point = point + :point WHERE user_seq = :userSeq")
+    @Query("UPDATE user_reward SET point = point + :point WHERE user.seq = :userSeq")
     int incrementPoint(
             @Param("userSeq") Long userSeq,
             @Param("point") int point
     );
+
+    @Modifying
+    @Query("UPDATE user_reward SET point = point-:point WHERE user.seq = :userSeq")
+    int decrementPoint(@Param("userSeq") Long userSeq, @Param("point") int point);
 }

@@ -16,11 +16,12 @@ public class UserIslandRepositoryImpl extends QuerydslRepositorySupport implemen
     }
 
     @Override
-    public List<UserIsland> findAllByUser(User user) {
+    public List<UserIsland> findAllByUserOrderByType(User user) {
         return from(qUserIsland)
                 .innerJoin(qUserIsland.user, qUser).fetchJoin()
                 .innerJoin(qUserIsland.island, qIsland).fetchJoin()
                 .innerJoin(qUserIsland.islandImg, qIslandImg).fetchJoin()
+                .where(qUserIsland.user.eq(user))
                 .orderBy(qIsland.type.asc())
                 .fetch();
     }
