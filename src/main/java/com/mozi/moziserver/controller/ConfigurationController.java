@@ -3,10 +3,7 @@ package com.mozi.moziserver.controller;
 import com.mozi.moziserver.httpException.ResponseError;
 import com.mozi.moziserver.model.entity.User;
 import com.mozi.moziserver.model.mappedenum.ResignReasonType;
-import com.mozi.moziserver.model.req.ReqList;
-import com.mozi.moziserver.model.req.ReqQuestionCreate;
-import com.mozi.moziserver.model.req.ReqResign;
-import com.mozi.moziserver.model.req.ReqSuggestionCreate;
+import com.mozi.moziserver.model.req.*;
 import com.mozi.moziserver.model.res.ResBoardList;
 import com.mozi.moziserver.model.res.ResUserInfo;
 import com.mozi.moziserver.security.SessionUser;
@@ -95,12 +92,12 @@ public class ConfigurationController {
     @PutMapping("/v1/users/me/password")
     public ResponseEntity<Void> updateUserPassword(
             @ApiParam(hidden = true) @SessionUser Long userSeq,
-            @RequestBody @Valid String password
-    ) {
+            @RequestBody @Valid ReqUserPw req
+            ) {
         User user = userService.getUserBySeq(userSeq)
                 .orElseThrow(ResponseError.InternalServerError.UNEXPECTED_ERROR::getResponseException);
 
-        userService.updatePw(user, password);
+        userService.updatePw(user, req.getPw());
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
