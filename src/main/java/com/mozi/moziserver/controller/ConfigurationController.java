@@ -2,8 +2,10 @@ package com.mozi.moziserver.controller;
 
 import com.mozi.moziserver.httpException.ResponseError;
 import com.mozi.moziserver.model.entity.User;
+import com.mozi.moziserver.model.mappedenum.ResignReasonType;
 import com.mozi.moziserver.model.req.ReqList;
 import com.mozi.moziserver.model.req.ReqQuestionCreate;
+import com.mozi.moziserver.model.req.ReqResign;
 import com.mozi.moziserver.model.req.ReqSuggestionCreate;
 import com.mozi.moziserver.model.res.ResBoardList;
 import com.mozi.moziserver.model.res.ResUserInfo;
@@ -120,6 +122,7 @@ public class ConfigurationController {
     @PostMapping(value = "v1/users/resign")
     public ResponseEntity<Void> resign(
             @ApiParam(hidden = true) @SessionUser Long userSeq,
+            @RequestBody @Valid ReqResign reqResign,
             HttpSession session
     ) {
         User user = userService.getUserBySeq(userSeq)
