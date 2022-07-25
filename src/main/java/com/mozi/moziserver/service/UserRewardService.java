@@ -1,5 +1,6 @@
 package com.mozi.moziserver.service;
 
+import com.mozi.moziserver.httpException.ResponseError;
 import com.mozi.moziserver.model.entity.User;
 import com.mozi.moziserver.model.entity.UserPointRecord;
 import com.mozi.moziserver.model.entity.UserReward;
@@ -9,6 +10,9 @@ import com.mozi.moziserver.repository.UserRepository;
 import com.mozi.moziserver.repository.UserRewardRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -37,6 +41,18 @@ public class UserRewardService {
                     .build();
 
         userPointRecordRepository.save(userPointRecord);
+    }
+
+    public Integer getPointOfUserPointRecord(User user, LocalDateTime startDateTime, LocalDateTime endDateTime){
+
+        Integer sumPoint=0;
+        List<UserPointRecord> userPointRecordList=userPointRecordRepository.findByUserAndDate(user,startDateTime,endDateTime);
+
+        for(UserPointRecord userPointRecord: userPointRecordList){
+            sumPoint+=userPointRecord.getPoint();
+        }
+
+        return sumPoint;
     }
 
 }
