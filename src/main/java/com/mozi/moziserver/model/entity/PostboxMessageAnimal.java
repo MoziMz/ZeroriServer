@@ -1,12 +1,14 @@
 package com.mozi.moziserver.model.entity;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 
 @Getter
 @Setter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity(name = "postbox_message_animal")
 public class PostboxMessageAnimal extends AbstractTimeEntity {
     @Id
@@ -24,6 +26,6 @@ public class PostboxMessageAnimal extends AbstractTimeEntity {
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "animal_seq", insertable = false, updatable = false)
+    @JoinColumn(name = "animal_seq")
     private Animal animal;
 }

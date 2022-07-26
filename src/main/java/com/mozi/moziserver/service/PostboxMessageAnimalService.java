@@ -1,11 +1,9 @@
 package com.mozi.moziserver.service;
 
 import com.mozi.moziserver.httpException.ResponseError;
-import com.mozi.moziserver.model.entity.PostboxMessageAdmin;
-import com.mozi.moziserver.model.entity.PostboxMessageAnimal;
-import com.mozi.moziserver.model.entity.PreparationItem;
-import com.mozi.moziserver.model.entity.User;
+import com.mozi.moziserver.model.entity.*;
 import com.mozi.moziserver.model.req.ReqList;
+import com.mozi.moziserver.repository.PostboxMessageAnimalContentRepository;
 import com.mozi.moziserver.repository.PostboxMessageAnimalRepository;
 import com.mozi.moziserver.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +19,7 @@ import java.util.List;
 public class PostboxMessageAnimalService {
     private final UserRepository userRepository;
     private final PostboxMessageAnimalRepository postboxMessageAnimalRepository;
+    private final PostboxMessageAnimalContentRepository postboxMessageAnimalContentRepository;
     public PostboxMessageAnimal getPostboxMessageAnimal(Long userSeq, Long seq) {
         PostboxMessageAnimal postboxMessageAnimal = postboxMessageAnimalRepository.findById(seq)
                 .orElseThrow(ResponseError.NotFound.POSTBOX_MESSAGE_ANIMAL_NOT_EXISTS::getResponseException);
@@ -53,6 +52,21 @@ public class PostboxMessageAnimalService {
     public void checkMessage(Long userSeq, Long seq) {
         final PostboxMessageAnimal postboxMessageAnimal = getPostboxMessageAnimal(userSeq, seq);
         postboxMessageAnimal.setCheckedState(true);
+
+        postboxMessageAnimalRepository.save(postboxMessageAnimal);
+    }
+
+    @Transactional
+    public void createPostboxMessageAnimal(User user, Animal animal) {
+        PostboxMessageAnimalContent postboxMessageAnimalContent = postboxMessageAnimalContentRepository.findByAnimalSeq(animal.getSeq());
+
+        PostboxMessageAnimal postboxMessageAnimal = PostboxMessageAnimal.builder()
+                .user(user)
+                .animal(animal)
+                .checkedState(false)
+                .content(postboxMessageAnimalContent.getContent())
+                .level(1)
+                .build();
 
         postboxMessageAnimalRepository.save(postboxMessageAnimal);
     }

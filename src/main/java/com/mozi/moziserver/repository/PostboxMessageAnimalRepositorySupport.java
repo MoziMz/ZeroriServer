@@ -13,4 +13,6 @@ public interface PostboxMessageAnimalRepositorySupport {
     List<PreparationItem> findItemByUser(User user, Long animalSeq);
 
     List<PostboxMessageAnimal> findAllByUser(User user, Integer pageSize, Long prevLastSeq);
+
+    PostboxMessageAnimal findLastOneByUser(User user);
 }

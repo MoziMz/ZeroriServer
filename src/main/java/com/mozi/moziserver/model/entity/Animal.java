@@ -21,4 +21,7 @@ public class Animal extends AbstractTimeEntity {
     private String explanation;
 
     private String imgUrl;
+
+    private Integer islandType;
+    private Integer islandLevel;
 }

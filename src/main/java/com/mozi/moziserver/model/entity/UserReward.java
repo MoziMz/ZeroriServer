@@ -25,7 +25,7 @@ public class UserReward extends AbstractTimeEntity{
     @Builder.Default
     private Integer cRewardCnt = 0;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_seq")
     private User user;
 }

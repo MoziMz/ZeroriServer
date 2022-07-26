@@ -61,9 +61,17 @@ public class PostboxMessageAnimalRepositoryImpl extends QuerydslRepositorySuppor
                  .where(predicates)
                  .orderBy(qPostboxMessageAnimal.updatedAt.desc())
                  .limit(pageSize)
-                 .fetch()
-                 .stream()
-                 .collect(Collectors.toList());
+                 .fetch();
+    }
+
+    @Override
+    public PostboxMessageAnimal findLastOneByUser(User user) {
+        return from(qPostboxMessageAnimal)
+                .innerJoin(qPostboxMessageAnimal.user, qUser).fetchJoin()
+                .innerJoin(qPostboxMessageAnimal.animal, qAnimal).fetchJoin()
+                .where(qPostboxMessageAnimal.user.eq(user))
+                .orderBy(qPostboxMessageAnimal.animal.islandType.desc(), qPostboxMessageAnimal.animal.islandLevel.desc())
+                .fetchFirst();
     }
 
     private <T> Predicate predicateOptional(final Function<T, Predicate> whereFunc, final T value) {

@@ -16,7 +16,7 @@ public class ResPreparationItemList {
         this.name = preparationItem.getName();
         this.colorImgUrl = preparationItem.getColorImgUrl();
         this.blackImgUrl = preparationItem.getBlackImgUrl();
-        this.coloredState = turn <= level;
+        this.coloredState = turn < level;
     }
 
     public static ResPreparationItemList of(PreparationItem preparationItem, Integer level) {

@@ -20,4 +20,8 @@ public class User extends AbstractTimeEntity {
 
     @Enumerated(EnumType.STRING)
     private UserState state = UserState.ACTIVE;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "seq")
+    UserReward userReward;
 }
