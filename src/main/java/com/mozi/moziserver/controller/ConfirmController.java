@@ -73,18 +73,12 @@ public class ConfirmController {
                 .collect(Collectors.toList());
     }
 
-    //최신순
     @ApiOperation("본인 스토리 전체 조회")
     @GetMapping("/v1/users/me/confirms")
     public List<ResUserConfirmList> getUserConfirmList(
             @ApiParam(hidden = true) @SessionUser Long userSeq,
-            @PathVariable Long seq,
             @Valid ReqList req
     ) {
-        if (!userSeq.equals(seq)) {
-            throw ResponseError.Forbidden.NO_AUTHORITY.getResponseException();
-        }
-
         return confirmService.getUserConfirmList(userSeq, req)
                 .stream()
                 .map(ResUserConfirmList::of)

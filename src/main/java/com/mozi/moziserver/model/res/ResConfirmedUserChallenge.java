@@ -9,7 +9,8 @@ import static com.mozi.moziserver.model.entity.QUserChallengeRecord.userChalleng
 
 @Getter
 public class ResConfirmedUserChallenge {
-    private Long userChellengeSeq;
+
+    private Long challengeSeq;
 
     private String challengeName;
 
@@ -17,7 +18,7 @@ public class ResConfirmedUserChallenge {
 
     private ResConfirmedUserChallenge(UserChallengeRecord userChallengeRecord) {
 
-        this.userChellengeSeq=userChallengeRecord.getChallenge().getSeq();
+        this.challengeSeq=userChallengeRecord.getChallenge().getSeq();
 
         this.challengeName=userChallengeRecord.getChallenge().getName();
 
