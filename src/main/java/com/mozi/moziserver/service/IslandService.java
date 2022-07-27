@@ -31,8 +31,9 @@ public class IslandService {
     private final UserRewardRepository userRewardRepository;
     private final S3ImageService s3ImageService;
     private final PlatformTransactionManager transactionManager;
-
     private final UserRewardService userRewardService;
+    private final AnimalRepository animalRepository;
+    private final PostboxMessageAnimalService postboxMessageAnimalService;
 
     private Island getIsland(Integer type) {
         Island island = islandRepository.findById(type)
@@ -93,6 +94,12 @@ public class IslandService {
                 .build();
 
         userIslandRepository.save(nextUserIsland);
+
+        //동물의 편지 생성: 1.새로운 섬의 첫번째 동물 찾기
+        Animal nextAnimal = animalRepository.findByIslandTypeAndIslandLevel(nextIslandType,2);
+
+        //동물의 편지 생성: 2.동물의 편지 생성
+        postboxMessageAnimalService.createPostboxMessageAnimal(user,nextAnimal);
 
         userRewardRepository.decrementPoint(user.getSeq(), lastUserIsland.getIsland().getMaxPoint());
 
