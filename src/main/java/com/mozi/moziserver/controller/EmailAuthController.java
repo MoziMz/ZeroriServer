@@ -35,11 +35,14 @@ public class EmailAuthController {
                 switch (result.getType()) {
                     case JOIN:
                         httpHeaders.setLocation(new URI("/email-auth-join-valid.html"));
+                        break;
                     case RESET_PW:
                         httpHeaders.setLocation(new URI("/email-auth-reset-pw-valid.html"));
+                        break;
                         // TODO ?JSESSIONID=
                     case RESET_EMAIL:
                         httpHeaders.setLocation(new URI("/email-auth-reset-email-valid.html"));
+                        break;
                 }
                 break;
             case ALREADY_SUCC:
