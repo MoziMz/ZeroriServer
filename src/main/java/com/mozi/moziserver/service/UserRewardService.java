@@ -49,7 +49,8 @@ public class UserRewardService {
         List<UserPointRecord> userPointRecordList=userPointRecordRepository.findByUserAndDate(user,startDateTime,endDateTime);
 
         for(UserPointRecord userPointRecord: userPointRecordList){
-            sumPoint+=userPointRecord.getPoint();
+            if(userPointRecord.getPoint()>0)
+                sumPoint+=userPointRecord.getPoint();
         }
 
         return sumPoint;
