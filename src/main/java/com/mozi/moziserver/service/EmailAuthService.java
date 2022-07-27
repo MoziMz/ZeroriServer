@@ -3,9 +3,7 @@ package com.mozi.moziserver.service;
 import com.mozi.moziserver.common.JpaUtil;
 import com.mozi.moziserver.httpException.ResponseError;
 import com.mozi.moziserver.model.EmailAuthResult;
-import com.mozi.moziserver.model.entity.EmailAuth;
-import com.mozi.moziserver.model.entity.User;
-import com.mozi.moziserver.model.entity.UserAuth;
+import com.mozi.moziserver.model.entity.*;
 import com.mozi.moziserver.model.mappedenum.EmailAuthType;
 import com.mozi.moziserver.model.mappedenum.UserAuthType;
 import com.mozi.moziserver.repository.*;
@@ -30,6 +28,12 @@ public class EmailAuthService {
     private final EmailAuthRepository emailAuthRepository;
     private final UserAuthRepository userAuthRepository;
     private final UserRepository userRepository;
+
+    private final PostboxMessageAnimalService postboxMessageAnimalService;
+
+    private final AnimalRepository animalRepository;
+
+    private final UserIslandRepository userIslandRepository;
 
     @Value("${spring.mail.username}")
     private String emailAddress;
@@ -253,6 +257,21 @@ public class EmailAuthService {
             User user = userAuth.getUser();
             user.setEmail(userAuth.getId());
             userRepository.save(user);
+
+            // UserIsland 생성
+            UserIsland firstUserIsland = UserIsland.builder()
+                    .type(1)
+                    .user(user)
+                    .rewardLevel(1)
+                    .build();
+
+            userIslandRepository.save(firstUserIsland);
+
+            //동물의 편지 생성
+            Animal firstAnimal = animalRepository.findByIslandTypeAndIslandLevel(1,2);
+
+            postboxMessageAnimalService.createPostboxMessageAnimal(user,firstAnimal);
+
         } catch (DataIntegrityViolationException e) {
             if (JpaUtil.isDuplicateKeyException(e)) {
                 throw ResponseError.BadRequest.ALREADY_EXISTS_EMAIL.getResponseException();
