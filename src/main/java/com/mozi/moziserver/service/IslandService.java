@@ -4,6 +4,7 @@ package com.mozi.moziserver.service;
 import com.mozi.moziserver.common.Constant;
 import com.mozi.moziserver.httpException.ResponseError;
 import com.mozi.moziserver.model.entity.*;
+import com.mozi.moziserver.model.mappedenum.PointReasonType;
 import com.mozi.moziserver.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,6 +31,8 @@ public class IslandService {
     private final UserRewardRepository userRewardRepository;
     private final S3ImageService s3ImageService;
     private final PlatformTransactionManager transactionManager;
+
+    private final UserRewardService userRewardService;
 
     private Island getIsland(Integer type) {
         Island island = islandRepository.findById(type)
@@ -92,6 +95,9 @@ public class IslandService {
         userIslandRepository.save(nextUserIsland);
 
         userRewardRepository.decrementPoint(user.getSeq(), lastUserIsland.getIsland().getMaxPoint());
+
+        //UserPointRecord에 기록
+        userRewardService.createUserPointRecord(user, PointReasonType.ISLAND_OPEN,-450);
     }
 
     public List<Island> getIslandList() {
