@@ -108,10 +108,11 @@ public class ScheduleService {
 
             PostboxMessageAnimal lastPostboxMessageAnimal = postboxMessageAnimalRepository.findLastOneByUser(curUser);
 //
-            if (lastPostboxMessageAnimal.getLevel() == 2 && lastPostboxMessageAnimal.getAnimal().getIslandLevel() < 5) {
-                Animal nextAnimal = animalRepository.findByIslandTypeAndIslandLevel(lastPostboxMessageAnimal.getAnimal().getIslandType(), lastPostboxMessageAnimal.getLevel() + 1);
-                postboxMessageAnimalService.createPostboxMessageAnimal(curUser, nextAnimal);
-
+            if (lastPostboxMessageAnimal.getLevel() == 2) {
+                if (lastPostboxMessageAnimal.getAnimal().getIslandLevel() < 5) {
+                    Animal nextAnimal = animalRepository.findByIslandTypeAndIslandLevel(lastPostboxMessageAnimal.getAnimal().getIslandType(), lastPostboxMessageAnimal.getLevel() + 1);
+                    postboxMessageAnimalService.createPostboxMessageAnimal(curUser, nextAnimal);
+                }
                 userIslandRepository.updateUserIslandRewardLevel(curUser.getSeq(),lastPostboxMessageAnimal.getAnimal().getIslandType());
             }
 
