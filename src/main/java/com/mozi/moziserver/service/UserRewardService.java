@@ -11,6 +11,7 @@ import com.mozi.moziserver.repository.UserRewardRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -32,6 +33,7 @@ public class UserRewardService {
         return userReward.getPoint();
     }
 
+    @Transactional
     public void createUserPointRecord(User user, PointReasonType pointReasonType, Integer point){
 
         UserPointRecord userPointRecord=UserPointRecord.builder()
@@ -43,6 +45,7 @@ public class UserRewardService {
         userPointRecordRepository.save(userPointRecord);
     }
 
+    @Transactional
     public Integer getPointOfUserPointRecord(User user, LocalDateTime startDateTime, LocalDateTime endDateTime){
 
         Integer sumPoint=0;
