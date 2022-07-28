@@ -33,8 +33,8 @@ public class AdminIslandController {
             @RequestParam("maxRewardLevel") Integer maxRewardLevel,
             @RequestPart(value = "islandImgUrlList",required = false) List<MultipartFile> islandImgUrlList
     ) {
-        if (islandImgUrlList.size()!=6){
-            throw ResponseError.BadRequest.INVALID_IMAGE.getResponseException("need to images");
+        if (islandImgUrlList.size() != 5){
+            throw ResponseError.BadRequest.INVALID_IMAGE.getResponseException("need to 5 images");
         }
 
         islandService.createIsland(name,type,description,maxPoint,maxRewardLevel,islandImgUrlList);
