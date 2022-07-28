@@ -31,8 +31,6 @@ public class ScheduleService {
     private final PostboxMessageAnimalService postboxMessageAnimalService;
     private final UserRewardService userRewardService;
     private final UserIslandRepository userIslandRepository;
-    // TODO 전역변수로 분리하기
-    final int extraPoints = 5;
 
     @Transactional
     @Scheduled(cron = "0 0 0 * * *")
@@ -109,7 +107,7 @@ public class ScheduleService {
             PostboxMessageAnimal lastPostboxMessageAnimal = postboxMessageAnimalRepository.findLastOneByUser(curUser);
 //
             if (lastPostboxMessageAnimal.getLevel() == 2) {
-                if (lastPostboxMessageAnimal.getAnimal().getIslandLevel() < 5) {
+                if (lastPostboxMessageAnimal.getAnimal().getIslandLevel() < Constant.islandMaxLevel) {
                     Animal nextAnimal = animalRepository.findByIslandTypeAndIslandLevel(lastPostboxMessageAnimal.getAnimal().getIslandType(), lastPostboxMessageAnimal.getLevel() + 1);
                     postboxMessageAnimalService.createPostboxMessageAnimal(curUser, nextAnimal);
                 }

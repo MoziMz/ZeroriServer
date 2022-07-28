@@ -73,5 +73,7 @@ public interface Constant {
 
     int islandMaxPoint = 450;
 
+    int islandMaxLevel = 6;
+
     int lastIslandType = 6;
 }

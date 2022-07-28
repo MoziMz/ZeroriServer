@@ -1,6 +1,8 @@
 package com.mozi.moziserver.service;
 
 import com.mozi.moziserver.httpException.ResponseError;
+import com.mozi.moziserver.model.ChallengeExplanation;
+import com.mozi.moziserver.model.ChallengeExplanationContent;
 import com.mozi.moziserver.model.entity.*;
 import com.mozi.moziserver.model.req.ReqAdminChallengeCreate;
 import com.mozi.moziserver.model.req.ReqChallengeList;
@@ -10,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -120,6 +123,27 @@ public class ChallengeService {
         }
     }
 
+    public void createChallengeExplanation(Long challengeSeq, String title, List<String> contentList) {
+        Challenge challenge = challengeRepository.getById(challengeSeq);
+
+        List<ChallengeExplanationContent> challengeExplanationContentList = new ArrayList<>();
+        for (int i = 0; i < contentList.size(); i++) {
+            challengeExplanationContentList.add(
+                    ChallengeExplanationContent.builder()
+                            .turn(i + 1)
+                            .content(contentList.get(i))
+                            .build()
+            );
+        }
+
+        ChallengeExplanation challengeExplanation = ChallengeExplanation.builder()
+                .title(title)
+                .contents(challengeExplanationContentList)
+                .build();
+
+        challenge.setExplanation(challengeExplanation);
+        challengeRepository.save(challenge);
+    }
     public List<ChallengeTheme> getChallengeThemeList() {
         return challengeThemeRepository.findAll();
     }

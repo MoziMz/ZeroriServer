@@ -1,5 +1,6 @@
 package com.mozi.moziserver.model.req;
 
+import com.mozi.moziserver.model.ChallengeExplanationContent;
 import com.mozi.moziserver.model.entity.ChallengeTag;
 import com.mozi.moziserver.model.mappedenum.ChallengeTagType;
 import lombok.Getter;

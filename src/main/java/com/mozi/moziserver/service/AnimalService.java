@@ -47,7 +47,7 @@ public class AnimalService {
         return animalRepository.findAll();
     }
 
-    public void createAnimal(String name, String explanation, MultipartFile image) {
+    public void createAnimal(String name, String explanation, MultipartFile image, Integer islandType, Integer islandLevel) {
 
         String imgUrl = null;
         try {
@@ -60,6 +60,8 @@ public class AnimalService {
                 .name(name)
                 .explanation(explanation)
                 .imgUrl(imgUrl)
+                .islandType(islandType)
+                .islandLevel(islandLevel)
                 .build();
 
         try {

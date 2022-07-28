@@ -125,7 +125,7 @@ public class IslandService {
             throw ResponseError.BadRequest.ALREADY_CREATED.getResponseException("already created island");
         }
 
-        for(int i = 0; i < 5; i++){
+        for(int i = 0; i < Constant.islandMaxLevel; i++){
             String url=islandUploadFile(islandImgUrlList.get(i),i+1);
 
             final IslandImg islandImg=IslandImg.builder()

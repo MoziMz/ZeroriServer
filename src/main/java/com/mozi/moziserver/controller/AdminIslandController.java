@@ -1,5 +1,6 @@
 package com.mozi.moziserver.controller;
 
+import com.mozi.moziserver.common.Constant;
 import com.mozi.moziserver.httpException.ResponseError;
 import com.mozi.moziserver.security.SessionUser;
 import com.mozi.moziserver.service.IslandService;
@@ -33,8 +34,8 @@ public class AdminIslandController {
             @RequestParam("maxRewardLevel") Integer maxRewardLevel,
             @RequestPart(value = "islandImgUrlList",required = false) List<MultipartFile> islandImgUrlList
     ) {
-        if (islandImgUrlList.size() != 5){
-            throw ResponseError.BadRequest.INVALID_IMAGE.getResponseException("need to 5 images");
+        if (islandImgUrlList.size() != Constant.islandMaxLevel){
+            throw ResponseError.BadRequest.INVALID_IMAGE.getResponseException("need to 6 images");
         }
 
         islandService.createIsland(name,type,description,maxPoint,maxRewardLevel,islandImgUrlList);

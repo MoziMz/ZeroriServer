@@ -45,13 +45,15 @@ public class AdminAnimalController {
             @ApiParam(hidden = true) @SessionUser Long userSeq,
             @RequestParam(name = "name") @NotBlank  String name,
             @RequestParam(name = "explanation") @NotBlank String explanation,
+            @RequestParam(name = "islandType") @NotBlank Integer islandType,
+            @RequestParam(name = "islandLevel") @NotBlank Integer islandLevel,
             @RequestPart MultipartFile image
     ) {
         if (image == null) {
             throw ResponseError.BadRequest.INVALID_IMAGE.getResponseException("need to images");
         }
 
-        animalService.createAnimal(name, explanation, image);
+        animalService.createAnimal(name, explanation, image, islandType, islandLevel);
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
