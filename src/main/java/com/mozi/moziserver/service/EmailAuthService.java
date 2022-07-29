@@ -13,8 +13,12 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import javax.mail.internet.MimeMessage;
+import javax.transaction.Transactional;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -24,10 +28,12 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class EmailAuthService {
 
+    private final PlatformTransactionManager transactionManager;
     private final JavaMailSender emailSender;
     private final EmailAuthRepository emailAuthRepository;
     private final UserAuthRepository userAuthRepository;
     private final UserRepository userRepository;
+    private final UserRewardRepository userRewardRepository;
 
     private final PostboxMessageAnimalService postboxMessageAnimalService;
 
@@ -252,26 +258,31 @@ public class EmailAuthService {
         userAuth.setUser(emailAuth.getUser());
 
         try {
-            userAuthRepository.save(userAuth);
+            withTransaction(() -> {
+                userAuthRepository.save(userAuth);
 
-            User user = userAuth.getUser();
-            user.setEmail(userAuth.getId());
-            userRepository.save(user);
+                User user = userAuth.getUser();
+                user.setEmail(userAuth.getId());
+                userRepository.save(user);
 
-            // UserIsland 생성
-            UserIsland firstUserIsland = UserIsland.builder()
-                    .type(1)
-                    .user(user)
-                    .rewardLevel(1)
-                    .build();
+                // UserIsland 생성
+                UserIsland firstUserIsland = UserIsland.builder()
+                        .type(1)
+                        .user(user)
+                        .rewardLevel(1)
+                        .build();
+                userIslandRepository.save(firstUserIsland);
 
-            userIslandRepository.save(firstUserIsland);
+                //동물의 편지 생성
+                Animal firstAnimal = animalRepository.findByIslandTypeAndIslandLevel(1,2);
+                postboxMessageAnimalService.createPostboxMessageAnimal(user,firstAnimal);
 
-            //동물의 편지 생성
-            Animal firstAnimal = animalRepository.findByIslandTypeAndIslandLevel(1,2);
-
-            postboxMessageAnimalService.createPostboxMessageAnimal(user,firstAnimal);
-
+                UserReward userReward = UserReward.builder()
+                        .user(user)
+                        .point(0)
+                        .build();
+                userRewardRepository.save(userReward);
+            });
         } catch (DataIntegrityViolationException e) {
             if (JpaUtil.isDuplicateKeyException(e)) {
                 throw ResponseError.BadRequest.ALREADY_EXISTS_EMAIL.getResponseException();
@@ -338,6 +349,18 @@ public class EmailAuthService {
 
         if (userAuth.getSeq() == null) {
             throw ResponseError.InternalServerError.UNEXPECTED_ERROR.getResponseException();
+        }
+    }
+
+    private void withTransaction(Runnable runnable) {
+        DefaultTransactionDefinition definition = new DefaultTransactionDefinition();
+
+        TransactionStatus status = transactionManager.getTransaction(definition);
+        try {
+            runnable.run();
+            transactionManager.commit(status);
+        } catch (Exception e) {
+            transactionManager.rollback(status);
         }
     }
 }

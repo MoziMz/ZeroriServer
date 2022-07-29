@@ -19,12 +19,6 @@ public class UserReward extends AbstractTimeEntity{
     @Builder.Default
     private Integer point = 0;
 
-    @Builder.Default
-    private Integer bRewardCnt = 0;
-
-    @Builder.Default
-    private Integer cRewardCnt = 0;
-
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_seq")
     private User user;
