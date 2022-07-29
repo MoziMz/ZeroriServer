@@ -21,6 +21,8 @@ public class User extends AbstractTimeEntity {
     @Enumerated(EnumType.STRING)
     private UserState state = UserState.ACTIVE;
 
+    private String stateReason;
+
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "seq")
     UserReward userReward;

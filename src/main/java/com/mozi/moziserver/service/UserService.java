@@ -7,6 +7,7 @@ import com.mozi.moziserver.model.entity.User;
 import com.mozi.moziserver.model.entity.UserAuth;
 import com.mozi.moziserver.model.entity.UserFcm;
 import com.mozi.moziserver.model.mappedenum.UserAuthType;
+import com.mozi.moziserver.model.req.ReqResign;
 import com.mozi.moziserver.model.req.ReqUserSignIn;
 import com.mozi.moziserver.model.req.ReqUserSignUp;
 import com.mozi.moziserver.repository.UserAuthRepository;
@@ -115,8 +116,8 @@ public class UserService {
             throw ResponseError.BadRequest.BAD_REQUEST.getResponseException();
         }
 
-        if (auth instanceof ResUserSignIn) {
-            User user = userRepository.findById(((ResUserSignIn) auth).getUserSeq())
+        if (auth.getPrincipal() instanceof ResUserSignIn) {
+            User user = userRepository.findById(((ResUserSignIn) auth.getPrincipal()).getUserSeq())
                     .orElseThrow(ResponseError.NotFound.USER_NOT_EXISTS::getResponseException);
 
             if (user.getState() == UserState.DELETED) {
@@ -351,5 +352,16 @@ public class UserService {
         userFcm.setUser(user);
 
         userFcmRepository.save(userFcm);
+    }
+
+    public void resignUser(User user, ReqResign req) {
+        String reasonString = "";
+        req.getResignReasonTypeList().stream().map(resignReasonType -> reasonString.concat(resignReasonType.getName()));
+        user.setStateReason(reasonString);
+
+        user.setState(UserState.DELETED);
+
+        userRepository.save(user);
+        // TODO DeleteLog에 삭제된 회원정보 넣기
     }
 }

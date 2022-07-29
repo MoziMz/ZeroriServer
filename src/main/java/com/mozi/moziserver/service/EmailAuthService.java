@@ -286,7 +286,6 @@ public class EmailAuthService {
         }
     }
 
-
     private void authResetPw(EmailAuth emailAuth) {
 
         UserAuth userAuth = userAuthRepository.findByUserAndType(emailAuth.getUser(), UserAuthType.EMAIL);

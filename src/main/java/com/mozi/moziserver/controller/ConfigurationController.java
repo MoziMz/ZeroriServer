@@ -125,9 +125,9 @@ public class ConfigurationController {
         User user = userService.getUserBySeq(userSeq)
                 .orElseThrow(ResponseError.InternalServerError.UNEXPECTED_ERROR::getResponseException);
 
-        // 회원 탈퇴 서비스 로직
-        // DeleteLog에 삭제된 회원정보 넣기?
         // 세션에서 정보 지우기 -> 로그아웃 참고
+        userService.resignUser(user, reqResign);
+        session.invalidate();
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
