@@ -1,6 +1,7 @@
 package com.mozi.moziserver.controller;
 
 import com.mozi.moziserver.httpException.ResponseError;
+import com.mozi.moziserver.model.entity.ConfirmLike;
 import com.mozi.moziserver.model.entity.Sticker;
 import com.mozi.moziserver.model.req.ReqConfirmSticker;
 import com.mozi.moziserver.model.req.ReqDeclarationCreate;
@@ -53,7 +54,6 @@ public class ConfirmController {
             @ApiParam(hidden = true) @SessionUser Long userSeq,
             @Valid ReqList req
     ) {
-
         return confirmService.getConfirmList(req)
                 .stream()
                 .map(ResConfirmList::of)
@@ -118,7 +118,6 @@ public class ConfirmController {
                 .collect(Collectors.toList());
     }
 
-
     @ApiOperation("스티커 생성(부착)")
     @PostMapping("/v1/confirms/{seq}/confirm-stickers")
     public ResponseEntity<Void> createConfirmSticker(
@@ -130,4 +129,25 @@ public class ConfirmController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    @ApiOperation("스토리 좋아요")
+    @PostMapping("/v1/confirms/{seq}/like")
+    public ResponseEntity<Void> createConfirmLike(
+            @ApiParam(hidden = true) @SessionUser Long userSeq,
+            @PathVariable Long seq
+    ) {
+        confirmService.createConfirmLike(userSeq, seq);
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @ApiOperation("스토리 좋아요")
+    @DeleteMapping ("/v1/confirms/{seq}/like")
+    public ResponseEntity<Void> deleteConfirmLike(
+            @ApiParam(hidden = true) @SessionUser Long userSeq,
+            @PathVariable Long seq
+    ) {
+        confirmService.deleteConfirmLike(userSeq, seq);
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 }

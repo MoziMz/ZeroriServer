@@ -1,6 +1,7 @@
 package com.mozi.moziserver.model.entity;
 
 import lombok.*;
+import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -11,6 +12,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@DynamicUpdate
 @Entity(name = "confirm")
 public class Confirm extends AbstractTimeEntity {
 
@@ -34,6 +36,9 @@ public class Confirm extends AbstractTimeEntity {
 
     @Column(name="declaration_state")
     private Byte confirmState;
+
+    @Builder.Default
+    private Integer likeCnt = 0;
 
     @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name="confirm_seq")

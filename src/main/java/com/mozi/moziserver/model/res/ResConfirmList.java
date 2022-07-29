@@ -17,6 +17,7 @@ public class ResConfirmList {
     private String imgUrl;
     private String challengeName;
     private Long challengeThemeSeq ;
+    private Integer likeCnt;
     private List<ResConfirmStickerList> resConfirmStickerList;
 
     private ResConfirmList(Confirm confirm) {
@@ -28,6 +29,7 @@ public class ResConfirmList {
         this.imgUrl=confirm.getImgUrl();
         this.challengeName=confirm.getChallenge().getName();
         this.challengeThemeSeq = confirm.getChallenge().getThemeSeq();
+        this.likeCnt = confirm.getLikeCnt();
         this.resConfirmStickerList = confirm.getConfirmStickerList()
                 .stream()
                 .map(ResConfirmStickerList::of)

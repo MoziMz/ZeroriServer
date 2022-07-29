@@ -10,7 +10,6 @@ import java.util.Optional;
 public interface ConfirmRepositorySupport {
 
     List<Confirm> findByUserByOrderDesc(Long userSeq,Long prevLastConfirmSeq, Integer pageSize);
-
     Confirm findBySeq(Long ConfirmSeq);
 
     void updateDeclarationState(Confirm confirm,Byte state);

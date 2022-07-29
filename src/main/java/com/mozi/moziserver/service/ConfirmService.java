@@ -1,5 +1,6 @@
 package com.mozi.moziserver.service;
 
+import com.mozi.moziserver.common.JpaUtil;
 import com.mozi.moziserver.httpException.ResponseError;
 import com.mozi.moziserver.model.entity.*;
 import com.mozi.moziserver.model.mappedenum.DeclarationType;
@@ -10,6 +11,7 @@ import com.mozi.moziserver.model.req.ReqUserStickerList;
 import com.mozi.moziserver.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
@@ -47,6 +49,7 @@ public class ConfirmService {
     private final ChallengeRecordRepository challengeRecordRepository;
 
     private final UserRewardService userRewardService;
+    private final ConfirmLikeRepository confirmLikeRepository;
 
     //인증 생성
     public void createConfirm(Long userSeq, Long challengeSeq, MultipartFile image) {
@@ -277,6 +280,53 @@ public class ConfirmService {
 
     }
 
+    public void createConfirmLike(Long userSeq, Long confirmSeq) {
+        User user = userRepository.findById(userSeq)
+                .orElseThrow(ResponseError.NotFound.USER_NOT_EXISTS::getResponseException);
+
+        Confirm confirm = confirmRepository.findBySeq(confirmSeq);
+        if (confirm == null) {
+            throw ResponseError.NotFound.CONFIRM_NOT_EXISTS.getResponseException();
+        }
+
+        ConfirmLike confirmLike = ConfirmLike.builder()
+                .confirm(confirm)
+                .user(user)
+                .build();
+
+        try {
+            confirmLikeRepository.save(confirmLike);
+        } catch (DataIntegrityViolationException e) {
+            if (JpaUtil.isDuplicateKeyException(e)) {
+                throw ResponseError.BadRequest.ALREADY_EXISTS_CONFIRM_LIKE.getResponseException();
+            }
+            throw ResponseError.InternalServerError.UNEXPECTED_ERROR.getResponseException();
+        } catch (Exception e) {
+            throw ResponseError.InternalServerError.UNEXPECTED_ERROR.getResponseException();
+        }
+
+        confirmRepository.incrementLikeCnt(confirm.getSeq());
+    }
+
+    @Transactional
+    public void deleteConfirmLike(Long userSeq, Long confirmSeq) {
+        User user = userRepository.findById(userSeq)
+                .orElseThrow(ResponseError.NotFound.USER_NOT_EXISTS::getResponseException);
+
+        Confirm confirm = confirmRepository.findBySeq(confirmSeq);
+        if (confirm == null) {
+            throw ResponseError.NotFound.CONFIRM_NOT_EXISTS.getResponseException();
+        }
+
+        try {
+            confirmLikeRepository.deleteByConfirmSeqAndUserSeq(confirm.getSeq(), user.getSeq());
+        } catch (Exception e) {
+            throw ResponseError.NotFound.CONFIRM_LIKE_NOT_EXISTS.getResponseException();
+        }
+
+        confirmRepository.decrementLikeCnt(confirm.getSeq());
+    }
+
     private void withTransaction(Runnable runnable) {
         DefaultTransactionDefinition definition = new DefaultTransactionDefinition();
 
@@ -288,5 +338,4 @@ public class ConfirmService {
             transactionManager.rollback(status);
         }
     }
-
 }
