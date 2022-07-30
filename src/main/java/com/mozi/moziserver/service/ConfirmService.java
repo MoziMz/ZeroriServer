@@ -339,7 +339,10 @@ public class ConfirmService {
         }
 
         try {
-            confirmLikeRepository.deleteByConfirmSeqAndUserSeq(confirm.getSeq(), user.getSeq());
+            int deleteCnt = confirmLikeRepository.deleteByConfirmSeqAndUserSeq(confirm.getSeq(), user.getSeq());
+            if (deleteCnt != 1) {
+                throw ResponseError.NotFound.CONFIRM_LIKE_NOT_EXISTS.getResponseException();
+            }
         } catch (Exception e) {
             throw ResponseError.NotFound.CONFIRM_LIKE_NOT_EXISTS.getResponseException();
         }

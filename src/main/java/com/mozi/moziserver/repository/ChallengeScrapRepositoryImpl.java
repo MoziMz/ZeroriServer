@@ -27,8 +27,6 @@ public class ChallengeScrapRepositoryImpl extends QuerydslRepositorySupport impl
     public List<ChallengeScrap> findByUserSeq(Long userSeq){
         return from(qChallengeScrap)
                 .where(qChallengeScrap.userSeq.eq(userSeq))
-                .fetch()
-                .stream()
-                .collect(Collectors.toList());
+                .fetch();
     }
 }
