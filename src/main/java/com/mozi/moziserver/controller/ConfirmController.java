@@ -54,7 +54,7 @@ public class ConfirmController {
             @ApiParam(hidden = true) @SessionUser Long userSeq,
             @Valid ReqList req
     ) {
-        return confirmService.getConfirmList(req)
+        return confirmService.getConfirmList(userSeq, req)
                 .stream()
                 .map(ResConfirmList::of)
                 .collect(Collectors.toList());
@@ -67,7 +67,7 @@ public class ConfirmController {
             @PathVariable Long challengeSeq,
             @Valid ReqList req
     ) {
-        return confirmService.getConfirmListByChallenge(challengeSeq, req)
+        return confirmService.getConfirmListByChallenge(userSeq, challengeSeq, req)
                 .stream()
                 .map(ResConfirmList::of)
                 .collect(Collectors.toList());
@@ -140,7 +140,7 @@ public class ConfirmController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @ApiOperation("스토리 좋아요")
+    @ApiOperation("스토리 좋아요 취소")
     @DeleteMapping ("/v1/confirms/{seq}/like")
     public ResponseEntity<Void> deleteConfirmLike(
             @ApiParam(hidden = true) @SessionUser Long userSeq,

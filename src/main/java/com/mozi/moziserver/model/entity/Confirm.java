@@ -47,4 +47,7 @@ public class Confirm extends AbstractTimeEntity {
     @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name="confirm_seq")
     private List<Declaration> DeclarationList;
+
+    @Transient
+    boolean isLiked;
 }

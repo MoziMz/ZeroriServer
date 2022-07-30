@@ -9,6 +9,7 @@ import com.mozi.moziserver.model.req.ReqConfirmSticker;
 import com.mozi.moziserver.model.req.ReqList;
 import com.mozi.moziserver.model.req.ReqUserStickerList;
 import com.mozi.moziserver.repository.*;
+import com.querydsl.core.types.QMap;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -21,11 +22,13 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class ConfirmService {
+    private final UserService userService;
     private final UserRepository userRepository;
 
     private final ChallengeRepository challengeRepository;
@@ -104,26 +107,43 @@ public class ConfirmService {
         });
     }
 
-    @Transactional
-    public List<Confirm> getConfirmList(ReqList req) {
-        return confirmRepository.findAll(req.getPrevLastSeq(), req.getPageSize());
+    public List<Confirm> getConfirmList(Long userSeq, ReqList req) {
+        List<Confirm> confirmList = confirmRepository.findAll(req.getPrevLastSeq(), req.getPageSize());
+
+        return setConfirmLike(userSeq, confirmList);
     }
 
     // 챌린지별 인증 조회
     @Transactional
-    public List<Confirm> getConfirmListByChallenge(Long challengeSeq, ReqList req) {
+    public List<Confirm> getConfirmListByChallenge(Long userSeq, Long challengeSeq, ReqList req) {
         final Challenge challenge = challengeRepository.findById(challengeSeq)
                 .orElseThrow(ResponseError.NotFound.CHALLENGE_NOT_EXISTS::getResponseException);
 
-        return confirmRepository.findAllByChallenge(challenge, req.getPrevLastSeq(), req.getPageSize());
-//        return confirmRepository.findByChallengeByOrderDesc(seq, req.getPrevLastSeq(), req.getPageSize());
+        List<Confirm> confirmList = confirmRepository.findAllByChallenge(challenge, req.getPrevLastSeq(), req.getPageSize());
+
+        return setConfirmLike(userSeq, confirmList);
     }
 
     @Transactional
     public Optional<Confirm> getConfirmByChallenge(Challenge challenge) {
-
         return confirmRepository.findByChallenge(challenge);
+    }
 
+    private List<Confirm> setConfirmLike(Long userSeq, List<Confirm> confirmList) {
+        User user = userService.getUserBySeq(userSeq)
+                .orElseThrow(ResponseError.InternalServerError.UNEXPECTED_ERROR::getResponseException);
+
+        List<ConfirmLike> confirmLikeList = confirmLikeRepository.findAllByUserAndConfirmsIn(user, confirmList);
+        HashSet<Long> likedConfirmSeqSet = new HashSet<>(confirmLikeList.stream()
+                .map(confirmLike -> confirmLike.getConfirm().getSeq())
+                .collect(Collectors.toSet()));
+
+        for (Confirm confirm: confirmList) {
+            boolean isLiked  = likedConfirmSeqSet.contains(confirm.getSeq());
+            confirm.setLiked(isLiked);
+        }
+
+        return confirmList;
     }
 
     @Transactional

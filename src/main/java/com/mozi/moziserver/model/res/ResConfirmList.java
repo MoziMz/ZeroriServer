@@ -18,6 +18,7 @@ public class ResConfirmList {
     private String challengeName;
     private Long challengeThemeSeq ;
     private Integer likeCnt;
+    private boolean isLiked;
     private List<ResConfirmStickerList> resConfirmStickerList;
 
     private ResConfirmList(Confirm confirm) {
@@ -34,6 +35,7 @@ public class ResConfirmList {
                 .stream()
                 .map(ResConfirmStickerList::of)
                 .collect(Collectors.toList());
+        this.isLiked = confirm.isLiked();
     }
 
     public static ResConfirmList of(Confirm confirm) { return new ResConfirmList(confirm); }
