@@ -1,10 +1,9 @@
 package com.mozi.moziserver.controller;
 
 import com.mozi.moziserver.httpException.ResponseError;
+import com.mozi.moziserver.model.entity.Board;
 import com.mozi.moziserver.model.entity.User;
-import com.mozi.moziserver.model.mappedenum.ResignReasonType;
 import com.mozi.moziserver.model.req.*;
-import com.mozi.moziserver.model.res.ResBoardList;
 import com.mozi.moziserver.model.res.ResUserInfo;
 import com.mozi.moziserver.security.SessionUser;
 import com.mozi.moziserver.service.*;
@@ -19,7 +18,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -44,14 +42,22 @@ public class ConfigurationController {
 
     @ApiOperation("공지사항 보기")
     @GetMapping("/v1/boards")
-    public List<ResBoardList> getBoardListByCreatedAt(
+    public List<Board> getBoardListByCreatedAt(
             @ApiParam(hidden = true) @SessionUser Long userSeq,
             @Valid ReqList req
     ) {
-        return boardService.getAllBoardListByCreatedAt(userSeq, req)
-                .stream()
-                .map(ResBoardList::of)
-                .collect(Collectors.toList());
+        return boardService.getAllBoardListByCreatedAt(userSeq, req);
+    }
+
+    @ApiOperation("공지사항 확인 완료")
+    @PutMapping("/v1/boards/{seq}/checked")
+    public ResponseEntity<Void> checkedBoard(
+            @ApiParam(hidden = true) @SessionUser Long userSeq,
+            @PathVariable("seq") Long seq
+    ) {
+        boardService.checkBoard(userSeq, seq);
+
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @ApiOperation("챌린지 제안하기")

@@ -33,7 +33,8 @@ public interface ResponseError {
         INVALID_NAME("invalid name"),
         ALREADY_EXISTS_ANIMAL_NAME("already exists animal name"),
         INVALID_USER_ISLAND_OPEN("invalid user island open"),
-        ALREADY_EXISTS_CONFIRM_LIKE("already exists confirm like");
+        ALREADY_EXISTS_CONFIRM_LIKE("already exists confirm like"),
+        ALREADY_CHECKED_BOARD("already checked board");
 
 
         // INVALID 는 한가지로 명확하지 않을때 쓴다.
@@ -156,7 +157,8 @@ public interface ResponseError {
 
         PREPARATIONITEM_NOT_EXISTS("preparationItem not exists"),
         CONFIRM_NOT_EXISTS("confirm not exists"),
-        CONFIRM_LIKE_NOT_EXISTS("confirm like not exists");
+        CONFIRM_LIKE_NOT_EXISTS("confirm like not exists"),
+        BOARD_NOT_EXISTS("board not exists");
 
         private final String message;
 
