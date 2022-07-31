@@ -12,6 +12,6 @@ public class ReqList {
     @Min(1L)
     private Long prevLastSeq;
 
-    @Min(1L) @Max(50L)
+    @Min(1L) @Max(30L)
     private Integer pageSize = 20;
 }
