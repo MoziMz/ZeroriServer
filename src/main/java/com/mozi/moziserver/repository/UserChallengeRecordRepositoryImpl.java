@@ -62,9 +62,7 @@ public class UserChallengeRecordRepositoryImpl extends QuerydslRepositorySupport
                 .orderBy(qChallenge.name.asc())
                 .where(predicates)
                 .limit(pageSize)
-                .fetch()
-                .stream()
-                .collect(Collectors.toList());
+                .fetch();
     }
 
     private <T> Predicate predicateOptional(final Function<T, Predicate> whereFunc, final T value) {

@@ -22,8 +22,6 @@ public class BoardRepositoryImpl extends QuerydslRepositorySupport implements Bo
     ) {
         return from(qBoard)
                 .orderBy(qBoard.createdAt.desc())
-                .fetch()
-                .stream()
-                .collect(Collectors.toList());
+                .fetch();
     }
 }

@@ -18,9 +18,7 @@ public class CurrentThemeListRepositoryImpl extends QuerydslRepositorySupport im
     public List<CurrentThemeList> findAllByOrderByTurn() {
         List<CurrentThemeList> currentThemeList = from(qCurrentThemeList)
                 .orderBy(qCurrentThemeList.turn.asc())
-                .fetch()
-                .stream()
-                .collect(Collectors.toList());
+                .fetch();
 
         return currentThemeList;
     }

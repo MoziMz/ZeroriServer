@@ -23,9 +23,7 @@ public class UserPointRecordRepositoryImpl extends QuerydslRepositorySupport imp
         return from(qUserPointRecord)
                 .where(qUser.eq(user)
                         .and(qUserPointRecord.createdAt.between(startDateTime,endDateTime)))
-                .fetch()
-                .stream()
-                .collect(Collectors.toList());
+                .fetch();
     }
 
 }

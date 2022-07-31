@@ -40,9 +40,7 @@ public class PostboxMessageAnimalRepositoryImpl extends QuerydslRepositorySuppor
                 .where(qPreparationItem.animalSeq.eq(animalSeq))
                 .orderBy(qPreparationItem.turn.asc())
                 .fetchAll()
-                .fetch()
-                .stream()
-                .collect(Collectors.toList());
+                .fetch();
 
         return preparationItemList;
 

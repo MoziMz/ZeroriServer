@@ -52,6 +52,7 @@ public class ChallengeRepositoryImpl extends QuerydslRepositorySupport implement
 
         List<Challenge> challengeList = from(qChallenge)
                 .where(predicates)
+                .orderBy(qChallenge.seq.desc())
                 .limit(pageSize)
                 .fetch();
 

@@ -32,9 +32,7 @@ public class PostboxMessageAdminRepositoryImpl extends QuerydslRepositorySupport
                 .innerJoin(qPostboxMessageAdmin.user, qUser).fetchJoin()
                 .where(predicates)
                 .where(qPostboxMessageAdmin.user.eq(user))
-                .fetch()
-                .stream()
-                .collect(Collectors.toList());
+                .fetch();
 
         return postboxMessageAdminList;
     }

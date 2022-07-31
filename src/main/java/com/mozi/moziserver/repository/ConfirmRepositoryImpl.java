@@ -68,14 +68,10 @@ public class ConfirmRepositoryImpl extends QuerydslRepositorySupport implements 
     public List<Confirm> findByUserByOrderDesc(Long userSeq,Long prevLastConfirmSeq, Integer pageSize){
         List<User> user=from(qUser)
                 .where(qUser.seq.eq(userSeq))
-                .fetch()
-                .stream()
-                .collect(Collectors.toList());
+                .fetch();
 
         List<Challenge> challengeList=from(qChallenge)
-                .fetch()
-                .stream()
-                .collect(Collectors.toList());
+                .fetch();
 
         Predicate[] predicates = new Predicate[]{
                 predicateOptional(qConfirm.seq::lt,prevLastConfirmSeq),
@@ -88,9 +84,7 @@ public class ConfirmRepositoryImpl extends QuerydslRepositorySupport implements 
                 .where(predicates)
                 .orderBy(qConfirm.createdAt.desc())
                 .limit(pageSize)
-                .fetch()
-                .stream()
-                .collect(Collectors.toList());
+                .fetch();
 
         return confirmList;
 

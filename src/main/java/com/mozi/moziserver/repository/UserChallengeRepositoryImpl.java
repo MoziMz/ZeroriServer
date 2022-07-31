@@ -157,10 +157,10 @@ public class UserChallengeRepositoryImpl extends QuerydslRepositorySupport imple
 
         return from(qUserChallenge)
                 .where(predicates)
-                .fetch()
-                .stream()
+                .fetch();
+//                .stream()
 //                .filter( item -> item.getUserChallengeResultList().get(Period.between(item.getStartDate(), date).getDays()).getResult() == UserChallengeResultType.PLAN)
-                .collect(Collectors.toList());
+//                .collect(Collectors.toList());
 
         // TODO
         // filter 에 걸려서 나오지 않는데도 JSON 내용이 바뀐것으로 인식되고 있음

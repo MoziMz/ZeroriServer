@@ -18,9 +18,7 @@ public class ConfirmStickerRepositoryImpl extends QuerydslRepositorySupport impl
 
         List<ConfirmSticker> confirmStickerList=from(qConfirmSticker)
                 .where(qConfirmSticker.confirm.seq.in(seq))
-                .fetch()
-                .stream()
-                .collect(Collectors.toList());
+                .fetch();
 
         return confirmStickerList;
 

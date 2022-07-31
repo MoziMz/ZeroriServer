@@ -22,9 +22,7 @@ public class UserStickerRepositoryImpl extends QuerydslRepositorySupport impleme
 
         List<UserSticker> userStickerList = from(qUserSticker)
                 .where(qUserSticker.id.user.in(user))
-                .fetch()
-                .stream()
-                .collect(Collectors.toList());
+                .fetch();
 
         return userStickerList;
     }
@@ -38,9 +36,7 @@ public class UserStickerRepositoryImpl extends QuerydslRepositorySupport impleme
         List<Long> userStickerSeqList = from(qUserSticker)
                 .select(qUserSticker.id.sticker.seq)
                 .where(qUserSticker.id.user.in(user))
-                .fetch()
-                .stream()
-                .collect(Collectors.toList());
+                .fetch();
 
         return userStickerSeqList;
     }

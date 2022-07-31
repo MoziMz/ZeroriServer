@@ -26,9 +26,7 @@ public class StickerRepositoryImpl extends QuerydslRepositorySupport implements 
 
         List<Sticker> stickerList=from(qSticker)
                 .where(builder)
-                .fetch()
-                .stream()
-                .collect(Collectors.toList());
+                .fetch();
 
         return stickerList;
 

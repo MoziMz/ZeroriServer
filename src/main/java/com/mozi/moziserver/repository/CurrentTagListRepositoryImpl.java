@@ -18,9 +18,7 @@ public class CurrentTagListRepositoryImpl extends QuerydslRepositorySupport impl
     public List<CurrentTagList> findAllByOrderByTurn() {
         List<CurrentTagList> currentTagList = from(qCurrentTagList)
                 .orderBy(qCurrentTagList.turn.asc())
-                .fetch()
-                .stream()
-                .collect(Collectors.toList());
+                .fetch();
 
         return currentTagList;
     }
