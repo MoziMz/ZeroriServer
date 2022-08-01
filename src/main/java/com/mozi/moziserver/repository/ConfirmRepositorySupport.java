@@ -2,8 +2,8 @@ package com.mozi.moziserver.repository;
 
 import com.mozi.moziserver.model.entity.Challenge;
 import com.mozi.moziserver.model.entity.Confirm;
-import com.mozi.moziserver.model.entity.ConfirmSticker;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,5 +21,8 @@ public interface ConfirmRepositorySupport {
     Long findSeq();
 
     Optional<Confirm> findByChallenge(Challenge challenge);
+
+    List<Confirm> findByCreatedAt(LocalDateTime localDateTime);
+
 
 }

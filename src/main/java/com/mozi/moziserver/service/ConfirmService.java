@@ -8,8 +8,8 @@ import com.mozi.moziserver.model.mappedenum.PointReasonType;
 import com.mozi.moziserver.model.req.ReqConfirmSticker;
 import com.mozi.moziserver.model.req.ReqList;
 import com.mozi.moziserver.model.req.ReqUserStickerList;
+import com.mozi.moziserver.model.res.ResWeekConfirm;
 import com.mozi.moziserver.repository.*;
-import com.querydsl.core.types.QMap;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -21,6 +21,7 @@ import org.springframework.transaction.support.DefaultTransactionDefinition;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -348,6 +349,19 @@ public class ConfirmService {
         }
 
         confirmRepository.decrementLikeCnt(confirm.getSeq());
+    }
+
+    @Transactional
+    public ResWeekConfirm getWeekConfirm(){
+        LocalDateTime today = LocalDateTime.now();
+
+        List<Confirm> confirmList=confirmRepository.findByCreatedAt(today);
+
+        List<User> userList=confirmList.stream().map(Confirm::getUser).collect(Collectors.toList());
+
+        userList=userList.stream().distinct().collect(Collectors.toList());
+
+        return ResWeekConfirm.of(userList,confirmList);
     }
 
     private void withTransaction(Runnable runnable) {

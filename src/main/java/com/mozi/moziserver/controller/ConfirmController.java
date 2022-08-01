@@ -9,6 +9,7 @@ import com.mozi.moziserver.model.req.ReqList;
 import com.mozi.moziserver.model.res.ResConfirmList;
 import com.mozi.moziserver.model.res.ResStickerList;
 import com.mozi.moziserver.model.res.ResUserConfirmList;
+import com.mozi.moziserver.model.res.ResWeekConfirm;
 import com.mozi.moziserver.security.SessionUser;
 import com.mozi.moziserver.service.ConfirmService;
 import io.swagger.annotations.ApiOperation;
@@ -149,5 +150,13 @@ public class ConfirmController {
         confirmService.deleteConfirmLike(userSeq, seq);
 
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @ApiOperation("제로리 주민들의 활동보기")
+    @GetMapping("/v1/confirms/week")
+    public ResWeekConfirm getWeekConfirm(
+            @ApiParam(hidden = true) @SessionUser Long userSeq
+    ) {
+        return confirmService.getWeekConfirm();
     }
 }

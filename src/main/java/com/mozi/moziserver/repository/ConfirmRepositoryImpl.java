@@ -9,6 +9,9 @@ import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -128,6 +131,17 @@ public class ConfirmRepositoryImpl extends QuerydslRepositorySupport implements 
                 .stream()
                 .distinct()
                 .findFirst();
+    }
+
+    @Override
+    public List<Confirm> findByCreatedAt(LocalDateTime localDateTime){
+
+        return from(qConfirm)
+                .innerJoin(qConfirm.challenge, qChallenge).fetchJoin()
+                .innerJoin(qConfirm.user, qUser).fetchJoin()
+                .where(qConfirm.createdAt.before(localDateTime)
+                        .and(qConfirm.createdAt.after(localDateTime.minus(7, ChronoUnit.DAYS))))
+                .fetch();
     }
 
 
