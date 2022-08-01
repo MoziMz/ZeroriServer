@@ -52,13 +52,16 @@ public class UserChallengeRecordRepositoryImpl extends QuerydslRepositorySupport
     }
 
     @Override
-    public List<UserChallengeRecord> findByUser(Long userSeq,Long prevLastChallengeSeq, Integer pageSize){
+    public List<UserChallengeRecord> findByUserAndConfirmCnt(Long userSeq,Long prevLastChallengeSeq, Integer pageSize){
         final Predicate[] predicates = new Predicate[]{
                 predicateOptional(qUserChallengeRecord.challenge.seq::lt,prevLastChallengeSeq),
         };
 
+        Integer zeroConfirmCnt=0;
+
         return from(qUserChallengeRecord)
-                .where(qUser.seq.eq(userSeq))
+                .where(qUser.seq.eq(userSeq)
+                        .and(qUserChallengeRecord.confirmCnt.ne(zeroConfirmCnt)))
                 .orderBy(qChallenge.name.asc())
                 .where(predicates)
                 .limit(pageSize)

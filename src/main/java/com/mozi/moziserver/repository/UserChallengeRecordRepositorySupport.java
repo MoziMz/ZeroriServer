@@ -17,5 +17,5 @@ public interface UserChallengeRecordRepositorySupport {
             Integer point
     );
 
-    List<UserChallengeRecord> findByUser(Long userSeq,Long prevLastSeq, Integer pageSize);
+    List<UserChallengeRecord> findByUserAndConfirmCnt(Long userSeq,Long prevLastSeq, Integer pageSize);
 }

@@ -301,7 +301,7 @@ public class UserChallengeService {
             ReqList reqList
     ) {
 
-        return userChallengeRecordRepository.findByUser(userSeq,reqList.getPrevLastSeq(),reqList.getPageSize());
+        return userChallengeRecordRepository.findByUserAndConfirmCnt(userSeq,reqList.getPrevLastSeq(),reqList.getPageSize());
 
     }
 }
