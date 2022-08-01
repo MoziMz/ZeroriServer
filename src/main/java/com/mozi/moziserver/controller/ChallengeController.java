@@ -2,6 +2,7 @@ package com.mozi.moziserver.controller;
 
 import com.mozi.moziserver.model.entity.*;
 import com.mozi.moziserver.model.req.ReqChallengeList;
+import com.mozi.moziserver.model.req.ReqList;
 import com.mozi.moziserver.model.res.ResChallenge;
 import com.mozi.moziserver.model.res.ResChallengeList;
 import com.mozi.moziserver.model.res.ResChallengeTagList;
@@ -84,6 +85,20 @@ public class ChallengeController {
         }
 
         return challengeLists;
+    }
+
+    @ApiOperation("스크랩한 챌린지 리스트 조회")
+    @GetMapping("v1/challenges/scrap")
+    public List<ResChallengeList> getScrappedChallengeList(
+            @ApiParam(hidden = true) @SessionUser Long userSeq
+    ) {
+        // TODO 페이징 기능 추가하기
+        List<Challenge> challengeList = challengeService.getScrappedChallengeList(userSeq);
+
+        boolean isScrapped = true;
+        return challengeList.stream()
+                .map(challenge -> ResChallengeList.of(challenge, true))
+                .collect(Collectors.toList());
     }
 
     @ApiOperation("챌린지 스크랩")

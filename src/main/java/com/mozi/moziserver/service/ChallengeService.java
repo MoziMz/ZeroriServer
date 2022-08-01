@@ -6,6 +6,7 @@ import com.mozi.moziserver.model.ChallengeExplanationContent;
 import com.mozi.moziserver.model.entity.*;
 import com.mozi.moziserver.model.req.ReqAdminChallengeCreate;
 import com.mozi.moziserver.model.req.ReqChallengeList;
+import com.mozi.moziserver.model.req.ReqList;
 import com.mozi.moziserver.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Slf4j
@@ -43,6 +45,17 @@ public class ChallengeService {
                 req.getPageSize(),
                 req.getPrevLastPostSeq()
         );
+    }
+
+    public List<Challenge> getScrappedChallengeList(Long userSeq) {
+        // TODO 페이징 기능 추가하기
+        List<ChallengeScrap> challengeScrapList = challengeScrapRepository.findByUserSeq(userSeq);
+
+        List<Long> challengeSeqList = challengeScrapList.stream()
+                .map(challengeScrap -> challengeScrap.getChallengeSeq())
+                .collect(Collectors.toList());
+
+        return challengeRepository.findAllBySeqIn(challengeSeqList);
     }
 
 

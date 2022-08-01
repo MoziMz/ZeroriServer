@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ChallengeScrapRepositorySupport {
-    ChallengeScrap findByChallengeSeqAndUserSeq (Long challengeSeq, Long userSeq );
+    ChallengeScrap findByChallengeSeqAndUserSeq (Long challengeSeq, Long userSeq);
 
     List<ChallengeScrap> findByUserSeq(Long userSeq);
 }
