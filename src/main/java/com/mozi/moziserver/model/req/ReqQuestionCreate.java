@@ -2,11 +2,14 @@ package com.mozi.moziserver.model.req;
 
 import com.mozi.moziserver.model.mappedenum.QuestionCategory;
 import lombok.Getter;
+import lombok.Setter;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 @Getter
+@Setter
 public class ReqQuestionCreate {
 
     private String email;
@@ -20,6 +23,5 @@ public class ReqQuestionCreate {
     @NotNull
     private QuestionCategory questionCategory;
 
-    @NotBlank
-    private String imgUrl;
+    private MultipartFile image;
 }

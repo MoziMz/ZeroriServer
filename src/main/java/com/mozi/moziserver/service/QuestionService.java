@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
 @Service
@@ -30,8 +31,14 @@ public class QuestionService {
 
         Long seq = questionRepository.findSeq();
 
-        String imgUrl = ""; // TODO s3ImageService.fileUpload(reqQuestionCreate.getImgUrl(), "question", seq);
-
+        String imgUrl = null;
+        if (reqQuestionCreate.getImage() != null) {
+            try {
+                imgUrl = s3ImageService.uploadFile(reqQuestionCreate.getImage(), "animal");
+            } catch (Exception e) {
+                throw new RuntimeException(e.getCause());
+            }
+        }
 
         Question question = Question.builder()
                 .user(user)
@@ -47,7 +54,5 @@ public class QuestionService {
         } catch (Exception e) {
             throw ResponseError.BadRequest.ALREADY_CREATED.getResponseException(); // for duplicate exception
         }
-
     }
-
 }

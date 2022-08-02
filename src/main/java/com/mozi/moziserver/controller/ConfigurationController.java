@@ -3,6 +3,7 @@ package com.mozi.moziserver.controller;
 import com.mozi.moziserver.httpException.ResponseError;
 import com.mozi.moziserver.model.entity.Board;
 import com.mozi.moziserver.model.entity.User;
+import com.mozi.moziserver.model.mappedenum.QuestionCategory;
 import com.mozi.moziserver.model.req.*;
 import com.mozi.moziserver.model.res.ResUserInfo;
 import com.mozi.moziserver.security.SessionUser;
@@ -14,9 +15,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @Slf4j
@@ -34,9 +38,22 @@ public class ConfigurationController {
     @PostMapping("/v1/questions")
     public ResponseEntity<Void> createQuestion(
             @ApiParam(hidden = true) @SessionUser Long userSeq,
-            @RequestBody @Valid ReqQuestionCreate reqQuestionCreate
+            @RequestParam(name = "email", required = true) String email,
+            @RequestParam(name = "title", required = true) String title,
+            @RequestParam(name = "content", required = true) String content,
+            @RequestParam(name = "questionCategory", required = true) QuestionCategory questionCategory,
+            @RequestPart(name = "image", required = false) MultipartFile image
     ) {
+        // TODO @ModelAttribute 사용 request 객체로 받는 방향으로 전환?
+        ReqQuestionCreate reqQuestionCreate = new ReqQuestionCreate();
+        reqQuestionCreate.setEmail(email);
+        reqQuestionCreate.setTitle(title);
+        reqQuestionCreate.setContent(content);
+        reqQuestionCreate.setQuestionCategory(questionCategory);
+        reqQuestionCreate.setImage(image);
+
         questionService.createQuestion(userSeq, reqQuestionCreate);
+
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
