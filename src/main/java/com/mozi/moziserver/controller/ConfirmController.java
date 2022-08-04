@@ -3,6 +3,7 @@ package com.mozi.moziserver.controller;
 import com.mozi.moziserver.httpException.ResponseError;
 import com.mozi.moziserver.model.entity.ConfirmLike;
 import com.mozi.moziserver.model.entity.Sticker;
+import com.mozi.moziserver.model.req.ReqConfirmOfUser;
 import com.mozi.moziserver.model.req.ReqConfirmSticker;
 import com.mozi.moziserver.model.req.ReqDeclarationCreate;
 import com.mozi.moziserver.model.req.ReqList;
@@ -158,5 +159,18 @@ public class ConfirmController {
             @ApiParam(hidden = true) @SessionUser Long userSeq
     ) {
         return confirmService.getWeekConfirm();
+    }
+
+    @ApiOperation("챌린지별 상세 챌린지")
+    @GetMapping("/v1/users/me/challenges/confirms")
+    public List<ResConfirmList> getConfirmOfUser(
+            @ApiParam(hidden = true) @SessionUser Long userSeq,
+            @Valid ReqConfirmOfUser reqConfirmOfUser
+    ) {
+
+        return confirmService.getConfirmListAboutPeriod(userSeq, reqConfirmOfUser)
+                .stream()
+                .map(ResConfirmList::of)
+                .collect(Collectors.toList());
     }
 }

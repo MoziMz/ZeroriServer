@@ -5,6 +5,7 @@ import com.mozi.moziserver.httpException.ResponseError;
 import com.mozi.moziserver.model.entity.*;
 import com.mozi.moziserver.model.mappedenum.DeclarationType;
 import com.mozi.moziserver.model.mappedenum.PointReasonType;
+import com.mozi.moziserver.model.req.ReqConfirmOfUser;
 import com.mozi.moziserver.model.req.ReqConfirmSticker;
 import com.mozi.moziserver.model.req.ReqList;
 import com.mozi.moziserver.model.req.ReqUserStickerList;
@@ -361,6 +362,19 @@ public class ConfirmService {
         userList=userList.stream().distinct().collect(Collectors.toList());
 
         return ResWeekConfirm.of(userList,confirmList);
+    }
+
+    public List<Confirm> getConfirmListAboutPeriod(Long userSeq, ReqConfirmOfUser req) {
+        User user = userRepository.findById(userSeq)
+                .orElseThrow(ResponseError.NotFound.USER_NOT_EXISTS::getResponseException);
+
+        Challenge challenge = challengeRepository.findById(req.getChallengeSeq())
+                .orElseThrow(ResponseError.BadRequest.INVALID_SEQ::getResponseException);
+
+        List<Confirm> confirmList = confirmRepository.findByUserAndPeriod(
+               user, challenge, req.getStartDate().atTime(0,0), req.getEndDate().atTime(23,59));
+
+        return setConfirmLike(userSeq, confirmList);
     }
 
     private void withTransaction(Runnable runnable) {
