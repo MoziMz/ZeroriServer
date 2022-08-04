@@ -99,9 +99,13 @@ public class UserService {
         Authentication auth = null;
 
         if (req.getType() == UserAuthType.EMAIL) {
-            auth = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(req.getId(), req.getPw())
-            );
+            try {
+                auth = authenticationManager.authenticate(
+                        new UsernamePasswordAuthenticationToken(req.getId(), req.getPw())
+                );
+            } catch (Exception e) {
+                throw ResponseError.BadRequest.INVALID_ID_OR_PASSWORD.getResponseException();
+            }
         } else {
             ReqUserSocialSignIn reqUserSocialSignIn = new ReqUserSocialSignIn(req);
 
