@@ -235,6 +235,7 @@ public class UserChallengeService {
 
         userChallenge.setState(UserChallengeStateType.END);
         userChallenge.setEndDate(today);
+        userChallenge.setCheckedState(true);
 
         userChallengeRepository.save(userChallenge);
     }
