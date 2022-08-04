@@ -55,14 +55,14 @@ public class UserChallengeRepositoryImpl extends QuerydslRepositorySupport imple
             Long prevLastUserChallengeSeq
     ){
         final Predicate[] predicates = new Predicate[]{
-                predicateOptional(qUserChallenge.seq::lt, prevLastUserChallengeSeq),
+                predicateOptional(qUserChallenge.seq::gt, prevLastUserChallengeSeq),
                 predicateOptional(qUserChallenge.user.seq::eq, userSeq)
         };
 
         return from(qUserChallenge)
                 .innerJoin(qUserChallenge.challenge, qChallenge)
                     .fetchJoin()
-                .orderBy(qUserChallenge.startDate.desc())
+                .orderBy(qUserChallenge.startDate.asc())
                 .where(predicates)
                 .limit(pageSize)
                 .fetch()
