@@ -35,7 +35,8 @@ public interface ResponseError {
         INVALID_USER_ISLAND_OPEN("invalid user island open"),
         ALREADY_EXISTS_CONFIRM_LIKE("already exists confirm like"),
         ALREADY_CHECKED_BOARD("already checked board"),
-        TODAY_ENDED_CHALLENGE("today ended challenge");
+        TODAY_ENDED_CHALLENGE("today ended challenge"),
+        ALREADY_CHECKED_EMAIL("already checked email");
 
 
         // INVALID 는 한가지로 명확하지 않을때 쓴다.

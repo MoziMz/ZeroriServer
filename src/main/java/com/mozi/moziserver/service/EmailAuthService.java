@@ -152,6 +152,10 @@ public class EmailAuthService {
                     .build();
         }
 
+        if (emailAuthOptional.get().isCheckedState()) {
+            throw ResponseError.BadRequest.ALREADY_CHECKED_EMAIL.getResponseException();
+        }
+
         EmailAuth emailAuth = emailAuthOptional.get();
 
         if (emailAuth.getUsedDt() != null) {

@@ -25,6 +25,8 @@ public class EmailAuth extends AbstractTimeEntity {
 
     private LocalDateTime usedDt;
 
+    private boolean checkedState;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_seq")
     private com.mozi.moziserver.model.entity.User user;
