@@ -268,6 +268,7 @@ public class UserChallengeService {
         }
 
         userChallenge.setStartDate(newStartDate);
+        userChallenge.setEndDate(newStartDate.plusDays(6));
 
         userChallengeRepository.save(userChallenge);
     }
