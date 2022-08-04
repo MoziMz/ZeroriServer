@@ -96,6 +96,13 @@ public class UserChallengeService {
             throw ResponseError.BadRequest.PAST_START_DATE.getResponseException();
         }
 
+        Optional<UserChallenge> endedUserChallenge = userChallengeRepository.findUserChallengeByUserSeqAndChallengeAndStates(userSeq, challenge, Arrays.asList(UserChallengeStateType.END));
+        if (endedUserChallenge.isPresent()) {
+            if (endedUserChallenge.get().getEndDate().equals(today)) {
+                throw ResponseError.BadRequest.TODAY_ENDED_CHALLENGE.getResponseException();
+            }
+        }
+
         UserChallengeStateType stateType = UserChallengeStateType.PLAN;
         if (req.getStartDate().isEqual(today)) {
             stateType = UserChallengeStateType.DOING;
@@ -105,6 +112,7 @@ public class UserChallengeService {
                 .user(user)
                 .challenge(challenge)
                 .startDate(req.getStartDate())
+                .endDate(req.getStartDate().plusDays(6))
                 .state(stateType)
                 .build();
 
@@ -218,6 +226,7 @@ public class UserChallengeService {
 
     @Transactional
     public void quitUserChallenge(Long userSeq, Long userChallengeSeq) {
+        LocalDate today = LocalDate.now();
         UserChallenge userChallenge = getUserChallenge(userSeq, userChallengeSeq);
 
         if (!UserChallengeStateType.activeTypes.contains(userChallenge.getState())) {
@@ -225,6 +234,7 @@ public class UserChallengeService {
         }
 
         userChallenge.setState(UserChallengeStateType.END);
+        userChallenge.setEndDate(today);
 
         userChallengeRepository.save(userChallenge);
     }

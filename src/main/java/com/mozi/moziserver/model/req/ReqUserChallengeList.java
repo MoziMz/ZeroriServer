@@ -16,5 +16,4 @@ public class ReqUserChallengeList {
     private LocalDate endDate;
 
     private Long ChallengeSeq;
-
 }

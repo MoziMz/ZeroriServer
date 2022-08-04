@@ -34,7 +34,8 @@ public interface ResponseError {
         ALREADY_EXISTS_ANIMAL_NAME("already exists animal name"),
         INVALID_USER_ISLAND_OPEN("invalid user island open"),
         ALREADY_EXISTS_CONFIRM_LIKE("already exists confirm like"),
-        ALREADY_CHECKED_BOARD("already checked board");
+        ALREADY_CHECKED_BOARD("already checked board"),
+        TODAY_ENDED_CHALLENGE("today ended challenge");
 
 
         // INVALID 는 한가지로 명확하지 않을때 쓴다.

@@ -44,7 +44,7 @@ public class ConfigurationController {
             @RequestParam(name = "questionCategory", required = true) QuestionCategory questionCategory,
             @RequestPart(name = "image", required = false) MultipartFile image
     ) {
-        // TODO @ModelAttribute 사용 request 객체로 받는 방향으로 전환?
+        // TODO @RequestPart 사용 request 객체로 받는 방향으로 전환?
         ReqQuestionCreate reqQuestionCreate = new ReqQuestionCreate();
         reqQuestionCreate.setEmail(email);
         reqQuestionCreate.setTitle(title);

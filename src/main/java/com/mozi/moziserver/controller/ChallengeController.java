@@ -66,7 +66,6 @@ public class ChallengeController {
             @ApiParam(hidden = true) @SessionUser Long userSeq,
             @Valid ReqChallengeList req
     ) {
-
         List<ChallengeScrap> challengeScrapList=challengeScrapService.getChallengeScrapList(userSeq);
 
         List<Challenge> challengeList=challengeService.getChallengeList(userSeq, req);

@@ -54,31 +54,6 @@ public class UserChallengeRepositoryImpl extends QuerydslRepositorySupport imple
             Integer pageSize,
             Long prevLastUserChallengeSeq
     ){
-
-//        final Predicate[] predicates = new Predicate[]{
-//                predicateOptional(qPost.seq::lt, prevLastPostSeq)
-//        };
-//
-//        return from(qPost)
-//                .select(new QPostProjection(qPost, qPostLike, qPostBookmark))
-//                //.innerJoin(qPost.user, qUser).fetchJoin()
-////                .leftJoin(qPost.pictures, qPostPicture).fetchJoin()
-//                .leftJoin(qPostLike)
-//                .on(qPostLike.postSeq.eq(qPost.seq)
-//                        .and(qPostLike.userSeq.eq(userSeq)))
-//                .leftJoin(qPostBookmark)
-//                .on(qPostBookmark.postSeq.eq(qPost.seq)
-//                        .and(qPostBookmark.userSeq.eq(userSeq)))
-//                .where(predicates)
-//                .where(qPost.user.seq.eq(userSeq))
-//                .orderBy(qPost.seq.desc())
-//                .limit(pageSize)
-//                .fetch()
-//                .stream()
-//                .distinct()
-//                .map(PostProjection::getPost)
-//                .collect(Collectors.toList());
-
         final Predicate[] predicates = new Predicate[]{
                 predicateOptional(qUserChallenge.seq::lt, prevLastUserChallengeSeq),
                 predicateOptional(qUserChallenge.user.seq::eq, userSeq)
@@ -87,14 +62,13 @@ public class UserChallengeRepositoryImpl extends QuerydslRepositorySupport imple
         return from(qUserChallenge)
                 .innerJoin(qUserChallenge.challenge, qChallenge)
                     .fetchJoin()
-                .where(predicates)
                 .orderBy(qUserChallenge.startDate.desc())
+                .where(predicates)
                 .limit(pageSize)
                 .fetch()
                 .stream()
                 .distinct()
                 .collect(Collectors.toList());
-
     }
 
 

@@ -5,6 +5,7 @@ import com.mozi.moziserver.model.mappedenum.ResultListConverter;
 import com.mozi.moziserver.model.mappedenum.UserChallengeResultType;
 import com.mozi.moziserver.model.mappedenum.UserChallengeStateType;
 import lombok.*;
+import org.apache.tomcat.jni.Local;
 import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
@@ -30,6 +31,8 @@ public class UserChallenge extends AbstractTimeEntity {
     private UserChallengeStateType state;
 
     private LocalDate startDate;
+
+    private LocalDate endDate;
 
     @Builder.Default
     @Convert(converter = ResultListConverter.class)
