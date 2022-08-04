@@ -351,7 +351,6 @@ public class ConfirmService {
         confirmRepository.decrementLikeCnt(confirm.getSeq());
     }
 
-    @Transactional
     public ResWeekConfirm getWeekConfirm(){
         LocalDateTime today = LocalDateTime.now();
 

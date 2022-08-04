@@ -7,5 +7,5 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface UserPointRecordRepositorySupport {
-    List<UserPointRecord> findByUserAndDate(User user, LocalDateTime startDateTime, LocalDateTime endDateTime);
+    List<UserPointRecord> findByUserAndPeriod(User user, LocalDateTime startDateTime, LocalDateTime endDateTime);
 }
