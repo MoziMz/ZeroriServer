@@ -251,6 +251,18 @@ public class IslandService {
         }
     }
 
+    @Transactional
+    public void firstCreateUserIsland(User user){
+
+        UserIsland firstUserIsland = UserIsland.builder()
+                .type(1)
+                .user(user)
+                .rewardLevel(1)
+                .build();
+        userIslandRepository.save(firstUserIsland);
+
+    }
+
     private void withTransaction(Runnable runnable) {
         DefaultTransactionDefinition definition = new DefaultTransactionDefinition();
 

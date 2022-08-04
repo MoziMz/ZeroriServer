@@ -59,5 +59,15 @@ public class UserRewardService {
         return sumPoint;
     }
 
+    @Transactional
+    public void firstCreateUserReward(User user){
+
+        UserReward userReward = UserReward.builder()
+                .user(user)
+                .point(0)
+                .build();
+        userRewardRepository.save(userReward);
+    }
+
 }
 

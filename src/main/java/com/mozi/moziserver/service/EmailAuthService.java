@@ -33,13 +33,15 @@ public class EmailAuthService {
     private final EmailAuthRepository emailAuthRepository;
     private final UserAuthRepository userAuthRepository;
     private final UserRepository userRepository;
-    private final UserRewardRepository userRewardRepository;
+    private final UserRewardService userRewardService;
 
     private final PostboxMessageAnimalService postboxMessageAnimalService;
 
     private final AnimalRepository animalRepository;
 
     private final UserIslandRepository userIslandRepository;
+
+    private final IslandService islandService;
 
     @Value("${spring.mail.username}")
     private String emailAddress;
@@ -266,22 +268,14 @@ public class EmailAuthService {
                 userRepository.save(user);
 
                 // UserIsland 생성
-                UserIsland firstUserIsland = UserIsland.builder()
-                        .type(1)
-                        .user(user)
-                        .rewardLevel(1)
-                        .build();
-                userIslandRepository.save(firstUserIsland);
+                islandService.firstCreateUserIsland(user);
 
                 //동물의 편지 생성
                 Animal firstAnimal = animalRepository.findByIslandTypeAndIslandLevel(1,2);
                 postboxMessageAnimalService.createPostboxMessageAnimal(user,firstAnimal);
 
-                UserReward userReward = UserReward.builder()
-                        .user(user)
-                        .point(0)
-                        .build();
-                userRewardRepository.save(userReward);
+                //UserReword 생성
+                userRewardService.firstCreateUserReward(user);
             });
         } catch (DataIntegrityViolationException e) {
             if (JpaUtil.isDuplicateKeyException(e)) {

@@ -3,6 +3,7 @@ package com.mozi.moziserver.service;
 import com.mozi.moziserver.common.JpaUtil;
 import com.mozi.moziserver.common.UserState;
 import com.mozi.moziserver.httpException.ResponseError;
+import com.mozi.moziserver.model.entity.Animal;
 import com.mozi.moziserver.model.entity.User;
 import com.mozi.moziserver.model.entity.UserAuth;
 import com.mozi.moziserver.model.entity.UserFcm;
@@ -10,6 +11,7 @@ import com.mozi.moziserver.model.mappedenum.UserAuthType;
 import com.mozi.moziserver.model.req.ReqResign;
 import com.mozi.moziserver.model.req.ReqUserSignIn;
 import com.mozi.moziserver.model.req.ReqUserSignUp;
+import com.mozi.moziserver.repository.AnimalRepository;
 import com.mozi.moziserver.repository.UserAuthRepository;
 import com.mozi.moziserver.repository.UserFcmRepository;
 import com.mozi.moziserver.repository.UserRepository;
@@ -23,6 +25,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import java.util.List;
 import java.util.Optional;
@@ -33,7 +38,6 @@ import static com.mozi.moziserver.common.Constant.EMAIL_REGEX;
 @Service
 @RequiredArgsConstructor
 public class UserService {
-
     private final UserRepository userRepository;
     private final UserAuthRepository userAuthRepository;
     private final UserFcmRepository userFcmRepository;
@@ -41,6 +45,11 @@ public class UserService {
     private final UserSocialAuthenticationProvider userSocialAuthenticationProvider;
     private final PasswordEncoder passwordEncoder;
     private final EmailAuthService emailAuthService;
+    private final PlatformTransactionManager transactionManager;
+    private final IslandService islandService;
+    private final AnimalRepository animalRepository;
+    private final PostboxMessageAnimalService postboxMessageAnimalService;
+    private final UserRewardService userRewardService;
 
     public User signUp(ReqUserSignUp reqUserSignUp) {
 
@@ -138,19 +147,33 @@ public class UserService {
             return;
         }
 
-        User user = new User();
-        userRepository.save(user);
+        withTransaction(() -> {
 
-        if (user.getSeq() == null) {
-            return;
-        }
+            User user = new User();
+            userRepository.save(user);
 
-        UserAuth userAuth = new UserAuth();
-        userAuth.setType(UserAuthType.KAKAO);
-        userAuth.setId(kakaoSocialId);
-        userAuth.setUser(user);
+            if (user.getSeq() == null) {
+                return;
+            }
 
-        userAuthRepository.save(userAuth);
+            UserAuth userAuth = new UserAuth();
+            userAuth.setType(UserAuthType.KAKAO);
+            userAuth.setId(kakaoSocialId);
+            userAuth.setUser(user);
+
+            userAuthRepository.save(userAuth);
+
+
+            // UserIsland 생성
+            islandService.firstCreateUserIsland(user);
+
+            //동물의 편지 생성
+            Animal firstAnimal = animalRepository.findByIslandTypeAndIslandLevel(1,2);
+            postboxMessageAnimalService.createPostboxMessageAnimal(user,firstAnimal);
+
+            //UserReword 생성
+            userRewardService.firstCreateUserReward(user);
+        });
     }
 
     private void appleSignUp(ReqUserSignIn reqUserSignIn) {
@@ -162,19 +185,32 @@ public class UserService {
             return;
         }
 
-        User user = new User();
-        userRepository.save(user);
+        withTransaction(() -> {
 
-        if (user.getSeq() == null) {
-            return;
-        }
+            User user = new User();
+            userRepository.save(user);
 
-        UserAuth userAuth = new UserAuth();
-        userAuth.setType(UserAuthType.APPLE);
-        userAuth.setId(appleSocialId);
-        userAuth.setUser(user);
+            if (user.getSeq() == null) {
+                return;
+            }
 
-        userAuthRepository.save(userAuth);
+            UserAuth userAuth = new UserAuth();
+            userAuth.setType(UserAuthType.APPLE);
+            userAuth.setId(appleSocialId);
+            userAuth.setUser(user);
+
+            userAuthRepository.save(userAuth);
+
+            // UserIsland 생성
+            islandService.firstCreateUserIsland(user);
+
+            //동물의 편지 생성
+            Animal firstAnimal = animalRepository.findByIslandTypeAndIslandLevel(1,2);
+            postboxMessageAnimalService.createPostboxMessageAnimal(user,firstAnimal);
+
+            //UserReword 생성
+            userRewardService.firstCreateUserReward(user);
+        });
     }
 
     private void facebookSignUp(ReqUserSignIn reqUserSignIn) {
@@ -364,5 +400,17 @@ public class UserService {
 
         userRepository.save(user);
         // TODO DeleteLog에 삭제된 회원정보 넣기
+    }
+
+    private void withTransaction(Runnable runnable) {
+        DefaultTransactionDefinition definition = new DefaultTransactionDefinition();
+
+        TransactionStatus status = transactionManager.getTransaction(definition);
+        try {
+            runnable.run();
+            transactionManager.commit(status);
+        } catch (Exception e) {
+            transactionManager.rollback(status);
+        }
     }
 }
