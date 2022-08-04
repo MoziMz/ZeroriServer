@@ -24,7 +24,10 @@ public class UserRewardService {
     final UserPointRecordRepository userPointRecordRepository;
 
     public UserReward getUserReward(Long userSeq) {
-        User user = userRepository.getById(userSeq);
+
+        User user = userRepository.findById(userSeq)
+                .orElseThrow(ResponseError.NotFound.USER_NOT_EXISTS::getResponseException);
+
         return userRewardRepository.findByUser(user);
     }
     public int getUserPoint(Long userSeq) {
