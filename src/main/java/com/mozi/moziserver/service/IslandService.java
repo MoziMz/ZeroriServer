@@ -42,8 +42,8 @@ public class IslandService {
         return island;
     }
 
-    private IslandImg getIslandImg(Integer type,Integer level) {
-        IslandImg islandImg = islandImgRepository.findByTypeAndLevel(type,level);
+    private IslandImg getIslandImg(Integer type, Integer level) {
+        IslandImg islandImg = islandImgRepository.findByTypeAndLevel(type, level);
 
         if(islandImg == null){
             throw ResponseError.NotFound.ISLAND_IMG_NOT_EXISTS.getResponseException();
@@ -117,7 +117,8 @@ public class IslandService {
             String description,
             Integer maxPoint,
             Integer maxRewardLevel,
-            List<MultipartFile> islandImgUrlList
+            List<MultipartFile> islandImgUrlList,
+            List<MultipartFile> islandThumbnailImgUrlList
     ){
         final Optional<Island> optionalIsland=islandRepository.findById(type);
 
@@ -126,12 +127,14 @@ public class IslandService {
         }
 
         for(int i = 0; i < Constant.islandMaxLevel; i++){
-            String url=islandUploadFile(islandImgUrlList.get(i),i+1);
+            String imgUrl=islandUploadFile(islandImgUrlList.get(i),i+1);
+            String thumbnailImgUrl = islandUploadFile(islandThumbnailImgUrlList.get(i),i+1);
 
             final IslandImg islandImg=IslandImg.builder()
                     .type(type)
                     .level(i+1)
-                    .imgUrl(url)
+                    .imgUrl(imgUrl)
+                    .thumbnailImgUrl(thumbnailImgUrl)
                     .build();
 
             withTransaction(()->{
@@ -198,19 +201,37 @@ public class IslandService {
     public void updateIslandImg(
             Integer type,
             Integer level,
-            MultipartFile islandImgUrl
+            MultipartFile islandImgFile,
+            MultipartFile islandThumbnailImgFile
     ) {
 
-        final IslandImg islandImg=getIslandImg(type,level);
+        final IslandImg islandImg = getIslandImg(type, level);
 
-        String imgUrl = null;
-        if (islandImgUrl != null) {
+        String islandImgUrl = null;
+        if (islandImgFile != null) {
             try {
-                imgUrl = islandUploadFile(islandImgUrl,level);
+                islandImgUrl = islandUploadFile(islandImgFile,level);
             } catch (Exception e) {
                 throw new RuntimeException(e.getCause());
             }
-            islandImg.setImgUrl(imgUrl);
+            islandImg.setImgUrl(islandImgUrl);
+        }
+
+        String islandThumbnailImgUrl = null;
+        if (islandThumbnailImgFile != null) {
+            try {
+                islandThumbnailImgUrl = islandUploadFile(islandThumbnailImgFile,level);
+            } catch (Exception e) {
+                throw new RuntimeException(e.getCause());
+            }
+            islandImg.setImgUrl(islandThumbnailImgUrl);
+        }
+
+        if (islandImgUrl != null) {
+            islandImg.setImgUrl(islandImgUrl);
+        }
+        if (islandThumbnailImgUrl != null) {
+            islandImg.setThumbnailImgUrl(islandThumbnailImgUrl);
         }
 
         withTransaction(()->{

@@ -32,13 +32,15 @@ public class AdminIslandController {
             @RequestParam("description") String description,
             @RequestParam("maxPoint") Integer maxPoint,
             @RequestParam("maxRewardLevel") Integer maxRewardLevel,
-            @RequestPart(value = "islandImgUrlList",required = false) List<MultipartFile> islandImgUrlList
+            @RequestPart(value = "islandImgUrlList",required = false) List<MultipartFile> islandImgUrlList,
+            @RequestPart(value = "islandThumbnailImgUrlList",required = false) List<MultipartFile> islandThumbnailImgUrlList
     ) {
-        if (islandImgUrlList.size() != Constant.islandMaxLevel){
+        if (islandImgUrlList.size() != Constant.islandMaxLevel ||
+                islandThumbnailImgUrlList.size() != Constant.islandMaxLevel){
             throw ResponseError.BadRequest.INVALID_IMAGE.getResponseException("need to 6 images");
         }
 
-        islandService.createIsland(name,type,description,maxPoint,maxRewardLevel,islandImgUrlList);
+        islandService.createIsland(name,type,description,maxPoint,maxRewardLevel,islandImgUrlList, islandThumbnailImgUrlList);
 
 
         return new ResponseEntity<>(HttpStatus.OK);
@@ -66,12 +68,13 @@ public class AdminIslandController {
     @PutMapping(value = "/admin/islandImgs")
     public ResponseEntity<Void> updateIslandImg(
             @ApiParam(hidden = true) @SessionUser Long userSeq,
-            @RequestParam("type") Integer type,
-            @RequestParam("level") Integer level,
-            @RequestPart(value = "islandImgUrl") MultipartFile islandImgUrl
+            @RequestParam(value = "type", required = true) Integer type,
+            @RequestParam(value = "level", required = true) Integer level,
+            @RequestPart(value = "islandImg", required = false) MultipartFile islandImg,
+            @RequestPart(value = "islandThumbnailImg", required = false) MultipartFile islandThumbnailImg
     ) {
-        if (type != null || level != null || islandImgUrl != null) {
-            islandService.updateIslandImg(type,level,islandImgUrl);
+        if (islandImg != null || islandThumbnailImg != null) {
+            islandService.updateIslandImg(type, level, islandImg, islandThumbnailImg);
         }
 
         return new ResponseEntity<>(HttpStatus.OK);

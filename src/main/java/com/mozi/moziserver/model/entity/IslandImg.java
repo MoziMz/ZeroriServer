@@ -19,4 +19,6 @@ public class IslandImg extends AbstractTimeEntity {
     private Integer level;
 
     private String imgUrl;
+
+    private String thumbnailImgUrl;
 }

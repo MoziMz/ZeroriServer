@@ -38,7 +38,7 @@ public class UserIslandController {
         List<Island> islandList = islandService.getIslandList();
 
         int currentUserPoint = userRewardService.getUserPoint(userSeq);
-        int finalUserIsland = userIslandList.size();
+        int finalUserIsland = userIslandList.size() + 1;
         List<ResUserIslandList> resUserIslandLists = new LinkedList<ResUserIslandList>();
         for (int i = 0; i < islandList.size(); i++) {
             UserIsland userIsland = null;

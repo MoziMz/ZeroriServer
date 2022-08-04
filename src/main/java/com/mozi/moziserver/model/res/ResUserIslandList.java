@@ -13,6 +13,7 @@ public class ResUserIslandList {
     private String description;
     private Integer currentRequiredPoint;
     private String imgUrl = null;
+    private String thumbnailImgUrl = null;
     private boolean existenceState = false;
 
     private ResUserIslandList(Island island, UserIsland userIsland, int finalUserIsland, int currentUserPoint) {
@@ -30,6 +31,7 @@ public class ResUserIslandList {
         if (userIsland != null) {
             this.existenceState = true;
             this.imgUrl = userIsland.getIslandImg().getImgUrl();
+            this.thumbnailImgUrl = userIsland.getIslandImg().getThumbnailImgUrl();
         }
     }
 
