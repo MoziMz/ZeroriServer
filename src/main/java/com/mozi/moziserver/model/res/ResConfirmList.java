@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 public class ResConfirmList {
     private Long seq;
     private Long userSeq;
+    private String userName;
     private Long challengeSeq;
     private String nickName;
     private LocalDate date;
@@ -24,6 +25,7 @@ public class ResConfirmList {
     private ResConfirmList(Confirm confirm) {
         this.seq=confirm.getSeq();
         this.userSeq=confirm.getUser().getSeq();
+        this.userName = confirm.getUser().getNickName();
         this.challengeSeq=confirm.getChallenge().getSeq();
         this.nickName=confirm.getUser().getNickName();
         this.date=confirm.getDate();
