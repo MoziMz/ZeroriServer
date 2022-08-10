@@ -5,6 +5,7 @@ import com.mozi.moziserver.model.req.ReqUserChallengeCreate;
 import com.mozi.moziserver.model.req.ReqUserChallengeList;
 import com.mozi.moziserver.model.res.ResConfirmedUserChallenge;
 import com.mozi.moziserver.model.res.ResUserChallengeList;
+import com.mozi.moziserver.model.res.ResUserChallengeOfReward;
 import com.mozi.moziserver.security.SessionUser;
 import com.mozi.moziserver.service.UserChallengeService;
 import io.swagger.annotations.ApiOperation;
@@ -75,12 +76,12 @@ public class UserChallengeController {
 
     @ApiOperation("완료한 유저 챌린지 리스트 조회 (유저가 확인 안한 것만)")
     @GetMapping("/v1/user-challenges/end")
-    public List<ResUserChallengeList> getEndUserChallengeList(
+    public List<ResUserChallengeOfReward> getEndUserChallengeList(
             @ApiParam(hidden = true) @SessionUser Long userSeq
     ) {
         return userChallengeService.getEndUserChallengeList(userSeq)
                 .stream()
-                .map(ResUserChallengeList::of)
+                .map(ResUserChallengeOfReward::of)
                 .collect(Collectors.toList());
     }
 
