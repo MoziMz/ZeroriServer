@@ -150,7 +150,9 @@ public class ConfirmService {
 
     @Transactional
     public List<Confirm> getUserConfirmList(Long userSeq, ReqList req) {
-        return confirmRepository.findByUserByOrderDesc(userSeq, req.getPrevLastSeq(), req.getPageSize());
+        List<Confirm> confirmList = confirmRepository.findByUserByOrderDesc(userSeq, req.getPrevLastSeq(), req.getPageSize());
+
+        return setConfirmLike(userSeq, confirmList);
     }
 
     //인증 하나 조회

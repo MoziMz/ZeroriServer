@@ -9,7 +9,6 @@ import com.mozi.moziserver.model.req.ReqDeclarationCreate;
 import com.mozi.moziserver.model.req.ReqList;
 import com.mozi.moziserver.model.res.ResConfirmList;
 import com.mozi.moziserver.model.res.ResStickerList;
-import com.mozi.moziserver.model.res.ResUserConfirmList;
 import com.mozi.moziserver.model.res.ResWeekConfirm;
 import com.mozi.moziserver.security.SessionUser;
 import com.mozi.moziserver.service.ConfirmService;
@@ -77,13 +76,13 @@ public class ConfirmController {
 
     @ApiOperation("본인 스토리 전체 조회")
     @GetMapping("/v1/users/me/confirms")
-    public List<ResUserConfirmList> getUserConfirmList(
+    public List<ResConfirmList> getUserConfirmList(
             @ApiParam(hidden = true) @SessionUser Long userSeq,
             @Valid ReqList req
     ) {
         return confirmService.getUserConfirmList(userSeq, req)
                 .stream()
-                .map(ResUserConfirmList::of)
+                .map(ResConfirmList::of)
                 .collect(Collectors.toList());
     }
 

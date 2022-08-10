@@ -14,7 +14,8 @@ public class ConfirmLikeRepositoryImpl extends QuerydslRepositorySupport impleme
     public List<ConfirmLike> findAllByUserAndConfirmsIn(User user, List<Confirm> confirmList) {
         return from(qConfirmLike)
                 .innerJoin(qConfirmLike.user, qUser).fetchJoin()
-                .where(qConfirmLike.confirm.in(confirmList))
+                .where(qConfirmLike.confirm.in(confirmList)
+                        .and(qConfirmLike.user.eq(user)))
                 .fetch();
     }
 }
