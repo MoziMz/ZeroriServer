@@ -116,9 +116,9 @@ public class UserService {
             if ((auth == null || !auth.isAuthenticated()) && req.getType().isSocial()) {
                 if (req.getType() == UserAuthType.KAKAO) kakaoSignUp(req);
                 else if (req.getType() == UserAuthType.APPLE) appleSignUp(req);
+                else if(req.getType() == UserAuthType.NAVER) naverSignUp(req);
 
 //            else if(reqUserSignIn.getType() == UserAuthType.FACEBOOK) facebookSignUp(reqUserSignIn);
-//            else if(reqUserSignIn.getType() == UserAuthType.NAVER) naverSignUp(reqUserSignIn);
 //            else if(reqUserSignIn.getType() == UserAuthType.GOOGLE) googleSignUp(reqUserSignIn);
 
                 auth = authenticationManager.authenticate(reqUserSocialSignIn);
@@ -243,7 +243,41 @@ public class UserService {
     }
 
     private void naverSignUp(ReqUserSignIn reqUserSignIn) {
-        // TODO
+        final String accessToken = reqUserSignIn.getId();
+
+        final String naverSocialId = userSocialAuthenticationProvider.getNaverSocialId(accessToken);
+
+        if (naverSocialId == null) {
+            return;
+        }
+
+        withTransaction(() -> {
+
+            User user = new User();
+            userRepository.save(user);
+
+            if (user.getSeq() == null) {
+                return;
+            }
+
+            UserAuth userAuth = new UserAuth();
+            userAuth.setType(UserAuthType.NAVER);
+            userAuth.setId(naverSocialId);
+            userAuth.setUser(user);
+
+            userAuthRepository.save(userAuth);
+
+
+            // UserIsland 생성
+            islandService.firstCreateUserIsland(user);
+
+            //동물의 편지 생성
+            Animal firstAnimal = animalRepository.findByIslandTypeAndIslandLevel(1,2);
+            postboxMessageAnimalService.createPostboxMessageAnimal(user,firstAnimal);
+
+            //UserReword 생성
+            userRewardService.firstCreateUserReward(user);
+        });
     }
 
     private void googleSignUp(ReqUserSignIn reqUserSignIn) {

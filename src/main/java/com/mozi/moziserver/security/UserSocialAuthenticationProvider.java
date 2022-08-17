@@ -8,6 +8,7 @@ import com.mozi.moziserver.model.mappedenum.UserAuthType;
 import com.mozi.moziserver.repository.UserAuthRepository;
 import com.mozi.moziserver.rest.AppleClient;
 import com.mozi.moziserver.rest.KakaoClient;
+import com.mozi.moziserver.rest.NaverClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -39,6 +40,8 @@ public class UserSocialAuthenticationProvider implements AuthenticationProvider 
     private final KakaoClient kakaoClient;
 
     private final AppleClient appleClient;
+
+    private final NaverClient naverClient;
 
     @Value("${social.kakao.appId}")
     private Long kakaoAppId;
@@ -138,6 +141,24 @@ public class UserSocialAuthenticationProvider implements AuthenticationProvider 
         }
 
         return jwt.getSubject();
+    }
+
+    public String getNaverSocialId(String accessToken) {
+
+        ResponseEntity<NaverClient.ResUserByAccessToken> response = null;
+        try {
+            response = naverClient.getUserMeByAccessToken("Bearer " + accessToken);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        if (response == null
+                || response.getBody() == null
+                || response.getBody().getResponse().getId() == null) {
+            return null;
+        }
+
+        return response.getBody().getResponse().getId().toString(); // naver user id
     }
 
     private Jwt getJwt(String identityToken) {

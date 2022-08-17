@@ -32,6 +32,9 @@ social:
   apple:
     url: https://appleid.apple.com
     appId: ${APPLE_APPID}
+  naver:
+    url: https://openapi.naver.com
+
 
 cloud:
   aws:
