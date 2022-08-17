@@ -3,6 +3,7 @@ package com.mozi.moziserver.httpException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.validation.BindException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -22,6 +23,16 @@ public class ResponseExceptionHandler {
     @ExceptionHandler
     @ResponseBody
     public ResponseEntity<ResponseException> handle(MethodArgumentNotValidException e) {
+        final String message = e.getFieldError() != null
+                ? e.getFieldError().getDefaultMessage() + " (" + e.getFieldError().getField() + ")"
+                : e.getGlobalError() != null ? e.getGlobalError().getDefaultMessage() : e.getMessage();
+        ResponseException ex = ResponseError.BadRequest.METHOD_ARGUMENT_NOT_VALID.getResponseException(message);
+        return handle(ex);
+    }
+
+    @ExceptionHandler
+    @ResponseBody
+    public ResponseEntity<ResponseException> handle(BindException e) {
         final String message = e.getFieldError() != null
                 ? e.getFieldError().getDefaultMessage() + " (" + e.getFieldError().getField() + ")"
                 : e.getGlobalError() != null ? e.getGlobalError().getDefaultMessage() : e.getMessage();

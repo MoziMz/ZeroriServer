@@ -47,15 +47,33 @@ public class ChallengeService {
         );
     }
 
-    public List<Challenge> getScrappedChallengeList(Long userSeq) {
-        // TODO 페이징 기능 추가하기
+    public List<Challenge> getScrappedChallengeList(Long userSeq, ReqList req) {
         List<ChallengeScrap> challengeScrapList = challengeScrapRepository.findByUserSeq(userSeq);
 
         List<Long> challengeSeqList = challengeScrapList.stream()
                 .map(challengeScrap -> challengeScrap.getChallengeSeq())
                 .collect(Collectors.toList());
 
-        return challengeRepository.findAllBySeqIn(challengeSeqList);
+        List<Challenge> challengeList = challengeRepository.findAllBySeqIn(challengeSeqList);
+
+        int startIdx = 0;
+        if (req.getPrevLastSeq() != null) {
+            for (int i = 0; i < challengeList.size(); i++) {
+                Challenge challenge = challengeList.get(i);
+                if (challenge.getSeq().equals(req.getPrevLastSeq())) {
+                    startIdx = i + 1;
+                    break;
+                }
+            }
+        }
+        if (startIdx == challengeList.size()) {
+            return new ArrayList<Challenge>();
+        }
+
+        int endIdx = startIdx + req.getPageSize() - 1 < challengeList.size() ? startIdx + req.getPageSize() - 1 :
+                challengeList.size() - 1;
+
+        return challengeList.subList(startIdx, endIdx + 1);
     }
 
 

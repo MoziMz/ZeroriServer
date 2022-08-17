@@ -89,10 +89,11 @@ public class ChallengeController {
     @ApiOperation("스크랩한 챌린지 리스트 조회")
     @GetMapping("v1/challenges/scrap")
     public List<ResChallengeList> getScrappedChallengeList(
-            @ApiParam(hidden = true) @SessionUser Long userSeq
+            @ApiParam(hidden = true) @SessionUser Long userSeq,
+            @Valid ReqList req
     ) {
         // TODO 페이징 기능 추가하기
-        List<Challenge> challengeList = challengeService.getScrappedChallengeList(userSeq);
+        List<Challenge> challengeList = challengeService.getScrappedChallengeList(userSeq, req);
 
         boolean isScrapped = true;
         return challengeList.stream()
