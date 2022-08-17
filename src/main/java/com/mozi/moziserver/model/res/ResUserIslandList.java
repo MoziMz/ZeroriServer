@@ -11,6 +11,7 @@ public class ResUserIslandList {
     private Integer type;
     private String name;
     private String description;
+    private Integer totalRequiredPoint;
     private Integer currentRequiredPoint;
     private String imgUrl = null;
     private String thumbnailImgUrl = null;
@@ -20,6 +21,7 @@ public class ResUserIslandList {
         this.type = island.getType();
         this.name = island.getName();
         this.description = island.getDescription();
+        this.totalRequiredPoint=island.getMaxPoint();
         this.currentRequiredPoint = 0;
         if (island.getType() >= finalUserIsland) {
             if (island.getType() == finalUserIsland) {
