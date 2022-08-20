@@ -11,7 +11,7 @@ import java.util.Optional;
 
 public interface ChallengeRepositorySupport {
 
-    Optional<Challenge> findBySeq (Long seq );
+    Optional<Challenge> findBySeq (Long seq);
 
     List<Challenge> findAll (
             Long userSeq,

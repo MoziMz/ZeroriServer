@@ -1,5 +1,6 @@
 package com.mozi.moziserver.controller;
 
+import com.mozi.moziserver.httpException.ResponseError;
 import com.mozi.moziserver.model.entity.*;
 import com.mozi.moziserver.model.req.ReqChallengeList;
 import com.mozi.moziserver.model.req.ReqList;
@@ -34,6 +35,7 @@ public class ChallengeController {
     private final ChallengeScrapService challengeScrapService;
 
     private final ConfirmService confirmService;
+    private final UserService userService;
 
     @ApiOperation("챌린지 하나 조회")
     @GetMapping("/v1/challenges/{seq}")
@@ -42,6 +44,8 @@ public class ChallengeController {
             @PathVariable Long seq
     ) {
         Challenge challenge = challengeService.getChallenge(seq);
+        User user = userService.getUserBySeq(userSeq)
+                .orElseThrow(ResponseError.InternalServerError.UNEXPECTED_ERROR::getResponseException);
 
         Optional<UserChallenge> optionalUserChallenge = userChallengeService.getActiveUserChallenge(userSeq, challenge);
 
@@ -53,7 +57,7 @@ public class ChallengeController {
 
         List<ResChallengeTagList> challengeTagList = challengeTagService.getChallengeTagList(seq);
 
-        ChallengeScrap challengeScrap = challengeService.getChallengeScrap(seq, userSeq);
+        ChallengeScrap challengeScrap = challengeService.getChallengeScrap(challenge, user);
 
         Optional<Confirm> optionalConfirm=confirmService.getConfirmByChallenge(challenge);
 
@@ -75,7 +79,7 @@ public class ChallengeController {
         for(Challenge challenge: challengeList){
             Boolean flag=false;
             for(ChallengeScrap cs: challengeScrapList){
-                if(cs.getChallengeSeq()==challenge.getSeq()){
+                if(cs.getChallenge().equals(challenge)){
                     challengeLists.add(ResChallengeList.of(challenge,true));
                     flag=true;
                 }
@@ -92,7 +96,6 @@ public class ChallengeController {
             @ApiParam(hidden = true) @SessionUser Long userSeq,
             @Valid ReqList req
     ) {
-        // TODO 페이징 기능 추가하기
         List<Challenge> challengeList = challengeService.getScrappedChallengeList(userSeq, req);
 
         boolean isScrapped = true;

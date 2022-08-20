@@ -10,12 +10,16 @@ import javax.persistence.*;
 @AllArgsConstructor
 @Builder
 @Entity(name = "challenge_scrap")
-@IdClass(ChallengeUserSeq.class)
 public class ChallengeScrap extends AbstractTimeEntity{
-
     @Id
-    private Long userSeq;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long seq;
 
-    @Id
-    private Long challengeSeq;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="challenge_seq")
+    private Challenge challenge;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="user_seq")
+    User user;
 }

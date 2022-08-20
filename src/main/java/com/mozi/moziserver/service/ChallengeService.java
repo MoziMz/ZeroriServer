@@ -28,6 +28,7 @@ public class ChallengeService {
     private final ChallengeScrapRepository challengeScrapRepository;
     private final ChallengeRecordRepository challengeRecordRepository;
     private final ChallengeThemeRepository challengeThemeRepository;
+    private final UserService userService;
 
     // 챌린지 하나 조회
     public Challenge getChallenge(Long seq) {
@@ -48,38 +49,25 @@ public class ChallengeService {
     }
 
     public List<Challenge> getScrappedChallengeList(Long userSeq, ReqList req) {
-        List<ChallengeScrap> challengeScrapList = challengeScrapRepository.findByUserSeq(userSeq);
+        User user = userService.getUserBySeq(userSeq)
+                .orElseThrow(ResponseError.InternalServerError.UNEXPECTED_ERROR::getResponseException);
 
-        List<Long> challengeSeqList = challengeScrapList.stream()
-                .map(challengeScrap -> challengeScrap.getChallengeSeq())
+        ChallengeScrap prevChallengeScrap = null;
+        if ( req.getPrevLastSeq() != null ) {
+            Challenge prevChallenge = challengeRepository.findBySeq(req.getPrevLastSeq())
+                    .orElseThrow(ResponseError.BadRequest.INVALID_SEQ::getResponseException);
+
+            prevChallengeScrap = challengeScrapRepository.findByChallengeAndUser(prevChallenge, user);
+        }
+        Long prevChallengeScrapSeq = prevChallengeScrap != null ? prevChallengeScrap.getSeq() : null;
+
+        return challengeScrapRepository.findByUser(user, prevChallengeScrapSeq,req.getPageSize()).stream()
+                .map(ChallengeScrap::getChallenge)
                 .collect(Collectors.toList());
-
-        List<Challenge> challengeList = challengeRepository.findAllBySeqIn(challengeSeqList);
-
-        int startIdx = 0;
-        if (req.getPrevLastSeq() != null) {
-            for (int i = 0; i < challengeList.size(); i++) {
-                Challenge challenge = challengeList.get(i);
-                if (challenge.getSeq().equals(req.getPrevLastSeq())) {
-                    startIdx = i + 1;
-                    break;
-                }
-            }
-        }
-        if (startIdx == challengeList.size()) {
-            return new ArrayList<Challenge>();
-        }
-
-        int endIdx = startIdx + req.getPageSize() - 1 < challengeList.size() ? startIdx + req.getPageSize() - 1 :
-                challengeList.size() - 1;
-
-        return challengeList.subList(startIdx, endIdx + 1);
     }
 
-
-    @Transactional
-    public ChallengeScrap getChallengeScrap(Long challengeSeq, Long userSeq) {
-        return challengeScrapRepository.findByChallengeSeqAndUserSeq(challengeSeq, userSeq);
+    public ChallengeScrap getChallengeScrap(Challenge challenge, User user) {
+        return challengeScrapRepository.findByChallengeAndUser(challenge, user);
 
     }
 
@@ -94,8 +82,8 @@ public class ChallengeService {
                 .orElseThrow(ResponseError.BadRequest.INVALID_SEQ::getResponseException);
 
         ChallengeScrap challengeScrap = ChallengeScrap.builder()
-                .challengeSeq(challenge.getSeq())
-                .userSeq(user.getSeq())
+                .challenge(challenge)
+                .user(user)
                 .build();
 
         try {
@@ -178,5 +166,4 @@ public class ChallengeService {
     public List<ChallengeTheme> getChallengeThemeList() {
         return challengeThemeRepository.findAll();
     }
-
 }
