@@ -46,6 +46,8 @@ dependencies {
     // image type detect
     implementation 'org.apache.tika:tika-core:2.3.0'
 
+    implementation 'com.google.firebase:firebase-admin:9.0.0'
+
     //Swagger
     implementation 'io.springfox:springfox-boot-starter:3.0.0'
 

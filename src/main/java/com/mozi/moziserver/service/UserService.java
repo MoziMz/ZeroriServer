@@ -117,9 +117,7 @@ public class UserService {
                 if (req.getType() == UserAuthType.KAKAO) kakaoSignUp(req);
                 else if (req.getType() == UserAuthType.APPLE) appleSignUp(req);
                 else if(req.getType() == UserAuthType.NAVER) naverSignUp(req);
-
-//            else if(reqUserSignIn.getType() == UserAuthType.FACEBOOK) facebookSignUp(reqUserSignIn);
-//            else if(reqUserSignIn.getType() == UserAuthType.GOOGLE) googleSignUp(reqUserSignIn);
+                else if(req.getType() == UserAuthType.GOOGLE) googleSignUp(req);
 
                 auth = authenticationManager.authenticate(reqUserSocialSignIn);
             }
@@ -151,33 +149,7 @@ public class UserService {
             return;
         }
 
-        withTransaction(() -> {
-
-            User user = new User();
-            userRepository.save(user);
-
-            if (user.getSeq() == null) {
-                return;
-            }
-
-            UserAuth userAuth = new UserAuth();
-            userAuth.setType(UserAuthType.KAKAO);
-            userAuth.setId(kakaoSocialId);
-            userAuth.setUser(user);
-
-            userAuthRepository.save(userAuth);
-
-
-            // UserIsland 생성
-            islandService.firstCreateUserIsland(user);
-
-            //동물의 편지 생성
-            Animal firstAnimal = animalRepository.findByIslandTypeAndIslandLevel(1,2);
-            postboxMessageAnimalService.createPostboxMessageAnimal(user,firstAnimal);
-
-            //UserReword 생성
-            userRewardService.firstCreateUserReward(user);
-        });
+        createSocialUser(UserAuthType.KAKAO, kakaoSocialId);
     }
 
     private void appleSignUp(ReqUserSignIn reqUserSignIn) {
@@ -189,57 +161,7 @@ public class UserService {
             return;
         }
 
-        withTransaction(() -> {
-
-            User user = new User();
-            userRepository.save(user);
-
-            if (user.getSeq() == null) {
-                return;
-            }
-
-            UserAuth userAuth = new UserAuth();
-            userAuth.setType(UserAuthType.APPLE);
-            userAuth.setId(appleSocialId);
-            userAuth.setUser(user);
-
-            userAuthRepository.save(userAuth);
-
-            // UserIsland 생성
-            islandService.firstCreateUserIsland(user);
-
-            //동물의 편지 생성
-            Animal firstAnimal = animalRepository.findByIslandTypeAndIslandLevel(1,2);
-            postboxMessageAnimalService.createPostboxMessageAnimal(user,firstAnimal);
-
-            //UserReword 생성
-            userRewardService.firstCreateUserReward(user);
-        });
-    }
-
-    private void facebookSignUp(ReqUserSignIn reqUserSignIn) {
-//        final String accessToken = reqUserSignIn.getId();
-//
-//        final FacebookRestClient.FacebookUserInfo facebookUserInfo =
-//                facebookClient.getUserInfo(accessToken, facebookAppId, facebookSecret);
-//
-//        if(facebookUserInfo == null || StringUtils.isEmpty(facebookUserInfo.getId()))
-//            return;
-//
-//        String name = facebookUserInfo.getName();
-//
-//        User user = new User();
-//        int insertCount = userRepository.insertUser(user);
-//
-//        if(user.getSeq() == null)
-//            return;
-//
-//        UserAuth userAuth = new UserAuth();
-//        userAuth.setType(UserAuthType.FACEBOOK);
-//        userAuth.setId(facebookUserInfo.getId());
-//        userAuth.setUserSeq(user.getSeq());
-//
-//        userAuthRepository.insertUserAuth(userAuth);
+        createSocialUser(UserAuthType.APPLE, appleSocialId);
     }
 
     private void naverSignUp(ReqUserSignIn reqUserSignIn) {
@@ -251,6 +173,22 @@ public class UserService {
             return;
         }
 
+        createSocialUser(UserAuthType.NAVER, naverSocialId);
+    }
+
+    private void googleSignUp(ReqUserSignIn reqUserSignIn) {
+        final String accessToken = reqUserSignIn.getId();
+
+        final String googleSocialId = userSocialAuthenticationProvider.getGoogleSocialId(accessToken);
+
+        if (googleSocialId == null) {
+            return;
+        }
+
+        createSocialUser(UserAuthType.GOOGLE, googleSocialId);
+    }
+
+    private void createSocialUser(UserAuthType userAuthType, String socialId) {
         withTransaction(() -> {
 
             User user = new User();
@@ -261,12 +199,11 @@ public class UserService {
             }
 
             UserAuth userAuth = new UserAuth();
-            userAuth.setType(UserAuthType.NAVER);
-            userAuth.setId(naverSocialId);
+            userAuth.setType(userAuthType);
+            userAuth.setId(socialId);
             userAuth.setUser(user);
 
             userAuthRepository.save(userAuth);
-
 
             // UserIsland 생성
             islandService.firstCreateUserIsland(user);
@@ -278,10 +215,6 @@ public class UserService {
             //UserReword 생성
             userRewardService.firstCreateUserReward(user);
         });
-    }
-
-    private void googleSignUp(ReqUserSignIn reqUserSignIn) {
-        // TODO
     }
 
     public Optional<UserAuth> findUserAuthByTypeAndId(UserAuthType type, String id) {

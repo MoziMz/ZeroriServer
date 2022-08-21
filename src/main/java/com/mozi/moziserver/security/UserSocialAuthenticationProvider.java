@@ -2,6 +2,9 @@ package com.mozi.moziserver.security;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthException;
+import com.google.firebase.auth.FirebaseToken;
 import com.mozi.moziserver.model.entity.User;
 import com.mozi.moziserver.model.entity.UserAuth;
 import com.mozi.moziserver.model.mappedenum.UserAuthType;
@@ -10,6 +13,7 @@ import com.mozi.moziserver.rest.AppleClient;
 import com.mozi.moziserver.rest.KakaoClient;
 import com.mozi.moziserver.rest.NaverClient;
 import lombok.RequiredArgsConstructor;
+import org.apache.tika.utils.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -80,12 +84,10 @@ public class UserSocialAuthenticationProvider implements AuthenticationProvider 
 
         if (userAuth.getType().isSocial()) {
             socialId =
-                    userAuth.getType() == UserAuthType.KAKAO ? getKakaoSocialId(userAuth.getId()) :
-                            userAuth.getType() == UserAuthType.APPLE ? getAppleSocialId(userAuth.getId()) :
-                             userAuth.getType() == UserAuthType.NAVER ? getNaverSocialId(userAuth.getId()) : null;
-
-//                type == UserAuthType.FACEBOOK ? getFacebookSocialId(userAuth) :
-//                type == UserAuthType.GOOGLE ? getGoogleSocialId(userAuth)
+                    userAuth.getType() == UserAuthType.KAKAO ? getKakaoSocialId(userAuth.getId())
+                            : userAuth.getType() == UserAuthType.APPLE ? getAppleSocialId(userAuth.getId())
+                            : userAuth.getType() == UserAuthType.NAVER ? getNaverSocialId(userAuth.getId())
+                            : userAuth.getType() == UserAuthType.GOOGLE ? getGoogleSocialId(userAuth.getId()) : null;
 
             if (socialId == null)
                 return new ResUserSignInFail(); // new ResUserSocialSignIn();
@@ -159,6 +161,23 @@ public class UserSocialAuthenticationProvider implements AuthenticationProvider 
         }
 
         return response.getBody().getResponse().getId(); // naver user id
+    }
+
+    public String getGoogleSocialId(String accessToken) {
+
+        FirebaseToken decodedToken = null;
+        try {
+            decodedToken = FirebaseAuth.getInstance().verifyIdToken(accessToken);
+        } catch (FirebaseAuthException e) {
+            e.printStackTrace();
+        }
+
+        if (decodedToken == null
+                || StringUtils.isEmpty(decodedToken.getUid())) {
+            return null;
+        }
+
+        return decodedToken.getUid(); // google user id
     }
 
     private Jwt getJwt(String identityToken) {

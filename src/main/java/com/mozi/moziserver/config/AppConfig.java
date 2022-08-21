@@ -5,6 +5,9 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
+import com.google.auth.oauth2.GoogleCredentials;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.FirebaseOptions;
 import com.mozi.moziserver.common.StringToLocalDateConverter;
 import com.mozi.moziserver.repository.UserRepository;
 import com.mozi.moziserver.security.SessionUserArgResolver;
@@ -16,6 +19,8 @@ import org.springframework.format.FormatterRegistry;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import javax.annotation.PostConstruct;
+import java.io.IOException;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -23,6 +28,16 @@ import java.util.List;
 public class AppConfig implements WebMvcConfigurer {
     @Autowired
     UserRepository userRepository;
+
+    @PostConstruct
+    public void postConstruct() throws IOException {
+        FirebaseOptions options = FirebaseOptions.builder()
+                .setCredentials(GoogleCredentials.getApplicationDefault())
+                .setDatabaseUrl("https://mozi-162e4.firebaseio.com/")
+                .build();
+
+        FirebaseApp.initializeApp(options);
+    }
 
     //Korea Time
     @Bean
