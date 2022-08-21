@@ -3,10 +3,12 @@ package com.mozi.moziserver.controller;
 import com.mozi.moziserver.model.entity.PostboxMessageAnimal;
 import com.mozi.moziserver.model.entity.PreparationItem;
 import com.mozi.moziserver.model.req.ReqList;
+import com.mozi.moziserver.model.res.ResAnimal;
 import com.mozi.moziserver.model.res.ResPostboxMessageAdminList;
 import com.mozi.moziserver.model.res.ResPostboxMessageAnimal;
 import com.mozi.moziserver.model.res.ResPostboxMessageAnimalList;
 import com.mozi.moziserver.security.SessionUser;
+import com.mozi.moziserver.service.AnimalService;
 import com.mozi.moziserver.service.PostboxMessageAdminService;
 import com.mozi.moziserver.service.PostboxMessageAnimalService;
 import io.swagger.annotations.ApiOperation;
@@ -29,6 +31,7 @@ public class PostboxMessageController {
 
     private final PostboxMessageAdminService postboxMessageAdminService;
     private final PostboxMessageAnimalService postboxMessageAnimalService;
+    private final AnimalService animalService;
 
     @ApiOperation("관리자의 편지 리스트 조회")
     @GetMapping("/v1/postbox-message-admins")
@@ -78,5 +81,14 @@ public class PostboxMessageController {
         postboxMessageAdminService.checkMessage(userSeq, seq);
 
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @ApiOperation("동물 하나 조회")
+    @GetMapping("v1/animals/{seq}")
+    public ResAnimal getAnimal(
+            @ApiParam(hidden = true) @SessionUser Long userSeq,
+            @PathVariable("seq") Long seq
+    ) {
+        return ResAnimal.of(animalService.getAnimal(seq));
     }
 }

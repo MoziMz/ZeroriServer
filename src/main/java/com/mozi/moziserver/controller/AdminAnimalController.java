@@ -47,13 +47,15 @@ public class AdminAnimalController {
             @RequestParam(name = "explanation") @NotBlank String explanation,
             @RequestParam(name = "islandType") @NotBlank Integer islandType,
             @RequestParam(name = "islandLevel") @NotBlank Integer islandLevel,
-            @RequestPart MultipartFile image
+            @RequestPart MultipartFile image,
+            @RequestPart MultipartFile fullBodyImage
+
     ) {
-        if (image == null) {
+        if (image == null || fullBodyImage == null) {
             throw ResponseError.BadRequest.INVALID_IMAGE.getResponseException("need to images");
         }
 
-        animalService.createAnimal(name, explanation, image, islandType, islandLevel);
+        animalService.createAnimal(name, explanation, image, fullBodyImage, islandType, islandLevel);
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
@@ -65,11 +67,12 @@ public class AdminAnimalController {
             @PathVariable("seq") Long seq,
             @RequestParam(name = "name", required = false) String name,
             @RequestParam(name = "explanation", required = false) String explanation,
-            @RequestPart(required = false) MultipartFile image
+            @RequestPart(required = false) MultipartFile image,
+            @RequestPart(required = false) MultipartFile fullBodyImage
     ) {
 
-        if (name != null || explanation != null || image != null) {
-            animalService.updateAnimal(seq, name, explanation, image);
+        if (name != null || explanation != null || image != null || fullBodyImage != null) {
+            animalService.updateAnimal(seq, name, explanation, image, fullBodyImage);
         }
 
         return new ResponseEntity<>(HttpStatus.OK);

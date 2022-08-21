@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 
 @Getter
 public class ResPostboxMessageAnimal {
+    private Long animalSeq;
     private String animalName;
     private String content;
     private String imgUrl;
@@ -19,6 +20,7 @@ public class ResPostboxMessageAnimal {
     private LocalDateTime updatedAt;
 
     private ResPostboxMessageAnimal(PostboxMessageAnimal postboxMessageAnimal, List<PreparationItem> preparationItemList) {
+        this.animalSeq = postboxMessageAnimal.getAnimal().getSeq();
         this.animalName = postboxMessageAnimal.getAnimal().getName();
         this.content = postboxMessageAnimal.getContent();
         this.imgUrl = postboxMessageAnimal.getAnimal().getImgUrl();

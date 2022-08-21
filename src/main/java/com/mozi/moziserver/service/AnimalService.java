@@ -30,7 +30,7 @@ public class AnimalService {
 
     private final PlatformTransactionManager transactionManager;
 
-    private Animal getAnimal(Long seq) {
+    public Animal getAnimal(Long seq) {
         Animal animal = animalRepository.findById(seq)
                 .orElseThrow(ResponseError.NotFound.ANIMAL_NOT_EXISTS::getResponseException);
 
@@ -47,7 +47,7 @@ public class AnimalService {
         return animalRepository.findAll();
     }
 
-    public void createAnimal(String name, String explanation, MultipartFile image, Integer islandType, Integer islandLevel) {
+    public void createAnimal(String name, String explanation, MultipartFile image, MultipartFile fullBodyImage, Integer islandType, Integer islandLevel) {
 
         String imgUrl = null;
         try {
@@ -56,10 +56,18 @@ public class AnimalService {
             throw new RuntimeException(e.getCause());
         }
 
+        String fullBodyImgUrl = null;
+        try {
+            fullBodyImgUrl = s3ImageService.uploadFile(fullBodyImage, "animal");
+        } catch (Exception e) {
+            throw new RuntimeException(e.getCause());
+        }
+
         Animal animal = Animal.builder()
                 .name(name)
                 .explanation(explanation)
                 .imgUrl(imgUrl)
+                .fullBodyImgUrl(fullBodyImgUrl)
                 .islandType(islandType)
                 .islandLevel(islandLevel)
                 .build();
@@ -76,7 +84,7 @@ public class AnimalService {
         }
     }
 
-    public void updateAnimal(Long animalSeq, String name, String explanation, MultipartFile image) {
+    public void updateAnimal(Long animalSeq, String name, String explanation, MultipartFile image, MultipartFile fullBodyImage) {
 
         final Animal animal = getAnimal(animalSeq);
 
@@ -88,6 +96,16 @@ public class AnimalService {
                 throw new RuntimeException(e.getCause());
             }
             animal.setImgUrl(imgUrl);
+        }
+
+        String fullBodyImgUrl = null;
+        if (fullBodyImage != null) {
+            try {
+                fullBodyImgUrl = s3ImageService.uploadFile(fullBodyImage, "animal");
+            } catch (Exception e) {
+                throw new RuntimeException(e.getCause());
+            }
+            animal.setFullBodyImgUrl(fullBodyImgUrl);
         }
 
         if (name != null && name.length() != 0 && animal.getName() != name) {
