@@ -19,11 +19,11 @@ public interface NaverClient {
     @Getter
     @Setter
     class ResUserByAccessToken {
-        private Response response;
+        private ResUserInfo response;
     }
     @Getter
     @Setter
-    class Response {
+    class ResUserInfo {
         private String email;
         private String id;
     }

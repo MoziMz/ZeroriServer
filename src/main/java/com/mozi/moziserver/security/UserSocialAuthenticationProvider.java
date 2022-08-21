@@ -81,10 +81,10 @@ public class UserSocialAuthenticationProvider implements AuthenticationProvider 
         if (userAuth.getType().isSocial()) {
             socialId =
                     userAuth.getType() == UserAuthType.KAKAO ? getKakaoSocialId(userAuth.getId()) :
-                            userAuth.getType() == UserAuthType.APPLE ? getAppleSocialId(userAuth.getId()) : null;
+                            userAuth.getType() == UserAuthType.APPLE ? getAppleSocialId(userAuth.getId()) :
+                             userAuth.getType() == UserAuthType.NAVER ? getNaverSocialId(userAuth.getId()) : null;
 
 //                type == UserAuthType.FACEBOOK ? getFacebookSocialId(userAuth) :
-//                type == UserAuthType.NAVER ? getNaverSocialId(userAuth) :
 //                type == UserAuthType.GOOGLE ? getGoogleSocialId(userAuth)
 
             if (socialId == null)
@@ -154,11 +154,11 @@ public class UserSocialAuthenticationProvider implements AuthenticationProvider 
 
         if (response == null
                 || response.getBody() == null
-                || response.getBody().getResponse().getId() == null) {
+                || response.getBody().getResponse() == null) {
             return null;
         }
 
-        return response.getBody().getResponse().getId().toString(); // naver user id
+        return response.getBody().getResponse().getId(); // naver user id
     }
 
     private Jwt getJwt(String identityToken) {
