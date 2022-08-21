@@ -44,6 +44,7 @@ public class ChallengeController {
             @PathVariable Long seq
     ) {
         Challenge challenge = challengeService.getChallenge(seq);
+
         User user = userService.getUserBySeq(userSeq)
                 .orElseThrow(ResponseError.InternalServerError.UNEXPECTED_ERROR::getResponseException);
 

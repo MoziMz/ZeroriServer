@@ -16,6 +16,5 @@ public class Tag extends AbstractTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long seq;
 
-    @Enumerated(EnumType.STRING)
-    private ChallengeTagType name;
+    private String name;
 }

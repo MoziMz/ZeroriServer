@@ -67,7 +67,7 @@ public class ResChallenge {
                 .map(ResUserChallengeRecord::of)
                 .orElse(null);
         this.challengeRecord = ResChallengeRecord.of(challenge.getChallengeRecord());
-        this.tagList = challenge.getTagList().stream().map(ResChallengeTagList::of).collect(Collectors.toList());
+        this.tagList = challenge.getChallengeTagList().stream().map(ResChallengeTagList::of).collect(Collectors.toList());
         this.isScrap=challengeScrap!=null?true:false;
         this.recentConfirmDateTime = optionalConfirm.isPresent()? optionalConfirm.get().getCreatedAt(): null;
     }

@@ -39,24 +39,25 @@ public class ChallengeRepositoryImpl extends QuerydslRepositorySupport implement
     @Override
     public List<Challenge> findAll (
             Long userSeq,
-            List<ChallengeTagType> tagTypeList,
+            List<Long> tagSeqList,
             List<Long> themeSeqList,
+            String keyword,
             Integer pageSize,
             Long prevLastPostSeq
     ) {
         final Predicate[] predicates = new Predicate[]{
-                predicateOptional(qChallenge.seq::lt,prevLastPostSeq),
-                predicateOptional(qChallenge.themeSeq::in,themeSeqList),
-                predicateOptional(qChallenge.mainTag::in, tagTypeList)
+                predicateOptional(qChallenge.seq::lt, prevLastPostSeq),
+                predicateOptional(qChallenge.themeSeq::in, themeSeqList),
+                predicateOptional(qChallengeTag.tag.seq::in, tagSeqList),
+                keyword != null ? predicateOptional(qChallenge.name::like, '%' + keyword + '%') : null
         };
 
-        List<Challenge> challengeList = from(qChallenge)
+        return from(qChallenge)
+                .innerJoin(qChallengeTag).on(qChallenge.seq.eq(qChallengeTag.challenge.seq)).fetchJoin()
                 .where(predicates)
                 .orderBy(qChallenge.seq.desc())
                 .limit(pageSize)
                 .fetch();
-
-        return challengeList;
     }
 
     private <T> Predicate predicateOptional(final Function<T, Predicate> whereFunc, final T value) {

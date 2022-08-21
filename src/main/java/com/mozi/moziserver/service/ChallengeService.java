@@ -41,8 +41,9 @@ public class ChallengeService {
 
         return challengeRepository.findAll(
                 userSeq,
-                req.getChallengeTagType(),
-                req.getThemeSeq(),
+                req.getTagSeqList(),
+                req.getThemeSeqList(),
+                req.getKeyword(),
                 req.getPageSize(),
                 req.getPrevLastPostSeq()
         );

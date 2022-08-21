@@ -16,7 +16,6 @@ import java.util.List;
 @DynamicUpdate
 @Entity(name = "confirm")
 public class Confirm extends AbstractTimeEntity {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long seq;

@@ -37,7 +37,7 @@ public class Challenge extends AbstractTimeEntity {
 
     @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name="challenge_seq")
-    private List<ChallengeTag> tagList;
+    private List<ChallengeTag> challengeTagList;
 
     @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name="challenge_seq")

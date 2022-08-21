@@ -6,7 +6,7 @@ import lombok.Getter;
 
 @Getter
 public class ResChallengeTagList {
-    private ChallengeTagType name;
+    private String name;
 
     private Integer turn;
 

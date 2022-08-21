@@ -14,10 +14,11 @@ import java.util.List;
 @Getter
 @Setter
 public class ReqChallengeList {
+    private List<Long> tagSeqList;
 
-    private List<ChallengeTagType> challengeTagType;
+    private List<Long> themeSeqList;
 
-    private List<Long> themeSeq;
+    private String keyword;
 
     @Min(1L)
     private Long prevLastPostSeq;
