@@ -14,7 +14,7 @@ public interface ConfirmRepositorySupport {
     List<Confirm> findByUserByOrderDesc(Long userSeq,Long prevLastConfirmSeq, Integer pageSize);
     Confirm findBySeq(Long ConfirmSeq);
 
-    void updateDeclarationState(Confirm confirm,Byte state);
+    void updateDeclarationCnt(Confirm confirm,Byte state,Integer cnt);
 
     List<Confirm> findAll(Long prevLastConfirmSeq, Integer pageSize);
 

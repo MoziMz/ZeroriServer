@@ -37,7 +37,8 @@ public interface ResponseError {
         ALREADY_CHECKED_BOARD("already checked board"),
         TODAY_ENDED_CHALLENGE("today ended challenge"),
         ALREADY_CHECKED_EMAIL("already checked email"),
-        INVALID_ID_OR_PASSWORD("invalid id or password");
+        INVALID_ID_OR_PASSWORD("invalid id or password"),
+        INVALID_CONFIRM("invalid confirm");
 
 
         // INVALID 는 한가지로 명확하지 않을때 쓴다.

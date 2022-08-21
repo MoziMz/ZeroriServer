@@ -104,13 +104,14 @@ public class ConfirmRepositoryImpl extends QuerydslRepositorySupport implements 
     }
 
     @Override
-    public void updateDeclarationState(Confirm confirm,Byte state){
+    public void updateDeclarationCnt(Confirm confirm,Byte state,Integer cnt){
         update(qConfirm)
-                .set(qConfirm.confirmState,state)
+                .set(qConfirm.declarationState,state)
+                .set(qConfirm.declarationCnt,cnt)
                 .where(qConfirm.eq(confirm))
                 .execute();
 
-        entityManager.clear();
+        return;
     }
 
     @Override

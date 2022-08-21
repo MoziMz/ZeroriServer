@@ -9,6 +9,7 @@ import lombok.Getter;
 
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -17,8 +18,7 @@ import java.util.stream.Collectors;
 public class ResConfirm {
     private String nickName;
 
-    @NotNull
-    private LocalDate date;
+    private LocalDateTime createdAt;
 
     private String imgUrl;
 
@@ -31,7 +31,7 @@ public class ResConfirm {
     private ResConfirm(Confirm confirm,List<ConfirmSticker> confirmStickerList) {
 
         this.nickName=confirm.getUser().getNickName();
-        this.date=confirm.getDate();
+        this.createdAt = confirm.getCreatedAt();
         this.imgUrl=confirm.getImgUrl();
         this.challengeName=confirm.getChallenge().getName();
         this.challengeThemeSeq=confirm.getChallenge().getThemeSeq();

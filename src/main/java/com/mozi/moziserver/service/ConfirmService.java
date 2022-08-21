@@ -58,7 +58,6 @@ public class ConfirmService {
 
     //인증 생성
     public void createConfirm(Long userSeq, Long challengeSeq, MultipartFile image) {
-        LocalDate today = LocalDate.now();
 
         User user = userRepository.findById(userSeq)
                 .orElseThrow(ResponseError.NotFound.USER_NOT_EXISTS::getResponseException);
@@ -82,9 +81,8 @@ public class ConfirmService {
         Confirm confirm = Confirm.builder()
                 .user(user)
                 .challenge(challenge)
-                .date(today)
                 .imgUrl(imgUrl)
-                .confirmState(state)
+                .declarationState(state)
                 .build();
 
         withTransaction(() -> {
@@ -97,7 +95,7 @@ public class ConfirmService {
                 throw ResponseError.BadRequest.ALREADY_CREATED.getResponseException(); // for duplicate exception
             }
 
-            userChallengeService.updateUserChallengeResultComplete(curUserChallenge, today);
+            userChallengeService.updateUserChallengeResultComplete(curUserChallenge,LocalDate.now());
 
             ChallengeRecord challengeRecord = challengeRecordRepository.findByChallenge(challenge);
 
@@ -112,7 +110,13 @@ public class ConfirmService {
     public List<Confirm> getConfirmList(Long userSeq, ReqList req) {
         List<Confirm> confirmList = confirmRepository.findAll(req.getPrevLastSeq(), req.getPageSize());
 
-        return setConfirmLike(userSeq, confirmList);
+        setConfirmLike(userSeq, confirmList);
+
+        setConfirmDeclaration(userSeq, confirmList);
+
+        return confirmList.stream()
+                .filter(c -> !c.isDeclared())
+                .collect(Collectors.toList());
     }
 
     // 챌린지별 인증 조회
@@ -123,7 +127,13 @@ public class ConfirmService {
 
         List<Confirm> confirmList = confirmRepository.findAllByChallenge(challenge, req.getPrevLastSeq(), req.getPageSize());
 
-        return setConfirmLike(userSeq, confirmList);
+        setConfirmLike(userSeq, confirmList);
+
+        setConfirmDeclaration(userSeq, confirmList);
+
+        return confirmList.stream()
+                .filter(c -> !c.isDeclared())
+                .collect(Collectors.toList());
     }
 
     @Transactional
@@ -131,7 +141,7 @@ public class ConfirmService {
         return confirmRepository.findByChallenge(challenge);
     }
 
-    private List<Confirm> setConfirmLike(Long userSeq, List<Confirm> confirmList) {
+    private void setConfirmLike(Long userSeq, List<Confirm> confirmList) {
         User user = userService.getUserBySeq(userSeq)
                 .orElseThrow(ResponseError.InternalServerError.UNEXPECTED_ERROR::getResponseException);
 
@@ -145,14 +155,32 @@ public class ConfirmService {
             confirm.setLiked(isLiked);
         }
 
-        return confirmList;
+        //return confirmList;
+    }
+
+    private void setConfirmDeclaration(Long userSeq, List<Confirm> confirmList) {
+        User user = userService.getUserBySeq(userSeq)
+                .orElseThrow(ResponseError.InternalServerError.UNEXPECTED_ERROR::getResponseException);
+
+        List<Declaration> declarationList = declarationRepository.findByUser(user);
+        HashSet<Long> declarationConfirmSeqSet = new HashSet<>(declarationList.stream()
+                .map( declaration -> declaration.getConfirm().getSeq())
+                .collect(Collectors.toSet()));
+
+        for (Confirm confirm: confirmList) {
+            boolean isDeclared  = declarationConfirmSeqSet.contains(confirm.getSeq());
+            confirm.setDeclared(isDeclared);
+        }
+
     }
 
     @Transactional
     public List<Confirm> getUserConfirmList(Long userSeq, ReqList req) {
         List<Confirm> confirmList = confirmRepository.findByUserByOrderDesc(userSeq, req.getPrevLastSeq(), req.getPageSize());
 
-        return setConfirmLike(userSeq, confirmList);
+        setConfirmLike(userSeq, confirmList);
+
+        return confirmList;
     }
 
     //인증 하나 조회
@@ -187,27 +215,33 @@ public class ConfirmService {
         } // FIXME DuplicateKeyException
     }
 
-    @Transactional
-    public void updateConfirmState(Confirm confirm) {
-
-        Byte state = 1;
-
-        confirmRepository.updateDeclarationState(
-                confirm, state
-        );
-    }
-
     //신고 생성
     @Transactional
-    public void createDeclaration(Long confirmSeq, DeclarationType type) {
+    public void createDeclaration(Long userSeq, Long confirmSeq, DeclarationType type) {
 
-        Confirm confirm = confirmRepository.findBySeq(confirmSeq);
+        User user = userRepository.findById(userSeq)
+                .orElseThrow(ResponseError.NotFound.USER_NOT_EXISTS::getResponseException);
 
+       Confirm confirm = confirmRepository.findBySeq(confirmSeq);
+       if(confirm == null){
+           throw ResponseError.NotFound.CONFIRM_NOT_EXISTS.getResponseException();
+       }
 
-        updateConfirmState(confirm);
+       if(user.equals(confirm.getUser())){
+           throw ResponseError.BadRequest.INVALID_CONFIRM.getResponseException();
+       }
 
-        Declaration declaration = Declaration.builder()
+       Declaration declaration=declarationRepository.findByConfirmAndUser(confirm,user);
+       if(declaration != null){
+           throw ResponseError.BadRequest.ALREADY_CREATED.getResponseException();
+       }
+
+        Byte state=1;
+        confirmRepository.updateDeclarationCnt(confirm,state,confirm.getDeclarationCnt()+1);
+
+        declaration = Declaration.builder()
                 .confirm(confirm)
+                .user(user)
                 .declarationType(type)
                 .build();
 
@@ -376,7 +410,9 @@ public class ConfirmService {
         List<Confirm> confirmList = confirmRepository.findByUserAndPeriod(
                user, challenge, req.getStartDate().atTime(0,0), req.getEndDate().atTime(23,59));
 
-        return setConfirmLike(userSeq, confirmList);
+        setConfirmLike(userSeq, confirmList);
+
+        return confirmList;
     }
 
     private void withTransaction(Runnable runnable) {

@@ -22,6 +22,10 @@ public class Declaration extends AbstractTimeEntity{
     @JoinColumn(name="confirm_seq")
     private Confirm confirm;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="user_seq")
+    private User user;
+
     @Enumerated(EnumType.STRING)
     @Column(name="type")
     private DeclarationType declarationType;

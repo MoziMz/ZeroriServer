@@ -5,6 +5,7 @@ import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -28,14 +29,11 @@ public class Confirm extends AbstractTimeEntity {
     @JoinColumn(name = "challenge_seq")
     Challenge challenge;
 
-    @Column(name = "date")
-    private LocalDate date;
-
     @Column(name="img_url")
     private String imgUrl;
 
     @Column(name="declaration_state")
-    private Byte confirmState;
+    private Byte declarationState;
 
     @Builder.Default
     private Integer likeCnt = 0;
@@ -48,6 +46,12 @@ public class Confirm extends AbstractTimeEntity {
     @JoinColumn(name="confirm_seq")
     private List<Declaration> DeclarationList;
 
+    @Builder.Default
+    private Integer declarationCnt = 0;
+
     @Transient
     boolean isLiked;
+
+    @Transient
+    boolean isDeclared;
 }

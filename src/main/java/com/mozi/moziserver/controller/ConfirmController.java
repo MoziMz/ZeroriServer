@@ -98,13 +98,13 @@ public class ConfirmController {
     }
 
     @ApiOperation("신고 생성")
-    @PostMapping("/v1/confirms/{seq}/declarations")
+    @PostMapping("/v1/confirms/{confirmSeq}/declarations")
     public ResponseEntity<Void> createDeclaration(
             @ApiParam(hidden = true) @SessionUser Long userSeq,
-            @PathVariable Long seq,
+            @PathVariable Long confirmSeq,
             @RequestBody @Valid ReqDeclarationCreate req
     ) {
-        confirmService.createDeclaration(seq, req.getType());
+        confirmService.createDeclaration(userSeq, confirmSeq, req.getType());
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
