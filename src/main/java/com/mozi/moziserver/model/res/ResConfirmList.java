@@ -21,7 +21,7 @@ public class ResConfirmList {
     private Integer likeCnt;
     private boolean isLiked;
     private List<ResConfirmStickerList> resConfirmStickerList;
-    private LocalDateTime created_at;
+    private LocalDateTime createdAt;
 
     private ResConfirmList(Confirm confirm) {
         this.seq=confirm.getSeq();
@@ -38,7 +38,7 @@ public class ResConfirmList {
                 .map(ResConfirmStickerList::of)
                 .collect(Collectors.toList());
         this.isLiked = confirm.isLiked();
-        this.created_at = confirm.getCreatedAt();
+        this.createdAt = confirm.getCreatedAt();
     }
 
     public static ResConfirmList of(Confirm confirm) { return new ResConfirmList(confirm); }
