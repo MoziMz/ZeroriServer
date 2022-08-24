@@ -43,6 +43,7 @@ public class UserChallengeRepositoryImpl extends QuerydslRepositorySupport imple
                 .where(qUserChallenge.user.seq.eq(userSeq)
                     .and(qUserChallenge.challenge.eq(challenge))
                     .and(qUserChallenge.state.in(states)))
+                .orderBy(qUserChallenge.endDate.desc())
                 .fetch()
                 .stream()
                 .findFirst();
