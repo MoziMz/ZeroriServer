@@ -69,12 +69,12 @@ public class UserChallengeController {
     }
 
     @ApiOperation("유저 챌린지 그만두기")
-    @PutMapping("/v1/user-challenges/{seq}/quit")
-    public ResponseEntity<Void> quitUserChallenge(
+    @PutMapping("/v1/user-challenges/{seq}/stop")
+    public ResponseEntity<Void> stopUserChallenge(
             @ApiParam(hidden = true) @SessionUser Long userSeq,
             @PathVariable("seq") Long userChallengeSeq
     ) {
-        userChallengeService.quitUserChallenge(userSeq, userChallengeSeq);
+        userChallengeService.stopUserChallenge(userSeq, userChallengeSeq);
 
         return new ResponseEntity<>(HttpStatus.OK);
     }

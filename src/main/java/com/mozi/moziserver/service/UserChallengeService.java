@@ -85,24 +85,7 @@ public class UserChallengeService {
         Challenge challenge = challengeRepository.findById(req.getChallengeSeq())
                 .orElseThrow(ResponseError.NotFound.CHALLENGE_NOT_EXISTS::getResponseException);
 
-        boolean isExists = userChallengeRepository.findUserChallengeByUserSeqAndChallengeAndStates(userSeq, challenge, Arrays.asList(UserChallengeStateType.PLAN, UserChallengeStateType.DOING))
-                .isPresent();
-        if (isExists) {
-            throw ResponseError.BadRequest.ALREADY_EXISTS_USER_CHALLENGE_IN_PROGRESS.getResponseException();
-        }
-
         LocalDate today = LocalDate.now();
-
-        if (req.getStartDate().isBefore(today)) {
-            throw ResponseError.BadRequest.PAST_START_DATE.getResponseException();
-        }
-
-        Optional<UserChallenge> endedUserChallenge = userChallengeRepository.findUserChallengeByUserSeqAndChallengeAndStates(userSeq, challenge, Arrays.asList(UserChallengeStateType.END));
-        if (endedUserChallenge.isPresent()) {
-            if (endedUserChallenge.get().getEndDate().equals(today)) {
-                throw ResponseError.BadRequest.TODAY_ENDED_CHALLENGE.getResponseException();
-            }
-        }
 
         UserChallengeStateType stateType = UserChallengeStateType.PLAN;
         if (req.getStartDate().isEqual(today)) {
@@ -116,12 +99,6 @@ public class UserChallengeService {
                 .endDate(req.getStartDate().plusDays(6))
                 .state(stateType)
                 .build();
-
-        isExists = userChallengeRepository.findUserChallengeByUserSeqAndChallengeAndStates(userSeq, challenge, Arrays.asList(UserChallengeStateType.PLAN, UserChallengeStateType.DOING))
-                .isPresent();
-        if (isExists) {
-            throw ResponseError.BadRequest.ALREADY_EXISTS_USER_CHALLENGE_IN_PROGRESS.getResponseException();
-        }
 
         userChallengeRepository.save(userChallenge);
 
@@ -226,15 +203,19 @@ public class UserChallengeService {
 
 
     @Transactional
-    public void quitUserChallenge(Long userSeq, Long userChallengeSeq) {
+    public void stopUserChallenge(Long userSeq, Long userChallengeSeq) {
         LocalDate today = LocalDate.now();
         UserChallenge userChallenge = getUserChallenge(userSeq, userChallengeSeq);
+
+        if (userChallenge.getState().equals(UserChallengeStateType.STOP)){
+            throw ResponseError.BadRequest.ALREADY_STOPPED_USER_CHALLENGE.getResponseException();
+        }
 
         if (!UserChallengeStateType.activeTypes.contains(userChallenge.getState())) {
             throw ResponseError.BadRequest.ALREADY_ENDED_USER_CHALLENGE.getResponseException();
         }
 
-        userChallenge.setState(UserChallengeStateType.END);
+        userChallenge.setState(UserChallengeStateType.STOP);
         userChallenge.setEndDate(today);
         userChallenge.setCheckedState(true);
 

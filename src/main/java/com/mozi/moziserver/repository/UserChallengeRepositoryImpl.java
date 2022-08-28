@@ -23,15 +23,12 @@ public class UserChallengeRepositoryImpl extends QuerydslRepositorySupport imple
 
     @Override
     public Optional<UserChallenge> findBySeq(Long seq) {
-        return from(qUserChallenge)
+        return Optional.ofNullable(from(qUserChallenge)
                 .select(qUserChallenge)
                 .innerJoin(qUserChallenge.challenge, qChallenge).fetchJoin()
                 .innerJoin(qUserChallenge.user, qUser).fetchJoin()
                 .where(qUserChallenge.seq.eq(seq))
-                .fetch()
-                .stream()
-                .distinct()
-                .findFirst();
+                .fetchFirst());
     }
 
 
@@ -39,13 +36,12 @@ public class UserChallengeRepositoryImpl extends QuerydslRepositorySupport imple
     @Override
     public Optional<UserChallenge> findUserChallengeByUserSeqAndChallengeAndStates(Long userSeq, Challenge challenge, Collection<UserChallengeStateType> states){
 
-        return from(qUserChallenge)
+        return Optional.ofNullable(from(qUserChallenge)
                 .where(qUserChallenge.user.seq.eq(userSeq)
                     .and(qUserChallenge.challenge.eq(challenge))
                     .and(qUserChallenge.state.in(states)))
-                .fetch()
-                .stream()
-                .findFirst();
+                .orderBy(qUserChallenge.endDate.desc())
+                .fetchFirst());
     }
 
     @Override
@@ -83,7 +79,8 @@ public class UserChallengeRepositoryImpl extends QuerydslRepositorySupport imple
                 qUserChallenge.user.seq.eq(userSeq),
                 qUserChallenge.startDate.gt(startDate.minusDays(7)),
                 qUserChallenge.startDate.loe(endDate),
-                predicateOptional(qUserChallenge.challenge.seq::eq, challengeSeq)
+                predicateOptional(qUserChallenge.challenge.seq::eq, challengeSeq),
+                qUserChallenge.state.notIn(UserChallengeStateType.STOP)
         };
 
         return from(qUserChallenge)
