@@ -29,6 +29,11 @@ public class UserChallengeService {
     private final UserRewardRepository userRewardRepository;
     private final UserChallengeRecordRepository userChallengeRecordRepository;
 
+    public UserChallenge getUserChallenge(Long userChallengeSeq) {
+        return userChallengeRepository.findBySeq(userChallengeSeq)
+                .orElseThrow(ResponseError.NotFound.USER_CHALLENGE_NOT_EXISTS::getResponseException);
+    }
+
     private UserChallenge getUserChallenge(Long userSeq, Long userChallengeSeq) {
         UserChallenge userChallenge = userChallengeRepository.findById(userChallengeSeq)
                 .orElseThrow(ResponseError.NotFound.USER_CHALLENGE_NOT_EXISTS::getResponseException);

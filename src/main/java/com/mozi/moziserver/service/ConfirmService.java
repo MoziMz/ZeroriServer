@@ -120,7 +120,6 @@ public class ConfirmService {
     }
 
     // 챌린지별 인증 조회
-    @Transactional
     public List<Confirm> getConfirmListByChallenge(Long userSeq, Long challengeSeq, ReqList req) {
         final Challenge challenge = challengeRepository.findById(challengeSeq)
                 .orElseThrow(ResponseError.NotFound.CHALLENGE_NOT_EXISTS::getResponseException);
@@ -136,7 +135,17 @@ public class ConfirmService {
                 .collect(Collectors.toList());
     }
 
-    @Transactional
+    public List<Confirm> getConfirmListByUserChallenge(Long userSeq, Long userChallengeSeq) {
+        final UserChallenge userChallenge = userChallengeService.getUserChallenge(userChallengeSeq);
+
+        return confirmRepository.findByUserAndPeriod(
+                userChallenge.getUser(),
+                userChallenge.getChallenge(),
+                userChallenge.getStartDate().atTime(0,0),
+                userChallenge.getEndDate().plusDays(1).atTime(0,0)
+        );
+    }
+
     public Optional<Confirm> getConfirmByChallenge(Challenge challenge) {
         return confirmRepository.findByChallenge(challenge);
     }
@@ -408,7 +417,7 @@ public class ConfirmService {
                 .orElseThrow(ResponseError.BadRequest.INVALID_SEQ::getResponseException);
 
         List<Confirm> confirmList = confirmRepository.findByUserAndPeriod(
-               user, challenge, req.getStartDate().atTime(0,0), req.getEndDate().atTime(23,59));
+               user, challenge, req.getStartDate().atTime(0,0), req.getEndDate().plusDays(1).atTime(0,0));
 
         setConfirmLike(userSeq, confirmList);
 

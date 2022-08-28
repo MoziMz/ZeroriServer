@@ -33,7 +33,7 @@ public class ChallengeService {
     // 챌린지 하나 조회
     public Challenge getChallenge(Long seq) {
         return challengeRepository.findBySeq(seq)
-                .orElseThrow(ResponseError.NotFound.USER_CHALLENGE_NOT_EXISTS::getResponseException);
+                .orElseThrow(ResponseError.NotFound.CHALLENGE_NOT_EXISTS::getResponseException);
     }
 
     // 챌린지 모두 조회

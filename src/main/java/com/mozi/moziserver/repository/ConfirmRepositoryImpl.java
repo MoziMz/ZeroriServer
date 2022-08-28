@@ -146,17 +146,20 @@ public class ConfirmRepositoryImpl extends QuerydslRepositorySupport implements 
     }
 
     @Override
-    public List<Confirm> findByUserAndPeriod(User user,Challenge challenge, LocalDateTime startDateTime,LocalDateTime endDateTime){
+    public List<Confirm> findByUserAndPeriod(User user, Challenge challenge, LocalDateTime startDateTime, LocalDateTime endDateTime) {
+        Predicate[] predicates = new Predicate[]{
+                qConfirm.createdAt.goe(startDateTime),
+                qConfirm.createdAt.lt(endDateTime),
+                qConfirm.user.eq(user),
+                qConfirm.challenge.eq(challenge)
+        };
+
         return from(qConfirm)
                 .innerJoin(qConfirm.challenge, qChallenge).fetchJoin()
                 .innerJoin(qConfirm.user, qUser).fetchJoin()
-                .where(qConfirm.user.eq(user)
-                        .and(qConfirm.challenge.eq(challenge)))
-                .where(qConfirm.createdAt.after(startDateTime)
-                        .and(qConfirm.createdAt.before(endDateTime)))
+                .where(predicates)
                 .fetch();
     }
-
 
     private <T> Predicate predicateOptional(final Function<T, Predicate> whereFunc, final T value) {
         return value != null ? whereFunc.apply(value) : null;

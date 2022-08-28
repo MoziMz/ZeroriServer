@@ -1,8 +1,6 @@
 package com.mozi.moziserver.controller;
 
 import com.mozi.moziserver.httpException.ResponseError;
-import com.mozi.moziserver.model.entity.ConfirmLike;
-import com.mozi.moziserver.model.entity.Sticker;
 import com.mozi.moziserver.model.req.ReqConfirmOfUser;
 import com.mozi.moziserver.model.req.ReqConfirmSticker;
 import com.mozi.moziserver.model.req.ReqDeclarationCreate;
@@ -69,6 +67,18 @@ public class ConfirmController {
             @Valid ReqList req
     ) {
         return confirmService.getConfirmListByChallenge(userSeq, challengeSeq, req)
+                .stream()
+                .map(ResConfirmList::of)
+                .collect(Collectors.toList());
+    }
+
+    @ApiOperation("유저 챌린지별 스토리 전체 조회")
+    @GetMapping("/v1/user-challenges/{userChallengeSeq}/confirms")
+    public List<ResConfirmList> getConfirmListNyUserChallenge(
+            @ApiParam(hidden = true) @SessionUser Long userSeq,
+            @PathVariable Long userChallengeSeq
+    ) {
+        return confirmService.getConfirmListByUserChallenge(userSeq, userChallengeSeq)
                 .stream()
                 .map(ResConfirmList::of)
                 .collect(Collectors.toList());
