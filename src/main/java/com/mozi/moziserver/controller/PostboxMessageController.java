@@ -74,7 +74,7 @@ public class PostboxMessageController {
 
     @ApiOperation("관리자 편지 확인 완료")
     @PutMapping("/v1/postbox-message-admins/{seq}/checked")
-    public ResponseEntity<Void> checkedUserChallenge(
+    public ResponseEntity<Void> checkUserChallenge(
             @ApiParam(hidden = true) @SessionUser Long userSeq,
             @PathVariable("seq") Long seq
     ) {

@@ -57,6 +57,17 @@ public class UserChallengeController {
                 .collect(Collectors.toList());
     }
 
+    @ApiOperation("유저 챌린지 생성 가능한지 확인")
+    @GetMapping("/v1/user-challenges/creatable")
+    public ResponseEntity<Void> checkCreatableUserChallenge(
+            @ApiParam(hidden = true) @SessionUser Long userSeq,
+            @Valid ReqChallengeAndDate req
+    ) {
+        userChallengeService.checkCreatableUserChallenge(userSeq, req);
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
     @ApiOperation("유저 챌린지 생성")
     @PostMapping("/v1/user-challenges")
     public ResponseEntity<Void> createUserChallenge(
@@ -111,16 +122,5 @@ public class UserChallengeController {
                 .stream()
                 .map(ResConfirmedUserChallenge::of)
                 .collect(Collectors.toList());
-    }
-
-    @ApiOperation("유저 챌린지 생성 가능한지 확인")
-    @GetMapping("/v1/user-challenges/creatable")
-    public ResponseEntity<Void> getCreatableUserChallenge(
-            @ApiParam(hidden = true) @SessionUser Long userSeq,
-            @Valid ReqChallengeAndDate req
-    ) {
-        userChallengeService.isCreatableUserChallenge(userSeq,req);
-        
-        return new ResponseEntity<>(HttpStatus.OK);
     }
 }
