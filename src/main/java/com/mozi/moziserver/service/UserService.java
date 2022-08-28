@@ -31,6 +31,8 @@ import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static com.mozi.moziserver.common.Constant.EMAIL_DOMAIN_GROUPS;
 import static com.mozi.moziserver.common.Constant.EMAIL_REGEX;
@@ -66,6 +68,10 @@ public class UserService {
         List<String> currentDomainGroup = getCurrentEmailDomainGroup(email);
         if (emailId == null || currentDomainGroup == null) {
             throw ResponseError.BadRequest.INVALID_EMAIL.getResponseException();
+        }
+
+        if (!isValidPassword(reqUserSignUp.getPw())) {
+            throw ResponseError.BadRequest.INVALID_PASSWORD.getResponseException();
         }
 
         for (String domain : currentDomainGroup) {
@@ -243,6 +249,13 @@ public class UserService {
             throw ResponseError.BadRequest.SOCIAL_LOGIN_USER.getResponseException("social login user cannot change password");
         }
 
+        //기존 비밀번호와 새 비밀번호가 같은지 확인
+        checkPassword(userAuth.getPw(),pw);
+
+        if (!isValidPassword(pw)) {
+            throw ResponseError.BadRequest.INVALID_PASSWORD.getResponseException();
+        }
+
         userAuth.setPw(passwordEncoder.encode(pw));
 
         try {
@@ -303,6 +316,15 @@ public class UserService {
         return userRepository.existsByNickName(nickName);
     }
 
+    public boolean checkPassword(String oldPw,String newPw) {
+
+        if(passwordEncoder.matches(newPw,oldPw)) {
+            throw ResponseError.BadRequest.MATCH_AN_EXISTING_PASSWORD.getResponseException();
+        }
+
+        return true;
+    }
+
     private boolean isValidEmail(String email) {
         if (!email.matches(EMAIL_REGEX)) {
             return false;
@@ -311,6 +333,15 @@ public class UserService {
         List<String> currentDomainGroup = getCurrentEmailDomainGroup(email);
 
         return currentDomainGroup != null;
+    }
+
+    public boolean isValidPassword(String pw) {
+        Pattern pattern = Pattern.compile("^(?=.*[A-Za-z])(?=.*[0-9])(?=.*[!%^&*.])[A-Za-z[0-9]!%^&*.]{8,16}$");
+        Matcher matcher = pattern.matcher(pw);
+        if (matcher.matches()) {
+            return true;
+        }
+        return false;
     }
 
     private List<String> getCurrentEmailDomainGroup(String email) {
