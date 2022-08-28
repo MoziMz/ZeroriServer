@@ -4,6 +4,7 @@ import com.mozi.moziserver.httpException.ResponseError;
 import com.mozi.moziserver.model.entity.*;
 import com.mozi.moziserver.model.mappedenum.UserChallengeResultType;
 import com.mozi.moziserver.model.mappedenum.UserChallengeStateType;
+import com.mozi.moziserver.model.req.ReqChallengeAndDate;
 import com.mozi.moziserver.model.req.ReqList;
 import com.mozi.moziserver.model.req.ReqUserChallengeCreate;
 import com.mozi.moziserver.model.req.ReqUserChallengeList;
@@ -315,5 +316,36 @@ public class UserChallengeService {
 
         return userChallengeRecordRepository.findByUserAndConfirmCnt(userSeq,reqList.getPrevLastSeq(),reqList.getPageSize());
 
+    }
+
+    @Transactional
+    public boolean isCreatableUserChallenge(Long userSeq, ReqChallengeAndDate req){
+        User user = userRepository.findById(userSeq)
+                .orElseThrow(ResponseError.NotFound.USER_NOT_EXISTS::getResponseException);
+
+        Challenge challenge = challengeRepository.findById(req.getChallengeSeq())
+                .orElseThrow(ResponseError.NotFound.CHALLENGE_NOT_EXISTS::getResponseException);
+
+        LocalDate today = LocalDate.now();
+
+        if (req.getStartDate().isBefore(today)) {
+            throw ResponseError.BadRequest.PAST_START_DATE.getResponseException();
+        }
+
+        boolean isExists = userChallengeRepository.findUserChallengeByUserSeqAndChallengeAndStates(userSeq, challenge, Arrays.asList(UserChallengeStateType.PLAN, UserChallengeStateType.DOING))
+                .isPresent();
+        if (isExists) {
+            throw ResponseError.BadRequest.ALREADY_EXISTS_USER_CHALLENGE_IN_PROGRESS.getResponseException();
+        }
+
+        Optional<UserChallenge> stoppedUserChallenge = userChallengeRepository.findUserChallengeByUserSeqAndChallengeAndStates(userSeq, challenge, Arrays.asList(UserChallengeStateType.STOP));
+
+        if (stoppedUserChallenge.isPresent()) {
+            if (stoppedUserChallenge.get().getEndDate().equals(req.getStartDate())) {
+                throw ResponseError.BadRequest.TODAY_STOPPED_CHALLENGE.getResponseException();
+            }
+        }
+
+        return true;
     }
 }

@@ -38,7 +38,9 @@ public interface ResponseError {
         TODAY_ENDED_CHALLENGE("today ended challenge"),
         ALREADY_CHECKED_EMAIL("already checked email"),
         INVALID_ID_OR_PASSWORD("invalid id or password"),
-        INVALID_CONFIRM("invalid confirm");
+        INVALID_CONFIRM("invalid confirm"),
+        TODAY_STOPPED_CHALLENGE("today stopped challenge"),
+        ALREADY_STOPPED_USER_CHALLENGE("already stopped user-challenge cannot be modified");
 
 
         // INVALID 는 한가지로 명확하지 않을때 쓴다.

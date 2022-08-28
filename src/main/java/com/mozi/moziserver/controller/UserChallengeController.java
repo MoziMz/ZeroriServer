@@ -1,5 +1,9 @@
 package com.mozi.moziserver.controller;
 
+import com.mozi.moziserver.httpException.ResponseError;
+import com.mozi.moziserver.model.entity.User;
+import com.mozi.moziserver.model.entity.UserChallenge;
+import com.mozi.moziserver.model.req.ReqChallengeAndDate;
 import com.mozi.moziserver.model.req.ReqList;
 import com.mozi.moziserver.model.req.ReqUserChallengeCreate;
 import com.mozi.moziserver.model.req.ReqUserChallengeList;
@@ -17,6 +21,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -106,5 +111,16 @@ public class UserChallengeController {
                 .stream()
                 .map(ResConfirmedUserChallenge::of)
                 .collect(Collectors.toList());
+    }
+
+    @ApiOperation("유저 챌린지 생성 가능한지 확인")
+    @GetMapping("/v1/user-challenges/creatable")
+    public ResponseEntity<Void> getCreatableUserChallenge(
+            @ApiParam(hidden = true) @SessionUser Long userSeq,
+            @Valid ReqChallengeAndDate req
+    ) {
+        userChallengeService.isCreatableUserChallenge(userSeq,req);
+        
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

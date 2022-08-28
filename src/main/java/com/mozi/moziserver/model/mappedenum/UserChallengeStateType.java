@@ -5,7 +5,8 @@ import java.util.Set;
 public enum UserChallengeStateType {
     END,
     PLAN,
-    DOING;
+    DOING,
+    STOP;
 
     public static Set<UserChallengeStateType> activeTypes = Set.of(PLAN, DOING);
 }
