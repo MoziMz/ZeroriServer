@@ -18,6 +18,8 @@ public interface Constant {
     String ROLE_USER = "USER";
     Collection<SimpleGrantedAuthority> USER_AUTHORITIES = Collections.singleton(new SimpleGrantedAuthority("ROLE_" + ROLE_USER));
 
+    String PW_FIELD_NAME = "pw";
+
     //TODO fix
     String ID_REGEX = "[A-Za-z0-9]{5,}$";
 

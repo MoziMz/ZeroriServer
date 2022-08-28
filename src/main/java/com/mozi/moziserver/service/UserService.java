@@ -127,7 +127,6 @@ public class UserService {
             throw ResponseError.BadRequest.BAD_REQUEST.getResponseException();
         }
 
-        // TODO 소셜로그인 탈퇴여부 동작하는지 확인하기
         if (auth.getPrincipal() instanceof ResUserSignIn) {
             User user = userRepository.findById(((ResUserSignIn) auth.getPrincipal()).getUserSeq())
                     .orElseThrow(ResponseError.NotFound.USER_NOT_EXISTS::getResponseException);

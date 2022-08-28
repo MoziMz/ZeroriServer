@@ -1,5 +1,6 @@
 package com.mozi.moziserver.log;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mozi.moziserver.common.Constant;
 import lombok.Builder;
@@ -24,13 +25,22 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
 import java.util.Optional;
+import java.util.List;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import static com.mozi.moziserver.common.Constant.PW_FIELD_NAME;
 
 @Slf4j
 @RequiredArgsConstructor
 public class ApiLogFilter extends OncePerRequestFilter {
-    //private final static Pattern reqParamPwPattern = Pattern.compile("(?<=\\\"pw\\\":\\\")[\\S]+(?=\\\"\\,)");
+    private final static List<Pattern> reqParamPwPatterns = Arrays.asList(
+            Pattern.compile("(?<=\\\"" + PW_FIELD_NAME + "\\\":\\\")[\\S]+(?=\\\"\\,)"),
+            Pattern.compile("(?<=\\\"" + PW_FIELD_NAME + "\\\":\\\")[\\S]+(?=\\\"\\})")
+    );
 
     private final String activeProfiles;
     private final ObjectMapper objectMapper;
@@ -110,7 +120,7 @@ public class ApiLogFilter extends OncePerRequestFilter {
             apiLogBuilder.reqParam(wrappedRequest.getQueryString());
         } else if (method == HttpMethod.POST || method == HttpMethod.PUT) {
             String reqParam = getMessagePayload(wrappedRequest);
-//            reqParam = hidePw(reqParam);
+            reqParam = hidePw(reqParam);
             apiLogBuilder.reqParam(reqParam);
         }
     }
@@ -176,22 +186,26 @@ public class ApiLogFilter extends OncePerRequestFilter {
         return sb.toString();
     }
 
-//    private String hidePw(String reqParam) {
-//        // TODO 로그인 짤 때 변수명에 맞게 수정
-//        if (!StringUtils.hasLength(reqParam) || !reqParam.contains("\"pw\"")) {
-//            return reqParam;
-//        }
-//        Matcher matcher = reqParamPwPattern.matcher(reqParam);
-//        if (!matcher.find()) {
-//            return reqParam;
-//        }
-//        String pw = matcher.group();
-//        StringBuilder starPw = new StringBuilder();
-//        for (int i = 0; i < pw.length(); i++) {
-//            starPw.append('*');
-//        }
-//        return reqParam.substring(0, matcher.start()) + starPw + reqParam.substring(matcher.end());
-//    }
+    private String hidePw(String reqParam) {
+        if (!StringUtils.hasLength(reqParam) || !reqParam.contains("\"" + PW_FIELD_NAME + "\"")) {
+            return reqParam;
+        }
+
+        for (final Pattern reqParamPwPattern : reqParamPwPatterns) {
+            Matcher matcher = reqParamPwPattern.matcher(reqParam);
+            if (!matcher.find()) {
+                continue;
+            }
+            String pw = matcher.group();
+            StringBuilder starPw = new StringBuilder();
+            for (int i = 0; i < pw.length(); i++) {
+                starPw.append('*');
+            }
+            return reqParam.substring(0, matcher.start()) + starPw + reqParam.substring(matcher.end());
+        }
+
+        return reqParam;
+    }
 
     @Builder
     @Getter
