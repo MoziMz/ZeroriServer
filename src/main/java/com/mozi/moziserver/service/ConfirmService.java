@@ -65,9 +65,6 @@ public class ConfirmService {
         Challenge challenge = challengeRepository.findById(challengeSeq)
                 .orElseThrow(ResponseError.BadRequest.INVALID_SEQ::getResponseException);
 
-        UserChallenge userChallenge = userChallengeService.getActiveUserChallenge(userSeq, challenge)
-                .orElseThrow(ResponseError.NotFound.USER_CHALLENGE_NOT_EXISTS::getResponseException);
-
         //신고안됨
         Byte state = 0;
 
@@ -109,6 +106,8 @@ public class ConfirmService {
 
     public List<Confirm> getConfirmList(Long userSeq, ReqList req) {
         List<Confirm> confirmList = confirmRepository.findAll(req.getPrevLastSeq(), req.getPageSize());
+
+        Collections.shuffle(confirmList);
 
         setConfirmLike(userSeq, confirmList);
 
