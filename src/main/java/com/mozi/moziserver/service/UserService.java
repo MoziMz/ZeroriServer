@@ -31,8 +31,6 @@ import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import static com.mozi.moziserver.common.Constant.*;
 
@@ -51,6 +49,7 @@ public class UserService {
     private final AnimalRepository animalRepository;
     private final PostboxMessageAnimalService postboxMessageAnimalService;
     private final UserRewardService userRewardService;
+    private final BadWordService badWordService;
 
     public User signUp(ReqUserSignUp reqUserSignUp) {
 
@@ -226,6 +225,11 @@ public class UserService {
     }
 
     public void updateNickname(User user, String nickname) {
+
+
+        if (badWordService.isBadWord(nickname)){
+            throw ResponseError.BadRequest.NICKNAME_WITH_BAD_WORD.getResponseException();
+        }
 
         if (!nickname.matches(NICKNAME_REGEX)){
             throw ResponseError.BadRequest.INVALID_NICKNAME.getResponseException();

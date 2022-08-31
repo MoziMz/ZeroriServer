@@ -43,7 +43,9 @@ public interface ResponseError {
         ALREADY_STOPPED_USER_CHALLENGE("already stopped user-challenge cannot be modified"),
         INVALID_PASSWORD("invalid password"),
         MATCH_AN_EXISTING_PASSWORD("match an existing password"),
-        INVALID_NICKNAME("invalid nickname");
+        INVALID_NICKNAME("invalid nick name"),
+        //The nickname includes slang
+        NICKNAME_WITH_BAD_WORD("nick name with bad word");
 
 
         // INVALID 는 한가지로 명확하지 않을때 쓴다.

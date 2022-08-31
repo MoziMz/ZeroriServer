@@ -37,6 +37,9 @@ dependencies {
 
     implementation 'org.springframework.security:spring-security-oauth2-jose:5.6.1'
 
+    // 비속어 검색 (Aho-Corasick 알고리즘)
+    implementation 'org.ahocorasick:ahocorasick:0.6.3'
+
     // QueryDSL
     implementation 'com.querydsl:querydsl-jpa:4.4.0'
     annotationProcessor 'javax.persistence:javax.persistence-api'

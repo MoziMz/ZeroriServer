@@ -2,6 +2,7 @@ package com.mozi.moziserver.controller;
 
 import com.mozi.moziserver.model.req.ReqTestUserChallengeStartDateUpdate;
 import com.mozi.moziserver.security.SessionUser;
+import com.mozi.moziserver.service.BadWordService;
 import com.mozi.moziserver.service.UserChallengeService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -22,6 +23,8 @@ import javax.validation.Valid;
 public class TestController {
     private final UserChallengeService userChallengeService;
 
+    private final BadWordService badWordService;
+
     @ApiOperation("유저 챌린지 startDate 변경")
     @PutMapping("/user-challenges/{seq}")
     public ResponseEntity<Void> updateUserChallengeStartDate(
@@ -30,6 +33,18 @@ public class TestController {
             @RequestBody @Valid ReqTestUserChallengeStartDateUpdate req
     ) {
         userChallengeService.updateUserChallengeStartDate(userSeq, userChallengeSeq, req.getStartDate());
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @ApiOperation("비속어 생성")
+    @PostMapping("/admin/badwords")
+    public ResponseEntity<Void> createBadWord(
+            @ApiParam(hidden = true) @SessionUser Long userSeq,
+            @RequestParam String content
+
+    ) {
+        badWordService.createBadword(content);
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
