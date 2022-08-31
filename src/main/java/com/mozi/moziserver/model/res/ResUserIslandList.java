@@ -16,6 +16,7 @@ public class ResUserIslandList {
     private String imgUrl = null;
     private String thumbnailImgUrl = null;
     private boolean existenceState = false;
+    private Integer animalLevel = 0 ;
 
     private ResUserIslandList(Island island, UserIsland userIsland, int finalUserIsland, int currentUserPoint) {
         this.type = island.getType();
@@ -34,6 +35,7 @@ public class ResUserIslandList {
             this.existenceState = true;
             this.imgUrl = userIsland.getIslandImg().getImgUrl();
             this.thumbnailImgUrl = userIsland.getIslandImg().getThumbnailImgUrl();
+            this.animalLevel=userIsland.getRewardLevel()-1;
         }
     }
 

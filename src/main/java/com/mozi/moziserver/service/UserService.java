@@ -34,8 +34,7 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.mozi.moziserver.common.Constant.EMAIL_DOMAIN_GROUPS;
-import static com.mozi.moziserver.common.Constant.EMAIL_REGEX;
+import static com.mozi.moziserver.common.Constant.*;
 
 @Service
 @RequiredArgsConstructor
@@ -70,7 +69,7 @@ public class UserService {
             throw ResponseError.BadRequest.INVALID_EMAIL.getResponseException();
         }
 
-        if (!isValidPassword(reqUserSignUp.getPw())) {
+        if (!reqUserSignUp.getPw().matches(PW_REGEX)) {
             throw ResponseError.BadRequest.INVALID_PASSWORD.getResponseException();
         }
 
@@ -228,6 +227,10 @@ public class UserService {
 
     public void updateNickname(User user, String nickname) {
 
+        if (!nickname.matches(NICKNAME_REGEX)){
+            throw ResponseError.BadRequest.INVALID_NICKNAME.getResponseException();
+        }
+
         user.setNickName(nickname);
 
         try {
@@ -252,7 +255,7 @@ public class UserService {
         //기존 비밀번호와 새 비밀번호가 같은지 확인
         checkPassword(userAuth.getPw(),pw);
 
-        if (!isValidPassword(pw)) {
+        if (!pw.matches(PW_REGEX)) {
             throw ResponseError.BadRequest.INVALID_PASSWORD.getResponseException();
         }
 
@@ -335,14 +338,6 @@ public class UserService {
         return currentDomainGroup != null;
     }
 
-    public boolean isValidPassword(String pw) {
-        Pattern pattern = Pattern.compile("^(?=.*[A-Za-z])(?=.*[0-9])(?=.*[!%^&*.])[A-Za-z[0-9]!%^&*.]{8,16}$");
-        Matcher matcher = pattern.matcher(pw);
-        if (matcher.matches()) {
-            return true;
-        }
-        return false;
-    }
 
     private List<String> getCurrentEmailDomainGroup(String email) {
         int atIndex = email.lastIndexOf('@');

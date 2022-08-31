@@ -60,6 +60,9 @@ public interface Constant {
     String EMAIL_REGEX = "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@"
             + "[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
 
+    String PW_REGEX="^(?=.*[A-Za-z])(?=.*[0-9])(?=.*[!%^&*.])[A-Za-z[0-9]!%^&*.]{8,16}$";
+    String NICKNAME_REGEX="^[ㄱ-ㅎ가-힣A-Za-z0-9!@#$%^&*(),.?\":{}|<>]{1,8}$";
+
     List<List<String>> EMAIL_DOMAIN_GROUPS = Arrays.asList(
             Arrays.asList("gmail.com"),
             Arrays.asList("naver.com"),
