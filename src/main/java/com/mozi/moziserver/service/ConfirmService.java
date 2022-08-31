@@ -137,12 +137,20 @@ public class ConfirmService {
     public List<Confirm> getConfirmListByUserChallenge(Long userSeq, Long userChallengeSeq) {
         final UserChallenge userChallenge = userChallengeService.getUserChallenge(userChallengeSeq);
 
-        return confirmRepository.findByUserAndPeriod(
+        List<Confirm> confirmList = confirmRepository.findByUserAndPeriod(
                 userChallenge.getUser(),
                 userChallenge.getChallenge(),
                 userChallenge.getStartDate().atTime(0,0),
                 userChallenge.getEndDate().plusDays(1).atTime(0,0)
         );
+
+        setConfirmLike(userSeq, confirmList);
+
+        setConfirmDeclaration(userSeq, confirmList);
+
+        return confirmList.stream()
+                .filter(c -> !c.isDeclared())
+                .collect(Collectors.toList());
     }
 
     public Optional<Confirm> getConfirmByChallenge(Challenge challenge) {
