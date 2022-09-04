@@ -1,14 +1,10 @@
 package com.mozi.moziserver.model.res;
 
-import com.mozi.moziserver.model.entity.Confirm;
 import com.mozi.moziserver.model.entity.UserChallengeRecord;
 import lombok.Getter;
-import lombok.Setter;
-
-import static com.mozi.moziserver.model.entity.QUserChallengeRecord.userChallengeRecord;
 
 @Getter
-public class ResConfirmedUserChallenge {
+public class ResConfirmedUserChallengeRecord {
 
     private Long challengeSeq;
 
@@ -16,7 +12,7 @@ public class ResConfirmedUserChallenge {
 
     private Integer totalConfirmCnt=0;
 
-    private ResConfirmedUserChallenge(UserChallengeRecord userChallengeRecord) {
+    private ResConfirmedUserChallengeRecord(UserChallengeRecord userChallengeRecord) {
 
         this.challengeSeq=userChallengeRecord.getChallenge().getSeq();
 
@@ -28,5 +24,5 @@ public class ResConfirmedUserChallenge {
 
 
 
-    public static ResConfirmedUserChallenge of(UserChallengeRecord userChallengeRecord) {return new ResConfirmedUserChallenge(userChallengeRecord);}
+    public static ResConfirmedUserChallengeRecord of(UserChallengeRecord userChallengeRecord) {return new ResConfirmedUserChallengeRecord(userChallengeRecord);}
 }

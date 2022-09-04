@@ -1,13 +1,11 @@
 package com.mozi.moziserver.controller;
 
-import com.mozi.moziserver.httpException.ResponseError;
-import com.mozi.moziserver.model.entity.User;
-import com.mozi.moziserver.model.entity.UserChallenge;
 import com.mozi.moziserver.model.req.ReqChallengeAndDate;
 import com.mozi.moziserver.model.req.ReqList;
 import com.mozi.moziserver.model.req.ReqUserChallengeCreate;
 import com.mozi.moziserver.model.req.ReqUserChallengeList;
-import com.mozi.moziserver.model.res.ResConfirmedUserChallenge;
+import com.mozi.moziserver.model.res.ResConfirmedUserChallengeRecord;
+import com.mozi.moziserver.model.res.ResUserChallengeHistory;
 import com.mozi.moziserver.model.res.ResUserChallengeList;
 import com.mozi.moziserver.model.res.ResUserChallengeOfReward;
 import com.mozi.moziserver.security.SessionUser;
@@ -21,9 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -83,7 +79,7 @@ public class UserChallengeController {
     @PutMapping("/v1/user-challenges/{seq}/stop")
     public ResponseEntity<Void> stopUserChallenge(
             @ApiParam(hidden = true) @SessionUser Long userSeq,
-            @PathVariable("seq") Long userChallengeSeq
+            @PathVariable("userChallengeSeq") Long userChallengeSeq
     ) {
         userChallengeService.stopUserChallenge(userSeq, userChallengeSeq);
 
@@ -114,13 +110,13 @@ public class UserChallengeController {
 
     @ApiOperation("인증한 제로 활동-활동별 (마이페이지)")
     @GetMapping("/v1/user-challenges/confirmed")
-    public List<ResConfirmedUserChallenge> getUserChallengeRecordList(
+    public List<ResConfirmedUserChallengeRecord> getUserChallengeRecordList(
             @ApiParam(hidden = true) @SessionUser Long userSeq,
             @Valid ReqList req
     ) {
         return userChallengeService.getUserChallengeRecordListByUserSeq(userSeq, req)
                 .stream()
-                .map(ResConfirmedUserChallenge::of)
+                .map(ResConfirmedUserChallengeRecord::of)
                 .collect(Collectors.toList());
     }
 }

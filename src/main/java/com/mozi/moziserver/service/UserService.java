@@ -320,6 +320,11 @@ public class UserService {
     }
 
     public boolean checkNickNameDuplicate(String nickName) {
+
+        if (badWordService.isBadWord(nickName)){
+            throw ResponseError.BadRequest.NICKNAME_WITH_BAD_WORD.getResponseException();
+        }
+
         return userRepository.existsByNickName(nickName);
     }
 
