@@ -21,7 +21,7 @@ public class ResUserIslandList {
     private ResUserIslandList(Island island, UserIsland userIsland, int finalUserIsland, int currentUserPoint) {
         this.type = island.getType();
         this.name = island.getName();
-        this.description = island.getDescription();
+        this.description = island.getDescription()+" 동물들을 도울 수 있어요";
         this.totalRequiredPoint=island.getMaxPoint();
         this.currentRequiredPoint = 0;
         if (island.getType() >= finalUserIsland) {
