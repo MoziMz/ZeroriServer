@@ -5,7 +5,6 @@ import com.mozi.moziserver.model.req.ReqList;
 import com.mozi.moziserver.model.req.ReqUserChallengeCreate;
 import com.mozi.moziserver.model.req.ReqUserChallengeList;
 import com.mozi.moziserver.model.res.ResConfirmedUserChallengeRecord;
-import com.mozi.moziserver.model.res.ResUserChallengeHistory;
 import com.mozi.moziserver.model.res.ResUserChallengeList;
 import com.mozi.moziserver.model.res.ResUserChallengeOfReward;
 import com.mozi.moziserver.security.SessionUser;
