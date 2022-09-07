@@ -86,7 +86,7 @@ public class UserController {
     @ApiOperation("이메일 찾기")
     @GetMapping("/v1/find/emails")
     public ResEmail findUserAuthEmail(
-            @RequestBody @Valid ReqUserNickNameAndPw req
+            @Valid ReqUserNickNameAndPw req
     ) {
         UserAuth userAuth = userService.findUserAuthByNicknameAndPw(req.getNickName(), req.getPw());
 
