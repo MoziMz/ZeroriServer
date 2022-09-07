@@ -136,7 +136,7 @@ public class ApiLogFilter extends OncePerRequestFilter {
         apiLogBuilder.userSeq(
                 Optional.ofNullable(MDC.get(Constant.MDC_KEY_USER_SEQ))
                         .filter(v -> !StringUtils.hasLength(v))
-                        .map(Integer::parseInt)
+                        .map(Long::parseLong)
                         .orElse(null));
     }
 
@@ -218,7 +218,7 @@ public class ApiLogFilter extends OncePerRequestFilter {
         private final Long duration;
         private final String userIp;
         private final String userAgent;
-        private final Integer userSeq;
+        private final Long userSeq;
         private final String method;
         private final String path;
         private final String patternPath;
