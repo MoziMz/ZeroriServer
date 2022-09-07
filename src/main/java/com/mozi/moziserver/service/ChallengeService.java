@@ -49,6 +49,15 @@ public class ChallengeService {
         );
     }
 
+    public long getChallengeCnt(ReqChallengeList req)
+    {
+        return challengeRepository.countChallengeList(
+                req.getTagSeqList(),
+                req.getThemeSeqList(),
+                req.getKeyword()
+        );
+    }
+
     public List<Challenge> getScrappedChallengeList(Long userSeq, ReqList req) {
         User user = userService.getUserBySeq(userSeq)
                 .orElseThrow(ResponseError.InternalServerError.UNEXPECTED_ERROR::getResponseException);

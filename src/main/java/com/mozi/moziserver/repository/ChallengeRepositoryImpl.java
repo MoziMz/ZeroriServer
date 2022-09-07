@@ -25,15 +25,12 @@ public class ChallengeRepositoryImpl extends QuerydslRepositorySupport implement
 
     @Override
     public Optional<Challenge> findBySeq (Long seq ) {
-        return from(qChallenge)
+        return Optional.ofNullable(from(qChallenge)
                 .innerJoin(qChallengeRecord)
                 .on(qChallenge.seq.eq(qChallengeRecord.challenge.seq))
                 .fetchJoin()
                 .where(qChallenge.seq.eq(seq))
-                .fetch()
-                .stream()
-                .distinct()
-                .findFirst();
+                .fetchFirst());
     }
 
     @Override
@@ -58,6 +55,25 @@ public class ChallengeRepositoryImpl extends QuerydslRepositorySupport implement
                 .orderBy(qChallenge.seq.desc())
                 .limit(pageSize)
                 .fetch();
+    }
+
+    @Override
+    public long countChallengeList(
+            List<Long> tagSeqList,
+            List<Long> themeSeqList,
+            String keyword
+    ){
+        final Predicate[] predicates = new Predicate[]{
+                predicateOptional(qChallenge.themeSeq::in, themeSeqList),
+                predicateOptional(qChallengeTag.tag.seq::in, tagSeqList),
+                keyword != null ? predicateOptional(qChallenge.name::like, '%' + keyword + '%') : null
+        };
+
+        return from(qChallenge)
+                .innerJoin(qChallengeTag).on(qChallenge.seq.eq(qChallengeTag.challenge.seq)).fetchJoin()
+                .where(predicates)
+                .orderBy(qChallenge.seq.desc())
+                .fetchCount();
     }
 
     private <T> Predicate predicateOptional(final Function<T, Predicate> whereFunc, final T value) {

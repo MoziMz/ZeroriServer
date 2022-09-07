@@ -21,4 +21,10 @@ public interface ChallengeRepositorySupport {
             Integer pageSize,
             Long prevLastPostSeq
     );
+
+    long countChallengeList(
+            List<Long> tagSeqList,
+            List<Long> themeSeqList,
+            String keyword
+    );
 }

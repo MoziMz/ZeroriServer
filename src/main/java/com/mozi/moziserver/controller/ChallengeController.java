@@ -7,6 +7,7 @@ import com.mozi.moziserver.model.req.ReqList;
 import com.mozi.moziserver.model.res.ResChallenge;
 import com.mozi.moziserver.model.res.ResChallengeList;
 import com.mozi.moziserver.model.res.ResChallengeTagList;
+import com.mozi.moziserver.model.res.ResSearchOfChallengeList;
 import com.mozi.moziserver.security.SessionUser;
 import com.mozi.moziserver.service.*;
 import io.swagger.annotations.ApiOperation;
@@ -68,17 +69,19 @@ public class ChallengeController {
 
     @ApiOperation("챌린지 모두 조회")
     @GetMapping("/v1/challenges")
-    public List<ResChallengeList> getChallengeList(
+    public ResSearchOfChallengeList getChallengeList(
             @ApiParam(hidden = true) @SessionUser Long userSeq,
             @Valid ReqChallengeList req
     ) {
         List<ChallengeScrap> challengeScrapList=challengeScrapService.getChallengeScrapList(userSeq);
 
-        List<Challenge> challengeList=challengeService.getChallengeList(userSeq, req);
+        long challengeCnt=challengeService.getChallengeCnt(req);
+
+        List<Challenge> challengeListPaging=challengeService.getChallengeList(userSeq, req);
 
         List<ResChallengeList> challengeLists=new ArrayList<ResChallengeList>();
 
-        for(Challenge challenge: challengeList){
+        for(Challenge challenge: challengeListPaging){
             Boolean flag=false;
             for(ChallengeScrap cs: challengeScrapList){
                 if(cs.getChallenge().equals(challenge)){
@@ -91,7 +94,7 @@ public class ChallengeController {
 
         Collections.shuffle(challengeLists);
 
-        return challengeLists;
+        return ResSearchOfChallengeList.of(challengeCnt,challengeLists);
     }
 
     @ApiOperation("스크랩한 챌린지 리스트 조회")
