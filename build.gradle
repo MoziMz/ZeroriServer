@@ -54,6 +54,8 @@ dependencies {
     //Swagger
     implementation 'io.springfox:springfox-boot-starter:3.0.0'
 
+    implementation 'co.elastic.apm:apm-agent-api:1.28.4'
+
     compileOnly 'org.projectlombok:lombok'
     //developmentOnly 'org.springframework.boot:spring-boot-devtools'
     runtimeOnly 'mysql:mysql-connector-java'

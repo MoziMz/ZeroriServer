@@ -1,5 +1,7 @@
 package com.mozi.moziserver.log;
 
+import co.elastic.apm.api.ElasticApm;
+import co.elastic.apm.api.Transaction;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mozi.moziserver.common.Constant;
@@ -58,6 +60,12 @@ public class ApiLogFilter extends OncePerRequestFilter {
         final String threadId = UUID.randomUUID().toString();
         MDC.put(Constant.MDC_KEY_THREAD_ID, threadId);
         apiLogBuilder.threadId(threadId);
+
+        Transaction transaction = ElasticApm.currentTransaction();
+        final String traceId = transaction.getTraceId();
+        if (StringUtils.hasLength(traceId)) {
+            MDC.put(Constant.MDC_KEY_THREAD_ID, traceId);
+        }
 
 //         TODO 로그인 구현 후 손보기
 //        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
