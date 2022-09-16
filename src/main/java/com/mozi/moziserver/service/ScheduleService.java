@@ -3,6 +3,7 @@ package com.mozi.moziserver.service;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.mozi.moziserver.common.Constant;
 import com.mozi.moziserver.model.entity.*;
+import com.mozi.moziserver.model.mappedenum.FcmMessageType;
 import com.mozi.moziserver.model.mappedenum.UserChallengeStateType;
 import com.mozi.moziserver.repository.*;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +32,7 @@ public class ScheduleService {
     private final PostboxMessageAnimalService postboxMessageAnimalService;
     private final UserRewardService userRewardService;
     private final UserIslandRepository userIslandRepository;
+    private final FcmService fcmService;
 
     @Transactional
     @Scheduled(cron = "0 0 0 * * *")
@@ -117,6 +119,8 @@ public class ScheduleService {
             lastPostboxMessageAnimal.setLevel(lastPostboxMessageAnimal.getLevel() + 1);
             lastPostboxMessageAnimal.setCheckedState(false);
             postboxMessageAnimalRepository.save(lastPostboxMessageAnimal);
+
+            fcmService.sendMessageToUser(lastPostboxMessageAnimal.getUser(), FcmMessageType.NEW_POST_BOX_MESSAGE);
         }
     }
 

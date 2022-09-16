@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import javax.swing.text.StyledEditorKit;
 
 /**
  * uniq(deviceId, token)
@@ -20,6 +21,8 @@ public class UserFcm extends AbstractTimeEntity {
     private String deviceId;
 
     private String token;
+
+    private Boolean state;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="user_seq")
