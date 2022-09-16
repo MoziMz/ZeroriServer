@@ -19,7 +19,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class FcmService {
     private final UserFcmRepository userFcmRepository;
-    
+
     private void sendMessage(String token, FcmMessageType type) {
         Message message = Message.builder()
                 .putData("isSilent", "" + type.isSilent())

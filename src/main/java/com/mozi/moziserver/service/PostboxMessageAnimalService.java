@@ -2,6 +2,7 @@ package com.mozi.moziserver.service;
 
 import com.mozi.moziserver.httpException.ResponseError;
 import com.mozi.moziserver.model.entity.*;
+import com.mozi.moziserver.model.mappedenum.FcmMessageType;
 import com.mozi.moziserver.model.req.ReqList;
 import com.mozi.moziserver.repository.PostboxMessageAnimalContentRepository;
 import com.mozi.moziserver.repository.PostboxMessageAnimalRepository;
@@ -20,6 +21,8 @@ public class PostboxMessageAnimalService {
     private final UserRepository userRepository;
     private final PostboxMessageAnimalRepository postboxMessageAnimalRepository;
     private final PostboxMessageAnimalContentRepository postboxMessageAnimalContentRepository;
+    private final FcmService fcmService;
+
     public PostboxMessageAnimal getPostboxMessageAnimal(Long userSeq, Long seq) {
         PostboxMessageAnimal postboxMessageAnimal = postboxMessageAnimalRepository.findById(seq)
                 .orElseThrow(ResponseError.NotFound.POSTBOX_MESSAGE_ANIMAL_NOT_EXISTS::getResponseException);
@@ -54,6 +57,8 @@ public class PostboxMessageAnimalService {
         postboxMessageAnimal.setCheckedState(true);
 
         postboxMessageAnimalRepository.save(postboxMessageAnimal);
+
+        fcmService.sendMessageToUser(postboxMessageAnimal.getUser(), FcmMessageType.NEW_POST_BOX_MESSAGE);
     }
 
     @Transactional
@@ -69,5 +74,7 @@ public class PostboxMessageAnimalService {
                 .build();
 
         postboxMessageAnimalRepository.save(postboxMessageAnimal);
+
+        fcmService.sendMessageToUser(postboxMessageAnimal.getUser(), FcmMessageType.NEW_POST_BOX_MESSAGE);
     }
 }
