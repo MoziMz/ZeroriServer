@@ -20,6 +20,8 @@ public interface Constant {
 
     String PW_FIELD_NAME = "pw";
 
+    String CURRENT_PW_FIELD_NAME = "currentPw";
+
     //TODO fix
     String ID_REGEX = "[A-Za-z0-9]{5,}$";
 

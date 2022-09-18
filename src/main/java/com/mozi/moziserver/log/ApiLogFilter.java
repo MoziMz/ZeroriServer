@@ -35,13 +35,16 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static com.mozi.moziserver.common.Constant.PW_FIELD_NAME;
+import static com.mozi.moziserver.common.Constant.CURRENT_PW_FIELD_NAME;
 
 @Slf4j
 @RequiredArgsConstructor
 public class ApiLogFilter extends OncePerRequestFilter {
     private final static List<Pattern> reqParamPwPatterns = Arrays.asList(
             Pattern.compile("(?<=\\\"" + PW_FIELD_NAME + "\\\":\\\")[\\S]+(?=\\\"\\,)"),
-            Pattern.compile("(?<=\\\"" + PW_FIELD_NAME + "\\\":\\\")[\\S]+(?=\\\"\\})")
+            Pattern.compile("(?<=\\\"" + PW_FIELD_NAME + "\\\":\\\")[\\S]+(?=\\\"\\})"),
+            Pattern.compile("(?<=\\\"" + CURRENT_PW_FIELD_NAME + "\\\":\\\")[\\S]+(?=\\\"\\,)"),
+            Pattern.compile("(?<=\\\"" + CURRENT_PW_FIELD_NAME + "\\\":\\\")[\\S]+(?=\\\"\\})")
     );
 
     private final String activeProfiles;
@@ -195,7 +198,7 @@ public class ApiLogFilter extends OncePerRequestFilter {
     }
 
     private String hidePw(String reqParam) {
-        if (!StringUtils.hasLength(reqParam) || !reqParam.contains("\"" + PW_FIELD_NAME + "\"")) {
+        if (!StringUtils.hasLength(reqParam) || !reqParam.contains("\"" + PW_FIELD_NAME + "\"") || !reqParam.contains("\"" + CURRENT_PW_FIELD_NAME + "\"")) {
             return reqParam;
         }
 

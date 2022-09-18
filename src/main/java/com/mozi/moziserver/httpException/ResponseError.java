@@ -42,7 +42,7 @@ public interface ResponseError {
         TODAY_STOPPED_CHALLENGE("today stopped challenge"),
         ALREADY_STOPPED_USER_CHALLENGE("already stopped user-challenge cannot be modified"),
         INVALID_PASSWORD("invalid password"),
-        MATCH_AN_EXISTING_PASSWORD("match an existing password"),
+        NOT_MATCH_AN_EXISTING_PASSWORD("not match an existing password"),
         INVALID_NICKNAME("invalid nick name"),
         //The nickname includes slang
         NICKNAME_WITH_BAD_WORD("nick name with bad word");

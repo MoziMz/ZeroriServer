@@ -22,6 +22,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @RestController
@@ -111,6 +112,21 @@ public class ConfigurationController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    @ApiOperation("비밀번호 확인")
+    @PostMapping("/v1/users/me/password/check")
+    public ResponseEntity<Void> checkPassword(
+            @ApiParam(hidden = true) @SessionUser Long userSeq,
+            @RequestBody @Valid ReqUserPw req
+    ) {
+        Optional<User> user=userService.getUserBySeq(userSeq);
+
+        if(!userService.checkPassword(user.get(),req.getCurrentPw())){
+            throw ResponseError.BadRequest.NOT_MATCH_AN_EXISTING_PASSWORD.getResponseException();
+        }
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
     @ApiOperation("비밀번호 재설정 (이메일 인증 X)")
     @PutMapping("/v1/users/me/password")
     public ResponseEntity<Void> updateUserPassword(
@@ -120,7 +136,7 @@ public class ConfigurationController {
         User user = userService.getUserBySeq(userSeq)
                 .orElseThrow(ResponseError.InternalServerError.UNEXPECTED_ERROR::getResponseException);
 
-        userService.updatePw(user, req.getPw());
+        userService.updatePw(user, req.getNewPw(), req.getCurrentPw());
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

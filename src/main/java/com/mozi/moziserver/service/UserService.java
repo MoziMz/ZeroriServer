@@ -249,27 +249,48 @@ public class UserService {
         }
     }
 
-    public void updatePw(User user, String pw) {
+    public void updatePw(User user, String newPw, String currentPw) {
 
         UserAuth userAuth = userAuthRepository.findByUserAndType(user, UserAuthType.EMAIL);
         if (userAuth == null) {
             throw ResponseError.BadRequest.SOCIAL_LOGIN_USER.getResponseException("social login user cannot change password");
         }
 
-        //기존 비밀번호와 새 비밀번호가 같은지 확인
-        checkPassword(userAuth.getPw(),pw);
+        //기존 비밀번호와 currentPw 같은지
+        if(!checkPassword(user,currentPw)){
+            throw ResponseError.BadRequest.NOT_MATCH_AN_EXISTING_PASSWORD.getResponseException();
+        }
 
-        if (!pw.matches(PW_REGEX)) {
+        //기존 비밀번호와 새로운 비밀번호가 같은지 확인 또는 새 비밀번호 정규식 확인
+        if (checkPassword(user,newPw) || !newPw.matches(PW_REGEX)) {
             throw ResponseError.BadRequest.INVALID_PASSWORD.getResponseException();
         }
 
-        userAuth.setPw(passwordEncoder.encode(pw));
+        userAuth.setPw(passwordEncoder.encode(newPw));
 
         try {
             userRepository.save(user);
         } catch (Exception e) {
             throw ResponseError.InternalServerError.UNEXPECTED_ERROR.getResponseException();
         }
+    }
+
+    public boolean checkPassword(User user,String pw){
+        UserAuth userAuth = userAuthRepository.findByUserAndType(user, UserAuthType.EMAIL);
+
+        if (userAuth == null) {
+            throw ResponseError.BadRequest.SOCIAL_LOGIN_USER.getResponseException("social login user cannot change password");
+        }
+
+        if(pw==null || pw.equals("")){
+            throw ResponseError.BadRequest.METHOD_ARGUMENT_NOT_VALID.getResponseException("password is null");
+        }
+
+        if (!pw.matches(PW_REGEX)) {
+            throw ResponseError.BadRequest.INVALID_PASSWORD.getResponseException();
+        }
+
+        return passwordEncoder.matches(pw, userAuth.getPw());
     }
 
     public void updateEmail(User user, String email) {
@@ -326,15 +347,6 @@ public class UserService {
         }
 
         return userRepository.existsByNickName(nickName);
-    }
-
-    public boolean checkPassword(String oldPw,String newPw) {
-
-        if(passwordEncoder.matches(newPw,oldPw)) {
-            throw ResponseError.BadRequest.MATCH_AN_EXISTING_PASSWORD.getResponseException();
-        }
-
-        return true;
     }
 
     private boolean isValidEmail(String email) {
