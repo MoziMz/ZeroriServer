@@ -296,6 +296,10 @@ public class UserService {
     public void updateEmail(User user, String email) {
         UserAuth userAuth = userAuthRepository.findByUser(user);
 
+        if (!isValidEmail(email)){
+            throw ResponseError.BadRequest.INVALID_EMAIL.getResponseException();
+        }
+
         emailAuthService.sendResetEmailEmail(userAuth, email);
     }
 
