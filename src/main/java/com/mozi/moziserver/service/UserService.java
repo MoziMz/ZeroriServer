@@ -405,7 +405,7 @@ public class UserService {
             }
         }
 
-        userFcm = userFcmRepository.findUserFcmByDeviceId(deviceId)
+        userFcm = userFcmRepository.findUserFcmByUser(user)
                 .orElseThrow(ResponseError.InternalServerError.UNEXPECTED_ERROR::getResponseException);
         userFcm.setToken(token);
         userFcm.setUser(user);
