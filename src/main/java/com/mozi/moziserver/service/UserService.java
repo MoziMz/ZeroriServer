@@ -390,6 +390,7 @@ public class UserService {
         userFcm.setDeviceId(deviceId);
         userFcm.setToken(token);
         userFcm.setUser(user);
+        userFcm.setState(Boolean.TRUE);
 
         try {
             userFcmRepository.save(userFcm);
