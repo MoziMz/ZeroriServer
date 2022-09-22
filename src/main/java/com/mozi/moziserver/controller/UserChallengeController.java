@@ -1,5 +1,6 @@
 package com.mozi.moziserver.controller;
 
+import com.mozi.moziserver.httpException.ResponseError;
 import com.mozi.moziserver.model.req.ReqChallengeAndDate;
 import com.mozi.moziserver.model.req.ReqList;
 import com.mozi.moziserver.model.req.ReqUserChallengeCreate;
@@ -34,6 +35,10 @@ public class UserChallengeController {
             @ApiParam(hidden = true) @SessionUser Long userSeq,
             @Valid ReqUserChallengeList req
     ) {
+        if (req.getStartDate().isAfter(req.getEndDate())) {
+            throw ResponseError.BadRequest.INVALID_START_DATE_END_DATE.getResponseException();
+        }
+
         return userChallengeService.getUserChallengeList(userSeq, req)
                 .stream()
                 .map(ResUserChallengeList::of)

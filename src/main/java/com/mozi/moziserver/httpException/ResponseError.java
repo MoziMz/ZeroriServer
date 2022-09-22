@@ -14,7 +14,7 @@ public interface ResponseError {
         ALREADY_EXISTS_EMAIL("already exists email"),
         INVALID_EMAIL_OR_PASSWORD("invalid email or password"),
         INVALID_SEQ("invalid seq"),
-        ALREADY_CREATED( "already created"),
+        ALREADY_CREATED("already created"),
         ALREADY_DELETED("already deleted"),
         ALREADY_EXISTS_USER_CHALLENGE_IN_PROGRESS("already exists user challenge in progress"),
         PLAN_DATE_TYPE_NOT_INVALID("plan date type cannot be in complete or fail, when creating a user-challenge"),
@@ -45,7 +45,8 @@ public interface ResponseError {
         NOT_MATCH_AN_EXISTING_PASSWORD("not match an existing password"),
         INVALID_NICKNAME("invalid nick name"),
         //The nickname includes slang
-        NICKNAME_WITH_BAD_WORD("nick name with bad word");
+        NICKNAME_WITH_BAD_WORD("nick name with bad word"),
+        INVALID_START_DATE_END_DATE("start date must be earlier than or equal to end date");
 
 
         // INVALID 는 한가지로 명확하지 않을때 쓴다.
@@ -154,6 +155,7 @@ public interface ResponseError {
         USER_NOT_EXISTS("user not exists"),
         CHALLENGE_NOT_EXISTS("challenge not exists"),
         USER_CHALLENGE_NOT_EXISTS("user-challenge not exists"),
+        NO_MORE_USER_CHALLENGES("no more user-challenges"),
         USER_STICKER_NOT_EXISTS("user sticker not exists"),
         EMAIL_NOT_EXISTS("email not exists"),
         NICKNAME_NOT_EXISTS("nickname not exists"),
@@ -161,11 +163,8 @@ public interface ResponseError {
         POSTBOX_MESSAGE_ANIMAL_NOT_EXISTS("postbox message animal not exists"),
         ANIMAL_NOT_EXISTS("animal not exists"),
         STICKER_NOT_EXISTS("sticker not exists"),
-
         ISLAND_NOT_EXISTS("island not exists"),
-
         ISLAND_IMG_NOT_EXISTS("islandImg not exists"),
-
         PREPARATIONITEM_NOT_EXISTS("preparationItem not exists"),
         CONFIRM_NOT_EXISTS("confirm not exists"),
         CONFIRM_LIKE_NOT_EXISTS("confirm like not exists"),

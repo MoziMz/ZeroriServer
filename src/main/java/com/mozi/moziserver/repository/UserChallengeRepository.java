@@ -26,4 +26,6 @@ public interface UserChallengeRepository extends JpaRepository<UserChallenge, Lo
     );
 
     List<UserChallenge> findAllByStateAndStartDate(UserChallengeStateType stateType, LocalDate startDate);
+
+    Optional<UserChallenge> findFirstByStateNotAndUserSeqOrderByStartDateAsc(UserChallengeStateType userChallengeStateType, Long userSeq);
 }

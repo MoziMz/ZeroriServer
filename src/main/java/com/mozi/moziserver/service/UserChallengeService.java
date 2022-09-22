@@ -66,6 +66,13 @@ public class UserChallengeService {
     }
 
     public List<UserChallenge> getUserChallengeList(Long userSeq, ReqUserChallengeList req) {
+        UserChallenge oldestUserChallenge = userChallengeRepository.findFirstByStateNotAndUserSeqOrderByStartDateAsc(UserChallengeStateType.STOP, userSeq)
+                .orElseThrow(ResponseError.NotFound.NO_MORE_USER_CHALLENGES::getResponseException);
+
+        if (req.getEndDate().isBefore(oldestUserChallenge.getStartDate())) {
+            throw ResponseError.NotFound.NO_MORE_USER_CHALLENGES.getResponseException();
+        }
+
         return userChallengeRepository.findAllByPeriod(
                 userSeq,
                 req.getStartDate(),
