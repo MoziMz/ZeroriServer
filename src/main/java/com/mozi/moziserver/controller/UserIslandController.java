@@ -36,16 +36,14 @@ public class UserIslandController {
     ) {
         List<UserIsland> userIslandList = islandService.getUserIslandList(userSeq);
         List<Island> islandList = islandService.getIslandList();
-
         int currentUserPoint = userRewardService.getUserPoint(userSeq);
-        int finalUserIsland = userIslandList.size() + 1;
+        UserIsland lastUserIsland = userIslandList.get(userIslandList.size() - 1);
+
         List<ResUserIslandList> resUserIslandLists = new LinkedList<ResUserIslandList>();
         for (int i = 0; i < islandList.size(); i++) {
-            UserIsland userIsland = null;
-            if (i < userIslandList.size())
-                userIsland = userIslandList.get(i);
-
-            resUserIslandLists.add(ResUserIslandList.of(islandList.get(i), userIsland, finalUserIsland, currentUserPoint));
+            Island island = islandList.get(i);
+            UserIsland userIsland = i < userIslandList.size() ? userIslandList.get(i) : null;
+            resUserIslandLists.add(ResUserIslandList.of(island, userIsland, lastUserIsland, currentUserPoint));
         }
 
         return resUserIslandLists;
@@ -54,7 +52,7 @@ public class UserIslandController {
     @ApiOperation("섬 오픈하기")
     @PostMapping("/v1/users/me/user-islands/open")
     public ResponseEntity<Void> openUserIsland(
-        @ApiParam(hidden = true) @SessionUser Long userSeq
+            @ApiParam(hidden = true) @SessionUser Long userSeq
     ) {
         islandService.openUserIsland(userSeq);
 
