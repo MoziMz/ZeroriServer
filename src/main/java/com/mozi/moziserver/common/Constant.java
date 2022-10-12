@@ -50,7 +50,9 @@ public interface Constant {
             "/api/*/users/user-auths/emails",
             "/api/*/challenge-themes",
             "/api/*/users/nicknames/{nickName}/check",
-            "/api/*/users/emails/{email}/check"
+            "/api/*/users/emails/{email}/check",
+            "/api/*/users/find-pw",
+            "/api/*/find/emails"
     };
 
     String[] AUTHENTICATED_PATHS = new String[]{
