@@ -1,6 +1,5 @@
 package com.mozi.moziserver.controller;
 
-import com.mozi.moziserver.model.ChallengeExplanationContent;
 import com.mozi.moziserver.model.req.ReqAdminChallengeCreate;
 import com.mozi.moziserver.security.SessionUser;
 import com.mozi.moziserver.service.ChallengeService;

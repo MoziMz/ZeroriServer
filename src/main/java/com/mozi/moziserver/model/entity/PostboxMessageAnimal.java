@@ -17,8 +17,6 @@ public class PostboxMessageAnimal extends AbstractTimeEntity {
 
     private Integer level;
 
-    private String content;
-
     private boolean checkedState;
 
     @ManyToOne(fetch = FetchType.LAZY)

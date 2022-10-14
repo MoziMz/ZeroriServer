@@ -10,12 +10,15 @@ import javax.persistence.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity(name = "preparation_item")
-@IdClass(PreparationItemId.class)
 public class PreparationItem extends AbstractTimeEntity {
     @Id
-    private Long animalSeq;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long seq;
 
-    @Id
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="animal_seq")
+    private Animal animal;
+
     private Integer turn;
 
     private String name;

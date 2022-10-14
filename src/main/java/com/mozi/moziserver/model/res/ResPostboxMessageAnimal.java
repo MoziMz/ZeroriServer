@@ -2,7 +2,6 @@ package com.mozi.moziserver.model.res;
 
 import com.mozi.moziserver.model.entity.PostboxMessageAnimal;
 import com.mozi.moziserver.model.entity.PreparationItem;
-import com.mozi.moziserver.model.mappedenum.AnimalType;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
@@ -22,7 +21,7 @@ public class ResPostboxMessageAnimal {
     private ResPostboxMessageAnimal(PostboxMessageAnimal postboxMessageAnimal, List<PreparationItem> preparationItemList) {
         this.animalSeq = postboxMessageAnimal.getAnimal().getSeq();
         this.animalName = postboxMessageAnimal.getAnimal().getName();
-        this.content = postboxMessageAnimal.getContent();
+        this.content = postboxMessageAnimal.getAnimal().getPostboxAnimalContent();
         this.imgUrl = postboxMessageAnimal.getAnimal().getImgUrl();
         this.preparationItemList = preparationItemList.stream().map(e -> ResPreparationItemList.of(e, postboxMessageAnimal.getLevel())).collect(Collectors.toList());
         this.createdAt = postboxMessageAnimal.getCreatedAt();

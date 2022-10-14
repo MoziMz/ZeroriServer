@@ -37,7 +37,7 @@ public class PostboxMessageAnimalRepositoryImpl extends QuerydslRepositorySuppor
     @Override
     public List<PreparationItem> findItemByUser(User user, Long animalSeq) {
         List<PreparationItem> preparationItemList = from(qPreparationItem)
-                .where(qPreparationItem.animalSeq.eq(animalSeq))
+                .where(qPreparationItem.animal.seq.eq(animalSeq))
                 .orderBy(qPreparationItem.turn.asc())
                 .fetchAll()
                 .fetch();

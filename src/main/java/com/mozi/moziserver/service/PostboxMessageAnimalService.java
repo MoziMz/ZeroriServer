@@ -4,7 +4,6 @@ import com.mozi.moziserver.httpException.ResponseError;
 import com.mozi.moziserver.model.entity.*;
 import com.mozi.moziserver.model.mappedenum.FcmMessageType;
 import com.mozi.moziserver.model.req.ReqList;
-import com.mozi.moziserver.repository.PostboxMessageAnimalContentRepository;
 import com.mozi.moziserver.repository.PostboxMessageAnimalRepository;
 import com.mozi.moziserver.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +19,6 @@ import java.util.List;
 public class PostboxMessageAnimalService {
     private final UserRepository userRepository;
     private final PostboxMessageAnimalRepository postboxMessageAnimalRepository;
-    private final PostboxMessageAnimalContentRepository postboxMessageAnimalContentRepository;
     private final FcmService fcmService;
 
     public PostboxMessageAnimal getPostboxMessageAnimal(Long userSeq, Long seq) {
@@ -63,13 +61,10 @@ public class PostboxMessageAnimalService {
 
     @Transactional
     public void createPostboxMessageAnimal(User user, Animal animal) {
-        PostboxMessageAnimalContent postboxMessageAnimalContent = postboxMessageAnimalContentRepository.findByAnimalSeq(animal.getSeq());
-
         PostboxMessageAnimal postboxMessageAnimal = PostboxMessageAnimal.builder()
                 .user(user)
                 .animal(animal)
                 .checkedState(false)
-                .content(postboxMessageAnimalContent.getContent())
                 .level(1)
                 .build();
 

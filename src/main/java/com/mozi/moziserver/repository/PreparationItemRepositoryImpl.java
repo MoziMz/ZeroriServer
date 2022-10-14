@@ -13,7 +13,7 @@ public class PreparationItemRepositoryImpl extends QuerydslRepositorySupport imp
     public PreparationItem findByAnimalSeqAndTurn(Long animalSeq,Integer turn){
         return from(qPreparationItem)
                 .select(qPreparationItem)
-                .where(qPreparationItem.animalSeq.eq(animalSeq).and(qPreparationItem.turn.eq(turn)))
+                .where(qPreparationItem.animal.seq.eq(animalSeq).and(qPreparationItem.turn.eq(turn)))
                 .fetchOne();
     }
 }

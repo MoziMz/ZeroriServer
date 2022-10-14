@@ -44,7 +44,7 @@ public class AdminAnimalController {
     public ResponseEntity<Void> createAnimal(
             @ApiParam(hidden = true) @SessionUser Long userSeq,
             @RequestParam(name = "name") @NotBlank  String name,
-            @RequestParam(name = "explanation") @NotBlank String explanation,
+            @RequestParam(name = "postboxAnimalContent") @NotBlank String postboxAnimalContent,
             @RequestParam(name = "islandType") @NotBlank Integer islandType,
             @RequestParam(name = "islandLevel") @NotBlank Integer islandLevel,
             @RequestPart MultipartFile image,
@@ -55,7 +55,7 @@ public class AdminAnimalController {
             throw ResponseError.BadRequest.INVALID_IMAGE.getResponseException("need to images");
         }
 
-        animalService.createAnimal(name, explanation, image, fullBodyImage, islandType, islandLevel);
+        animalService.createAnimal(name, postboxAnimalContent, image, fullBodyImage, islandType, islandLevel);
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
@@ -66,13 +66,13 @@ public class AdminAnimalController {
             @ApiParam(hidden = true) @SessionUser Long userSeq,
             @PathVariable("seq") Long seq,
             @RequestParam(name = "name", required = false) String name,
-            @RequestParam(name = "explanation", required = false) String explanation,
+            @RequestParam(name = "postboxAnimalContent", required = false) String postboxAnimalContent,
             @RequestPart(required = false) MultipartFile image,
             @RequestPart(required = false) MultipartFile fullBodyImage
     ) {
 
-        if (name != null || explanation != null || image != null || fullBodyImage != null) {
-            animalService.updateAnimal(seq, name, explanation, image, fullBodyImage);
+        if (name != null || postboxAnimalContent != null || image != null || fullBodyImage != null) {
+            animalService.updateAnimal(seq, name, postboxAnimalContent, image, fullBodyImage);
         }
 
         return new ResponseEntity<>(HttpStatus.OK);

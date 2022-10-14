@@ -4,8 +4,6 @@ import com.mozi.moziserver.common.JpaUtil;
 import com.mozi.moziserver.httpException.ResponseError;
 import com.mozi.moziserver.model.entity.Animal;
 import com.mozi.moziserver.model.entity.PreparationItem;
-import com.mozi.moziserver.model.entity.PreparationItemId;
-import com.mozi.moziserver.model.entity.UserChallenge;
 import com.mozi.moziserver.repository.AnimalRepository;
 import com.mozi.moziserver.repository.PreparationItemRepository;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +14,6 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 import org.springframework.web.multipart.MultipartFile;
-import org.w3c.dom.html.HTMLTableRowElement;
 
 import java.util.List;
 
@@ -47,7 +44,7 @@ public class AnimalService {
         return animalRepository.findAll();
     }
 
-    public void createAnimal(String name, String explanation, MultipartFile image, MultipartFile fullBodyImage, Integer islandType, Integer islandLevel) {
+    public void createAnimal(String name, String postboxAnimalContent, MultipartFile image, MultipartFile fullBodyImage, Integer islandType, Integer islandLevel) {
 
         String imgUrl = null;
         try {
@@ -65,7 +62,7 @@ public class AnimalService {
 
         Animal animal = Animal.builder()
                 .name(name)
-                .explanation(explanation)
+                .postboxAnimalContent(postboxAnimalContent)
                 .imgUrl(imgUrl)
                 .fullBodyImgUrl(fullBodyImgUrl)
                 .islandType(islandType)
@@ -84,7 +81,7 @@ public class AnimalService {
         }
     }
 
-    public void updateAnimal(Long animalSeq, String name, String explanation, MultipartFile image, MultipartFile fullBodyImage) {
+    public void updateAnimal(Long animalSeq, String name, String postboxAnimalContent, MultipartFile image, MultipartFile fullBodyImage) {
 
         final Animal animal = getAnimal(animalSeq);
 
@@ -112,8 +109,8 @@ public class AnimalService {
             animal.setName(name);
         }
 
-        if (explanation != null && explanation.length() != 0) {
-            animal.setExplanation(explanation);
+        if (postboxAnimalContent != null && postboxAnimalContent.length() != 0) {
+            animal.setPostboxAnimalContent(postboxAnimalContent);
         }
 
         try {
@@ -153,7 +150,7 @@ public class AnimalService {
         }
 
         final PreparationItem preparationItem = PreparationItem.builder()
-                .animalSeq(animal.getSeq())
+                .animal(animal)
                 .turn(turn)
                 .name(name)
                 .colorImgUrl(colorImgUrl)
