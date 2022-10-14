@@ -9,6 +9,7 @@ import com.mozi.moziserver.model.req.*;
 import com.mozi.moziserver.model.res.ResEmail;
 import com.mozi.moziserver.model.res.ResUserPoint;
 import com.mozi.moziserver.repository.UserRepository;
+import com.mozi.moziserver.security.RememberMeService;
 import com.mozi.moziserver.security.SessionUser;
 import com.mozi.moziserver.service.EmailAuthService;
 import com.mozi.moziserver.service.UserRewardService;
@@ -25,6 +26,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
@@ -35,6 +38,7 @@ import static org.springframework.security.web.context.HttpSessionSecurityContex
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
+    private final RememberMeService rememberMeService;
     private final EmailAuthService emailAuthService;
     private final UserRewardService userRewardService;
 
@@ -52,6 +56,8 @@ public class UserController {
     @PostMapping(value = "/v1/users/signin", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> signInUser(
             @RequestBody @Valid ReqUserSignIn req,
+            HttpServletRequest request,
+            HttpServletResponse response,
             HttpSession session
     ) {
         if (req.getType() == UserAuthType.EMAIL && !StringUtils.hasLength(req.getPw())) {
@@ -63,6 +69,8 @@ public class UserController {
         SecurityContext sc = SecurityContextHolder.getContext();
         sc.setAuthentication(auth);
         session.setAttribute(SPRING_SECURITY_CONTEXT_KEY, sc);
+
+        rememberMeService.loginSuccess(request, response, auth);
 
         return new ResponseEntity<>(HttpStatus.OK);
     }

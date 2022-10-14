@@ -34,7 +34,6 @@ import java.util.Base64;
 import java.util.Map;
 import java.util.Optional;
 
-// TODO
 @Component
 @RequiredArgsConstructor
 public class UserSocialAuthenticationProvider implements AuthenticationProvider {
@@ -53,18 +52,7 @@ public class UserSocialAuthenticationProvider implements AuthenticationProvider 
     @Value("${social.apple.appId}")
     private String appleAppId;
 
-    private static ObjectMapper objectMapper = new ObjectMapper();
-
-
-//    @Autowired
-//    UserAuthPwAspect userAuthPwAspect;
-
-//    @Autowired
-//    FacebookRestClient facebookClient;
-//    @Value("${social.facebook.appid}")
-//    String facebookAppId;
-//    @Value("${social.facebook.secret}")
-//    String facebookSecret;
+    private static final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
@@ -76,42 +64,38 @@ public class UserSocialAuthenticationProvider implements AuthenticationProvider 
         if (reqUserSocialSignIn.getType() == null || reqUserSocialSignIn.getId() == null)
             return null;
 
-        UserAuth userAuth = new UserAuth();
-        userAuth.setType(reqUserSocialSignIn.getType());
-        userAuth.setId(reqUserSocialSignIn.getId());
+        final UserAuthType type = reqUserSocialSignIn.getType();
+        final String id = reqUserSocialSignIn.getId();
 
         String socialId = null;
 
-        if (userAuth.getType().isSocial()) {
+        if (type.isSocial()) {
             socialId =
-                    userAuth.getType() == UserAuthType.KAKAO ? getKakaoSocialId(userAuth.getId())
-                            : userAuth.getType() == UserAuthType.APPLE ? getAppleSocialId(userAuth.getId())
-                            : userAuth.getType() == UserAuthType.NAVER ? getNaverSocialId(userAuth.getId())
-                            : userAuth.getType() == UserAuthType.GOOGLE ? getGoogleSocialId(userAuth.getId()) : null;
+                    type == UserAuthType.KAKAO ? getKakaoSocialId(id)
+                            : type == UserAuthType.APPLE ? getAppleSocialId(id)
+                            : type == UserAuthType.NAVER ? getNaverSocialId(id)
+                            : type == UserAuthType.GOOGLE ? getGoogleSocialId(id) : null;
 
             if (socialId == null)
                 return new ResUserSignInFail(); // new ResUserSocialSignIn();
         }
 
-        User user = getUserSeqByTypeAndSocialId(userAuth.getType(), socialId);
-        userAuth.setUser(user);
+        final UserAuth userAuth = userAuthRepository.findUserAuthByTypeAndId(type, socialId).orElse(null);
+        if (userAuth == null) {
+            return new ResUserSignInFail();
+        }
 
-        return user == null ? new ResUserSignInFail() : new ResUserSocialSignIn(userAuth);
+        final User user = userAuth.getUser();
+        if (user == null) {
+            return new ResUserSignInFail();
+        }
+
+        return new ResUserSocialSignIn(userAuth);
     }
 
     @Override
     public boolean supports(Class<?> authentication) {
         return authentication.equals(ReqUserSocialSignIn.class);
-    }
-
-    private User getUserSeqByTypeAndSocialId(UserAuthType type, String socialId) {
-
-        Optional<UserAuth> userAuthOptional = userAuthRepository.findUserAuthByTypeAndId(type, socialId);
-
-        if (userAuthOptional.isEmpty())
-            return null;
-
-        return userAuthOptional.get().getUser();
     }
 
     public String getKakaoSocialId(String accessToken) {
@@ -222,27 +206,4 @@ public class UserSocialAuthenticationProvider implements AuthenticationProvider 
             throw new RuntimeException("fail generate RSAPublicKey");
         }
     }
-
-//    private String getFacebookSocialId(UserAuth userAuth) {
-//        final String accessToken = userAuth.getId();
-//
-//        final FacebookRestClient.FacebookUserInfo facebookUserInfo = facebookClient.getUserInfo(
-//                accessToken,
-//                facebookAppId,
-//                facebookSecret
-//        );
-//
-//        if(facebookUserInfo == null || StringUtils.isEmpty(facebookUserInfo.getId()))
-//            return null;
-//
-//        return facebookUserInfo.getId();
-//    }
-
-//    private String getNaverSocialId(UserAuth userAuth) {
-//        return null; // TODO
-//    }
-
-//    private String getGoogleSocialId(UserAuth userAuth) {
-//        return null; // TODO
-//    }
 }

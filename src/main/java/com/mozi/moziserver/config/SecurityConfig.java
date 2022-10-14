@@ -6,6 +6,7 @@ import com.mozi.moziserver.log.ApiLogFilter;
 import com.mozi.moziserver.repository.RememberMeTokenRepository;
 import com.mozi.moziserver.security.*;
 import com.mozi.moziserver.security.UserEmailSignInService;
+import com.mozi.moziserver.security.RememberMeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -35,6 +36,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private UserEmailSignInService userEmailSignInService;
 
     @Autowired
+    private RememberMeService rememberMeService;
+
+    @Autowired
     private ObjectMapper objectMapper;
 
     @Autowired
@@ -46,7 +50,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         auth
                 .userDetailsService(userEmailSignInService)
                 .and()
-                .authenticationProvider(userSocialAuthenticationProvider);
+                .authenticationProvider(userSocialAuthenticationProvider)
+                .authenticationProvider(new UserRememberAuthenticationProvider());
     }
 
     @Override
@@ -70,6 +75,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .authenticationEntryPoint(new DefaultAuthenticationEntryPoint())
                 .accessDeniedHandler(new DefaultAccessDeniedHandler())
                 .and()
+                .rememberMe(configurer -> configurer
+                        .alwaysRemember(true)
+                        .rememberMeServices(rememberMeService))
                 .logout()
                 .logoutUrl("/api/v1/users/signout")
                 .logoutSuccessHandler((request, response, authentication) -> {
