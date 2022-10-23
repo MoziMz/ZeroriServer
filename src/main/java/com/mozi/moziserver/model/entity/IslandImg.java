@@ -10,12 +10,13 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity(name = "island_img")
-@IdClass(IslandImgId.class)
 public class IslandImg extends AbstractTimeEntity {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long seq;
+
     private Integer type;
 
-    @Id
     private Integer level;
 
     private String imgUrl;
