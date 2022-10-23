@@ -269,7 +269,7 @@ public class UserService {
         userAuth.setPw(passwordEncoder.encode(newPw));
 
         try {
-            userRepository.save(user);
+            userAuthRepository.save(userAuth);
         } catch (Exception e) {
             throw ResponseError.InternalServerError.UNEXPECTED_ERROR.getResponseException();
         }
