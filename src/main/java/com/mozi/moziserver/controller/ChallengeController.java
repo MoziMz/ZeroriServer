@@ -92,7 +92,16 @@ public class ChallengeController {
             if(!flag) challengeLists.add(ResChallengeList.of(challenge,false));
         }
 
-        Collections.shuffle(challengeLists);
+        if ( req.getIsRandom() )
+        {
+            ResChallengeList lastResChallenge = challengeLists.get(challengeLists.size()-1);
+
+            challengeLists.remove(challengeLists.size()-1);
+
+            Collections.shuffle(challengeLists);
+
+            challengeLists.add(lastResChallenge);
+        }
 
         return ResSearchOfChallengeList.of(challengeCnt,challengeLists);
     }

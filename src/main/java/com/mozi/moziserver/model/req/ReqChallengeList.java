@@ -20,6 +20,8 @@ public class ReqChallengeList {
 
     private String keyword;
 
+    private Boolean isRandom = Boolean.FALSE;
+
     @Min(1L)
     private Long prevLastPostSeq;
 
