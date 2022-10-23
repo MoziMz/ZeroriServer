@@ -7,12 +7,12 @@ import lombok.Getter;
 public class ResAnimal {
     private final Long seq;
     private final String name;
-    private final String full_body_img_url;
+    private final String fullBodyImgUrl;
 
     private ResAnimal(Animal animal) {
         this.seq = animal.getSeq();
         this.name = animal.getName();
-        this.full_body_img_url = animal.getFullBodyImgUrl();
+        this.fullBodyImgUrl = animal.getFullBodyImgUrl();
     }
 
     public static ResAnimal of(Animal animal) {
