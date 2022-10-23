@@ -19,6 +19,8 @@ public class UserChallengeRepositoryImpl extends QuerydslRepositorySupport imple
     private final QChallenge qChallenge = QChallenge.challenge;
     private final QUser qUser = QUser.user;
 
+    private final QChallengeRecord qChallengeRecord = QChallengeRecord.challengeRecord;
+
     public UserChallengeRepositoryImpl() { super(UserChallenge.class); }
 
     @Override
@@ -56,8 +58,8 @@ public class UserChallengeRepositoryImpl extends QuerydslRepositorySupport imple
         };
 
         return from(qUserChallenge)
-                .innerJoin(qUserChallenge.challenge, qChallenge)
-                    .fetchJoin()
+                .leftJoin(qUserChallenge.challenge,qChallenge).fetchJoin()
+                .leftJoin(qChallenge.challengeRecord,qChallengeRecord).fetchJoin()
                 .orderBy(qUserChallenge.startDate.asc())
                 .where(predicates)
                 .limit(pageSize)
