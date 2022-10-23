@@ -3,6 +3,7 @@ package com.mozi.moziserver.model.entity;
 import lombok.*;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
 @Getter
 @Setter
@@ -10,8 +11,8 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity(name = "island_img")
-@IdClass(IslandImgId.class)
-public class IslandImg extends AbstractTimeEntity {
+public class IslandImg extends AbstractTimeEntity implements Serializable {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long seq;
