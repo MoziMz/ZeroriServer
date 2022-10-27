@@ -36,7 +36,6 @@ public class UserRewardService {
         return userReward.getPoint();
     }
 
-    @Transactional
     public void createUserPointRecord(User user, PointReasonType pointReasonType, Integer point){
 
         UserPointRecord userPointRecord=UserPointRecord.builder()
@@ -48,7 +47,6 @@ public class UserRewardService {
         userPointRecordRepository.save(userPointRecord);
     }
 
-    @Transactional
     public Integer getPointOfUserPointRecord(User user, LocalDateTime startDateTime, LocalDateTime endDateTime){
 
         Integer sumPoint=0;
@@ -62,7 +60,6 @@ public class UserRewardService {
         return sumPoint;
     }
 
-    @Transactional
     public void firstCreateUserReward(User user){
 
         UserReward userReward = UserReward.builder()
