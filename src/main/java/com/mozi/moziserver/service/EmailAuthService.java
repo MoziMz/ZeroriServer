@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
@@ -23,6 +24,8 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
+
+import static com.mozi.moziserver.common.Constant.PW_REGEX;
 
 @Service
 @RequiredArgsConstructor
@@ -42,6 +45,7 @@ public class EmailAuthService {
     private final UserIslandRepository userIslandRepository;
 
     private final IslandService islandService;
+    private final PasswordEncoder passwordEncoder;
 
     @Value("${spring.mail.username}")
     private String emailAddress;
@@ -88,6 +92,16 @@ public class EmailAuthService {
             throw ResponseError.InternalServerError.UNEXPECTED_ERROR.getResponseException();
         }
 
+        String tempPassword=getTempPassword();
+
+        userAuth.setPw(passwordEncoder.encode(tempPassword));
+
+        try {
+            userAuthRepository.save(userAuth);
+        } catch (Exception e) {
+            throw ResponseError.InternalServerError.UNEXPECTED_ERROR.getResponseException();
+        }
+
         EmailAuth emailAuth = new EmailAuth();
         emailAuth.setType(EmailAuthType.RESET_PW);
         emailAuth.setId(userAuth.getId());
@@ -96,16 +110,28 @@ public class EmailAuthService {
 
         saveEmailAuth(emailAuth);
 
+        String content="<h1>회원님의 임시 비밀번호는 " + tempPassword + " 입니다." + "로그인 후에 비밀번호를 변경을 해주세요</h1>";
+
         boolean isSend = sendEmail(
                 emailAuth.getId(),
-                "비밀번호 찾기 인증메일",
-                "<html> <body><h1></h1>" + "<br/>아래 [인증] 버튼을 눌러주세요." + "<form action=\"" + serverDomain + "/email/auth/" + emailAuth.getToken() + "\"> <input type=\"submit\" value=\"인증\" /> </form>"
-                        + "</body></html>"
+                "비밀번호 재설정 메일",content
         );
 
         if (!isSend) {
             throw ResponseError.InternalServerError.UNEXPECTED_ERROR.getResponseException();
         }
+    }
+
+    public String getTempPassword(){
+        UUID uuidPassword=UUID.randomUUID();
+
+        String tempPassword=uuidPassword.toString().substring(0,8)+"!";
+
+        if (!tempPassword.matches(PW_REGEX)) {
+            throw ResponseError.BadRequest.INVALID_PASSWORD.getResponseException();
+        }
+
+        return tempPassword;
     }
 
     /**
