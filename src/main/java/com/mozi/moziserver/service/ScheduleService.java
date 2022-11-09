@@ -5,6 +5,7 @@ import com.mozi.moziserver.common.Constant;
 import com.mozi.moziserver.model.entity.*;
 import com.mozi.moziserver.model.mappedenum.FcmMessageType;
 import com.mozi.moziserver.model.mappedenum.UserChallengeStateType;
+import com.mozi.moziserver.model.mappedenum.UserNoticeType;
 import com.mozi.moziserver.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -34,6 +35,8 @@ public class ScheduleService {
     private final UserIslandRepository userIslandRepository;
     private final FcmService fcmService;
 
+    private final UserNoticeRepository userNoticeRepository;
+
     @Transactional
     @Scheduled(cron = "0 0 0 * * *")
 //    For test
@@ -60,7 +63,6 @@ public class ScheduleService {
      *
      * @param date start date
      */
-    @Transactional
     public void updateUserChallengeDoingToEnd(final LocalDate date) {
         // TODO 트렌젝션 걸기
 
@@ -82,7 +84,6 @@ public class ScheduleService {
         }
     }
 
-    @Transactional
     @Scheduled(cron = "0 0 21 ? * SUN")
 //    @Scheduled(initialDelay = 1000L, fixedDelay = 100000000000000L) //    For test
     public void updatePostboxAnimalByUserPointRecord() {
@@ -101,24 +102,37 @@ public class ScheduleService {
 
         // 2. 조건에 만족하는 유저면 포스트박스와 상황에 맞게 유저 아일랜드를 업그레이드 해준다.
         for (User user : accomplishedUser) {
-            User curUser = userRepository.findById(user.getSeq()).orElse(null);
-            if (curUser == null) {
-                // TODO
-            }
+//            User curUser = userRepository.findById(user.getSeq()).orElse(null);
+//            if (curUser == null) {
+//                // TODO 탈퇴한 유저를 재조회하면 좋음
+//                continue;
+//            }
+            PostboxMessageAnimal lastPostboxMessageAnimal = postboxMessageAnimalRepository.findLastOneByUser(user);
 
-            PostboxMessageAnimal lastPostboxMessageAnimal = postboxMessageAnimalRepository.findLastOneByUser(curUser);
-//
-            if (lastPostboxMessageAnimal.getLevel() == 2) {
-                if (lastPostboxMessageAnimal.getAnimal().getIslandLevel() < Constant.islandMaxLevel) {
-                    Animal nextAnimal = animalRepository.findByIslandTypeAndIslandLevel(lastPostboxMessageAnimal.getAnimal().getIslandType(), lastPostboxMessageAnimal.getLevel() + 1);
-                    postboxMessageAnimalService.createPostboxMessageAnimal(curUser, nextAnimal);
+            withTransaction(() -> {
+
+                lastPostboxMessageAnimal.setLevel(lastPostboxMessageAnimal.getLevel() + 1);
+                lastPostboxMessageAnimal.setCheckedState(false);
+                postboxMessageAnimalRepository.save(lastPostboxMessageAnimal);
+
+                if (lastPostboxMessageAnimal.getLevel() == 3) {
+                    if (lastPostboxMessageAnimal.getAnimal().getIslandLevel() < Constant.islandMaxLevel) {
+                        Animal nextAnimal = animalRepository.findByIslandTypeAndIslandLevel(lastPostboxMessageAnimal.getAnimal().getIslandType(), lastPostboxMessageAnimal.getAnimal().getIslandLevel() + 1);
+                        postboxMessageAnimalService.createPostboxMessageAnimal(user, nextAnimal);
+                    }
+                    userIslandRepository.updateUserIslandRewardLevel(user.getSeq(),lastPostboxMessageAnimal.getAnimal().getIslandType());
                 }
-                userIslandRepository.updateUserIslandRewardLevel(curUser.getSeq(),lastPostboxMessageAnimal.getAnimal().getIslandType());
-            }
 
-            lastPostboxMessageAnimal.setLevel(lastPostboxMessageAnimal.getLevel() + 1);
-            lastPostboxMessageAnimal.setCheckedState(false);
-            postboxMessageAnimalRepository.save(lastPostboxMessageAnimal);
+                //동물의 편지 알림
+                UserNotice userNotice = UserNotice.builder()
+                        .user(user)
+                        .checkedState(false)
+                        .type(UserNoticeType.PostboxMessageAnimal.ordinal())
+                        .build();
+
+                userNoticeRepository.save(userNotice);
+
+            });
 
             fcmService.sendMessageToUser(lastPostboxMessageAnimal.getUser(), FcmMessageType.NEW_POST_BOX_MESSAGE);
         }
