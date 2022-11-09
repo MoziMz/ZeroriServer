@@ -40,6 +40,21 @@ public class FcmService {
         }
     }
 
+    public void sendMessageToAll(FcmMessageType type) {
+        Message message = Message.builder()
+                .putData("isSilent", "" + type.isSilent())
+                .putData("type", type.toString())
+                .setTopic("APP")
+                .build();
+
+        try {
+            String response = FirebaseMessaging.getInstance().send(message);
+            log.debug(response);
+        } catch (FirebaseMessagingException e) {
+            log.error("FirebaseMessagingException", e);
+        }
+    }
+
     public void sendMessageToUser(User user, FcmMessageType type) {
         List<UserFcm> userFcmList = userFcmRepository.findAllByUserSeqAndState(user.getSeq(), Boolean.TRUE);
         // TODO userFcmList 길이가 0일 때 에러처리 추가

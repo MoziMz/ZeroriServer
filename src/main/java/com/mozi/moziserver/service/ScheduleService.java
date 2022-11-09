@@ -82,6 +82,8 @@ public class ScheduleService {
 
                 userChallengeRepository.updateUserChallengeState(curUserChallenge.getSeq(), UserChallengeStateType.DOING, UserChallengeStateType.END);
         }
+
+        fcmService.sendMessageToAll(FcmMessageType.END_USER_CHALLENGE_MESSAGE);
     }
 
     @Scheduled(cron = "0 0 21 ? * SUN")
@@ -135,6 +137,8 @@ public class ScheduleService {
             });
 
             fcmService.sendMessageToUser(lastPostboxMessageAnimal.getUser(), FcmMessageType.NEW_POST_BOX_MESSAGE);
+
+            fcmService.sendMessageToAll(FcmMessageType.USER_NOTICE_POSTBOX_MESSAGE_ANIMAL_MESSAGE);
         }
     }
 
