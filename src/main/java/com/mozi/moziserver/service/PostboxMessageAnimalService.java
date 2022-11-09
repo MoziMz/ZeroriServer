@@ -3,8 +3,11 @@ package com.mozi.moziserver.service;
 import com.mozi.moziserver.httpException.ResponseError;
 import com.mozi.moziserver.model.entity.*;
 import com.mozi.moziserver.model.mappedenum.FcmMessageType;
+import com.mozi.moziserver.model.mappedenum.UserChallengeStateType;
+import com.mozi.moziserver.model.mappedenum.UserNoticeType;
 import com.mozi.moziserver.model.req.ReqList;
 import com.mozi.moziserver.repository.PostboxMessageAnimalRepository;
+import com.mozi.moziserver.repository.UserNoticeRepository;
 import com.mozi.moziserver.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -20,6 +24,8 @@ public class PostboxMessageAnimalService {
     private final UserRepository userRepository;
     private final PostboxMessageAnimalRepository postboxMessageAnimalRepository;
     private final FcmService fcmService;
+
+    private final UserNoticeRepository userNoticeRepository;
 
     public PostboxMessageAnimal getPostboxMessageAnimal(Long userSeq, Long seq) {
         PostboxMessageAnimal postboxMessageAnimal = postboxMessageAnimalRepository.findById(seq)
@@ -71,5 +77,33 @@ public class PostboxMessageAnimalService {
         postboxMessageAnimalRepository.save(postboxMessageAnimal);
 
         fcmService.sendMessageToUser(postboxMessageAnimal.getUser(), FcmMessageType.NEW_POST_BOX_MESSAGE);
+    }
+
+    public UserNotice getUserNoticeByUserAndType(Long userSeq, UserNoticeType userNoticeType){
+        User user = userRepository.findById(userSeq)
+                .orElseThrow(ResponseError.NotFound.USER_NOT_EXISTS::getResponseException);
+
+        return userNoticeRepository.findOneByUserAndType(user,userNoticeType.ordinal())
+                .orElseThrow(ResponseError.NotFound.USER_NOTICE_NOT_EXISTS::getResponseException);
+    }
+
+    @Transactional
+    public PostboxMessageAnimal getRecentPostboxMessageAnimalByUser(Long userSeq){
+        User user = userRepository.findById(userSeq)
+                .orElseThrow(ResponseError.NotFound.USER_NOT_EXISTS::getResponseException);
+
+        return postboxMessageAnimalRepository.findLastOneByUser(user);
+
+    }
+
+    @Transactional
+    public void checkUserNotice(Long userSeq,UserNoticeType type){
+
+        UserNotice userNotice = getUserNoticeByUserAndType(userSeq,type);
+
+        userNotice.setCheckedState(true);
+
+        userNoticeRepository.save(userNotice);
+
     }
 }

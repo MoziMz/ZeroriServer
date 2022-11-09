@@ -1,12 +1,13 @@
 package com.mozi.moziserver.controller;
 
+import com.mozi.moziserver.httpException.ResponseError;
 import com.mozi.moziserver.model.entity.PostboxMessageAnimal;
 import com.mozi.moziserver.model.entity.PreparationItem;
+import com.mozi.moziserver.model.entity.User;
+import com.mozi.moziserver.model.entity.UserNotice;
+import com.mozi.moziserver.model.mappedenum.UserNoticeType;
 import com.mozi.moziserver.model.req.ReqList;
-import com.mozi.moziserver.model.res.ResAnimal;
-import com.mozi.moziserver.model.res.ResPostboxMessageAdminList;
-import com.mozi.moziserver.model.res.ResPostboxMessageAnimal;
-import com.mozi.moziserver.model.res.ResPostboxMessageAnimalList;
+import com.mozi.moziserver.model.res.*;
 import com.mozi.moziserver.security.SessionUser;
 import com.mozi.moziserver.service.AnimalService;
 import com.mozi.moziserver.service.PostboxMessageAdminService;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -91,4 +93,32 @@ public class PostboxMessageController {
     ) {
         return ResAnimal.of(animalService.getAnimal(seq));
     }
+
+    @ApiOperation("동물의 편지 알림 조회")
+    @GetMapping("/v1/user-notices/{type}")
+    public ResNoticeOfPostboxMessageAnimal getUserNotice(
+            @ApiParam(hidden = true) @SessionUser Long userSeq,
+            @PathVariable UserNoticeType type
+    ) {
+        //가장 최근꺼(마지막) 가져오기
+        PostboxMessageAnimal postboxMessageAnimal = postboxMessageAnimalService.getRecentPostboxMessageAnimalByUser(userSeq);
+
+        //UserNotice에서 type: PostboxMessageAnimal이고 checked_state: false인 User 조회한다.
+        UserNotice userNotice = postboxMessageAnimalService.getUserNoticeByUserAndType(userSeq,type);
+
+        return ResNoticeOfPostboxMessageAnimal.of(postboxMessageAnimal);
+
+    }
+
+    @ApiOperation("동물의 편지 알림 확인")
+    @PutMapping("/v1/user-notices/{type}/checked")
+    public ResponseEntity<Void> checkedUserNotice(
+            @ApiParam(hidden = true) @SessionUser Long userSeq,
+            @PathVariable UserNoticeType type
+    ) {
+        postboxMessageAnimalService.checkUserNotice(userSeq,type);
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
 }

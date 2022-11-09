@@ -168,7 +168,9 @@ public interface ResponseError {
         PREPARATIONITEM_NOT_EXISTS("preparationItem not exists"),
         CONFIRM_NOT_EXISTS("confirm not exists"),
         CONFIRM_LIKE_NOT_EXISTS("confirm like not exists"),
-        BOARD_NOT_EXISTS("board not exists");
+        BOARD_NOT_EXISTS("board not exists"),
+
+        USER_NOTICE_NOT_EXISTS("user notice not exists");
 
         private final String message;
 
