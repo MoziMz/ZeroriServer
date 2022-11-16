@@ -50,4 +50,5 @@ cloud:
       accessKey: ${ACCESS_KEY}
       secretKey: ${SECRET_KEY}
 
-
+server:
+  port: 8080
