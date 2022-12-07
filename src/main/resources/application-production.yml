@@ -3,3 +3,6 @@ spring:
     url: jdbc:mysql://${DB_ADDRESS}:3306/zeroplanet_prod?autoReconnect=true&useSSL=false
 server:
   domain: https://prod.zero-ri.com
+springfox:
+  documentation:
+    enabled: false

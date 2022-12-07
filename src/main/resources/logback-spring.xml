@@ -26,6 +26,9 @@
         <root level="INFO">
             <appender-ref ref="STDOUT" />
         </root>
+        <logger name="com.mozi.moziserver.log.ApiLogFilter" level="INFO" additivity="false">
+            <appender-ref ref="JSON" />
+        </logger>
     </springProfile>
 
     <springProfile name="production">
