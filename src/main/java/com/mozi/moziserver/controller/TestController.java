@@ -29,13 +29,6 @@ public class TestController {
 
     private final BadWordService badWordService;
 
-    @ApiOperation("API 확인 용도")
-    @GetMapping("/health-check")
-    public ResponseEntity<Void> getHealthCheck(
-    ) {
-        return new ResponseEntity<>(HttpStatus.OK);
-    }
-
     @ApiOperation("유저 챌린지 startDate 변경")
     @PutMapping("/user-challenges/{seq}")
     public ResponseEntity<Void> updateUserChallengeStartDate(
