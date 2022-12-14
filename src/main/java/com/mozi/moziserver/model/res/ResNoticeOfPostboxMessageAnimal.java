@@ -16,7 +16,8 @@ public class ResNoticeOfPostboxMessageAnimal {
 
         this.postboxMessageAnimalSeq=postboxMessageAnimal.getSeq();
 
-        this.nextAnimalSeq=postboxMessageAnimal.getAnimal().getSeq()+1;
+
+        this.nextAnimalSeq=postboxMessageAnimal.getLevel()==3?postboxMessageAnimal.getAnimal().getSeq()+1:null;
 
     }
 
