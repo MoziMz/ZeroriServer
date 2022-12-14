@@ -1,6 +1,8 @@
 package com.mozi.moziserver.controller;
 
+import com.mozi.moziserver.model.req.ReqList;
 import com.mozi.moziserver.model.req.ReqTestUserChallengeStartDateUpdate;
+import com.mozi.moziserver.model.res.ResConfirmList;
 import com.mozi.moziserver.security.SessionUser;
 import com.mozi.moziserver.service.BadWordService;
 import com.mozi.moziserver.service.UserChallengeService;
@@ -14,6 +16,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Profile("!production")
 @Slf4j
@@ -24,6 +28,13 @@ public class TestController {
     private final UserChallengeService userChallengeService;
 
     private final BadWordService badWordService;
+
+    @ApiOperation("API 확인 용도")
+    @GetMapping("/health-check")
+    public ResponseEntity<Void> getHealthCheck(
+    ) {
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 
     @ApiOperation("유저 챌린지 startDate 변경")
     @PutMapping("/user-challenges/{seq}")

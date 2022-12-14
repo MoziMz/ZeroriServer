@@ -52,7 +52,8 @@ public interface Constant {
             "/api/*/users/nicknames/{nickName}/check",
             "/api/*/users/emails/{email}/check",
             "/api/*/users/find-pw",
-            "/api/*/find/emails"
+            "/api/*/find/emails",
+            "/api/*/health-check"
     };
 
     String[] AUTHENTICATED_PATHS = new String[]{
