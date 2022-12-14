@@ -26,6 +26,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.Optional;
@@ -47,6 +49,8 @@ public class ApiLogFilter extends OncePerRequestFilter {
             Pattern.compile("(?<=\\\"" + CURRENT_PW_FIELD_NAME + "\\\":\\\")[\\S]+(?=\\\"\\})")
     );
 
+    private final ZoneId koreaZoneId = ZoneId.of("Asia/Seoul");
+
     private final String activeProfiles;
     private final ObjectMapper objectMapper;
 
@@ -55,7 +59,7 @@ public class ApiLogFilter extends OncePerRequestFilter {
 
         MDC.clear();
 
-        final LocalDateTime startDatetime = LocalDateTime.now();
+        final LocalDateTime startDatetime = ZonedDateTime.now().withZoneSameInstant(koreaZoneId).toLocalDateTime();
         ApiLog.ApiLogBuilder apiLogBuilder = ApiLog.builder()
                 .profiles(activeProfiles)
                 .time(startDatetime);
@@ -94,7 +98,7 @@ public class ApiLogFilter extends OncePerRequestFilter {
             else
                 filterChain.doFilter(wrappedRequest, wrappedResponse);
         } finally {
-            final LocalDateTime endDatetime = LocalDateTime.now();
+            final LocalDateTime endDatetime = ZonedDateTime.now().withZoneSameInstant(koreaZoneId).toLocalDateTime();
             final long durationMillis = ChronoUnit.MILLIS.between(startDatetime, endDatetime);
             apiLogBuilder.duration(durationMillis);
 
