@@ -202,7 +202,10 @@ public class ApiLogFilter extends OncePerRequestFilter {
     }
 
     private String hidePw(String reqParam) {
-        if (!StringUtils.hasLength(reqParam) || !reqParam.contains("\"" + PW_FIELD_NAME + "\"") || !reqParam.contains("\"" + CURRENT_PW_FIELD_NAME + "\"")) {
+        if (!StringUtils.hasLength(reqParam) ) {
+            return reqParam;
+        }
+        if(!(reqParam.contains("\"" + PW_FIELD_NAME + "\"") || reqParam.contains("\"" + CURRENT_PW_FIELD_NAME + "\""))){
             return reqParam;
         }
 
