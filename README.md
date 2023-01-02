@@ -36,3 +36,106 @@
 
 # 설계
 <img width="786" alt="KakaoTalk_Photo_2022-11-09-21-21-54" src="https://user-images.githubusercontent.com/47858282/200829291-d7c99d14-6d36-4354-8100-05abcb7f5627.png">
+
+# **🐰🐯** Commit C**onvention**
+
+## 🛼 Git Workflow
+
+Branch를 생성하기 전 Issue를 먼저 작성하고,
+
+`<Prefix>/#<Issue_Number>` 의 양식에 따라 브랜치 명을 작성합니다.
+
+## 🛼 Branch Prefix
+
+- `develop` : feature 브랜치에서 구현된 기능들이 merge될 브랜치. **default 브랜치이다.**
+- `feature` : 기능을 개발하는 브랜치, 이슈별/작업별로 브랜치를 생성하여 기능을 개발한다
+- `main` : 개발이 완료된 산출물이 저장될 공간
+- `release` : 릴리즈를 준비하는 브랜치, 릴리즈 직전 QA 기간에 사용한다
+- `bug` : 버그를 수정하는 브랜치
+- `hotfix` : 정말 급하게, 제출 직전에 에러가 난 경우 사용하는 브렌치
+
+---
+
+## 🧸 Commit Format
+
+`[prefix 소문자로 시작] #이슈번호 - 이슈내용` or `[prefix] 커밋내용`
+
+Ex. [feat] #1 - 회원가입
+
+## 🧸 Commit Prefix
+
+| Type 키워드 | 사용 시점 |
+| --- | --- |
+| feat | 새로운 기능 추가 |
+| fix | 버그 수정 |
+| docs | 문서 수정 |
+| style | 코드 스타일 변경 (코드 포매팅, 세미콜론 누락 등)기능 수정이 없는 경우 |
+| design | 사용자 UI 디자인 변경 (CSS 등) |
+| test | 테스트 코드, 리팩토링 테스트 코드 추가 |
+| refactor | 코드 리팩토링 |
+| build | 빌드 파일 수정 |
+| ci | CI 설정 파일 수정 |
+| perf | 성능 개선 |
+| chore | 빌드 업무 수정, 패키지 매니저 수정 (gitignore 수정 등) |
+| rename | 파일 혹은 폴더명을 수정만 한 경우 |
+| remove | 파일을 삭제만 한 경우 |
+
+---
+
+## 🎈Issue Format (using template)
+
+```markdown
+---
+name: Custom issue template
+about: Describe this issue template's purpose here.
+title: ''
+labels: ''
+assignees: ''
+
+---
+
+## 목적
+> 
+## 작업 상세내용
+- [ ]
+## 참고 사항
+[링크 이름](https://www.naver.com/)
+```
+
+---
+
+## 🎈PR Format (using template)
+
+```markdown
+---
+name: PR template
+about: pull request template
+title: ''
+labels: ''
+assignees: ''
+
+---
+
+## 개요 
+- Issue 번호
+- 작업 내용
+
+### 세부 작업 내용
+- 로그인 기능 추가했습니다.
+- 아주 아주 상세하게 적기
+
+### PR 타입(하나 이상의 PR 타입을 선택해주세요)
+-[] 기능 추가
+-[] 기능 삭제
+-[] 버그 수정
+-[] 의존성, 환경 변수, 빌드 관련 코드 업데이트
+
+### 반영 브랜치
+ex) feat/login -> dev
+
+### 테스트 결과 (optional)
+ex) 베이스 브랜치에 포함되기 위한 코드는 모두 정상적으로 동작해야 합니다. 결과물에 대한 스크린샷, GIF, 혹은 라이브
+
+### 특이 사항 (optional)
+- 로컬 및 개발 서버에 환경변수 추가되었습니다.
+```
