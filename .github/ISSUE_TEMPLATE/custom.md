@@ -11,7 +11,7 @@ assignees: ''
 > 
 
 ## 작업 상세내용
-- [ ]
+- [  ] 
 
 ## 참고 사항
 [링크 이름](https://www.naver.com/)
