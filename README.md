@@ -85,19 +85,12 @@ Ex. [feat] #1 - 회원가입
 ## 🎈Issue Format (using template)
 
 ```markdown
----
-name: Custom issue template
-about: Describe this issue template's purpose here.
-title: ''
-labels: ''
-assignees: ''
-
----
-
 ## 목적
 > 
+
 ## 작업 상세내용
-- [ ]
+- []
+
 ## 참고 사항
 [링크 이름](https://www.naver.com/)
 ```
@@ -107,15 +100,6 @@ assignees: ''
 ## 🎈PR Format (using template)
 
 ```markdown
----
-name: PR template
-about: pull request template
-title: ''
-labels: ''
-assignees: ''
-
----
-
 ## 개요 
 - Issue 번호
 - 작업 내용
@@ -125,10 +109,10 @@ assignees: ''
 - 아주 아주 상세하게 적기
 
 ### PR 타입(하나 이상의 PR 타입을 선택해주세요)
--[] 기능 추가
--[] 기능 삭제
--[] 버그 수정
--[] 의존성, 환경 변수, 빌드 관련 코드 업데이트
+- [] 기능 추가
+- [] 기능 삭제
+- [] 버그 수정
+- [] 의존성, 환경 변수, 빌드 관련 코드 업데이트
 
 ### 반영 브랜치
 ex) feat/login -> dev
