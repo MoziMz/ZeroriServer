@@ -19,5 +19,7 @@ public class Suggestion extends AbstractTimeEntity{
     @JoinColumn(name = "user_seq")
     private User user;
 
-    private String content;
+    private String challengeName;
+
+    private String explanation;
 }

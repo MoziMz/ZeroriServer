@@ -19,14 +19,15 @@ public class SuggestionService {
     private final SuggestionRepository suggestionRepository;
 
     @Transactional
-    public void createSuggestion(Long userSeq, ReqSuggestionCreate reqSuggestionCreate) {
+    public void createSuggestion(Long userSeq, ReqSuggestionCreate req) {
 
         User user = userRepository.findById(userSeq)
                 .orElseThrow(ResponseError.NotFound.USER_NOT_EXISTS::getResponseException);
 
         Suggestion suggestion = Suggestion.builder()
                 .user(user)
-                .content(reqSuggestionCreate.getContent())
+                .challengeName(req.getChallengeName())
+                .explanation(req.getExplanation())
                 .build();
 
         suggestionRepository.save(suggestion);

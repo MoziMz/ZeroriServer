@@ -8,6 +8,10 @@ import javax.validation.constraints.NotBlank;
 @Getter
 @Setter
 public class ReqSuggestionCreate {
+
     @NotBlank
-    private String content;
+    private String challengeName;
+
+    @NotBlank
+    private String explanation;
 }

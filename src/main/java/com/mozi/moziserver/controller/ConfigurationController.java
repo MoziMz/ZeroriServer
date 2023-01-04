@@ -82,9 +82,9 @@ public class ConfigurationController {
     @PostMapping("/v1/suggestions")
     public ResponseEntity<Void> createSuggestion(
             @ApiParam(hidden = true) @SessionUser Long userSeq,
-            @RequestBody @Valid ReqSuggestionCreate reqSuggestionCreate
+            @RequestBody @Valid ReqSuggestionCreate req
     ) {
-        suggestionService.createSuggestion(userSeq, reqSuggestionCreate);
+        suggestionService.createSuggestion(userSeq, req);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
