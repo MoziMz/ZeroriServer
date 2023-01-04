@@ -109,10 +109,12 @@ public class ApiLogFilter extends OncePerRequestFilter {
 
             setRequestLog(wrappedRequest, apiLogBuilder);
             setResponseLog(wrappedResponse, apiLogBuilder);
-
-            try {
-                log.info(objectMapper.writeValueAsString(apiLogBuilder.build()));
-            } catch (Exception e) {
+            
+            if(!wrappedRequest.getRequestURI().equals("/api/health-check")){
+                try {
+                    log.info(objectMapper.writeValueAsString(apiLogBuilder.build()));
+                } catch (Exception ignored) {
+                }
             }
         }
     }
