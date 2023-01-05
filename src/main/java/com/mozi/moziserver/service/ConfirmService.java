@@ -3,6 +3,7 @@ package com.mozi.moziserver.service;
 import com.mozi.moziserver.common.JpaUtil;
 import com.mozi.moziserver.httpException.ResponseError;
 import com.mozi.moziserver.model.entity.*;
+import com.mozi.moziserver.model.mappedenum.ConfirmListType;
 import com.mozi.moziserver.model.mappedenum.DeclarationType;
 import com.mozi.moziserver.model.mappedenum.PointReasonType;
 import com.mozi.moziserver.model.req.ReqConfirmOfUser;
@@ -104,10 +105,24 @@ public class ConfirmService {
         });
     }
 
-    public List<Confirm> getConfirmList(Long userSeq, ReqList req) {
+    public List<Confirm> getConfirmList(Long userSeq, ReqList req, ConfirmListType confirmListType) {
         List<Confirm> confirmList = confirmRepository.findAll(req.getPrevLastSeq(), req.getPageSize());
 
-        Collections.shuffle(confirmList);
+        if(confirmListType.equals(ConfirmListType.RECENT)){
+            LocalDateTime endDateTime = LocalDateTime.now();
+            LocalDateTime startDateTime = endDateTime.minusDays(7).withHour(0).withMinute(0).withSecond(0);
+
+            confirmList = confirmList.stream()
+                        .filter(c -> (c.getCreatedAt().isAfter(startDateTime)
+                                    && c.getCreatedAt().isBefore(endDateTime))
+                                    || c.getCreatedAt().isEqual(startDateTime)
+                                    || c.getCreatedAt().isEqual(endDateTime))
+                        .collect(Collectors.toList());
+
+
+        }
+
+        toRandomList(confirmList);
 
         setConfirmLike(userSeq, confirmList);
 
@@ -429,6 +444,16 @@ public class ConfirmService {
         setConfirmLike(userSeq, confirmList);
 
         return confirmList;
+    }
+
+    public void toRandomList(List<Confirm> confirmList){
+
+        Confirm lastConfirm=confirmList.remove(confirmList.size()-1);
+
+        Collections.shuffle(confirmList);
+
+        confirmList.add(lastConfirm);
+
     }
 
     private void withTransaction(Runnable runnable) {
