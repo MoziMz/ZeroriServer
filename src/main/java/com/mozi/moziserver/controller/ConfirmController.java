@@ -1,6 +1,7 @@
 package com.mozi.moziserver.controller;
 
 import com.mozi.moziserver.httpException.ResponseError;
+import com.mozi.moziserver.model.mappedenum.ConfirmListType;
 import com.mozi.moziserver.model.req.ReqConfirmOfUser;
 import com.mozi.moziserver.model.req.ReqConfirmSticker;
 import com.mozi.moziserver.model.req.ReqDeclarationCreate;
@@ -21,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -47,13 +49,18 @@ public class ConfirmController {
     }
 
 
-    @ApiOperation("스토리 전체 조회")
+    @ApiOperation("스토리 리스트 조회")
     @GetMapping("/v1/challenges/confirms")
     public List<ResConfirmList> getConfirmList(
             @ApiParam(hidden = true) @SessionUser Long userSeq,
+            @RequestParam(required = false) Optional<ConfirmListType> confirmListType,
             @Valid ReqList req
-    ) {
-        return confirmService.getConfirmList(userSeq, req)
+            )
+    {
+        if(confirmListType.isEmpty()){
+            confirmListType=Optional.of(ConfirmListType.RECENT);
+        }
+        return confirmService.getConfirmList(userSeq, req, confirmListType.get())
                 .stream()
                 .map(ResConfirmList::of)
                 .collect(Collectors.toList());
