@@ -6,5 +6,5 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum UserNoticeType {
-    PostboxMessageAnimal
+    POSTBOX_MESSAGE_ANIMAL_RECEIVED_ITEM
 }

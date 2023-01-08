@@ -129,7 +129,7 @@ public class ScheduleService {
                 UserNotice userNotice = UserNotice.builder()
                         .user(user)
                         .checkedState(false)
-                        .type(UserNoticeType.PostboxMessageAnimal.ordinal())
+                        .type(UserNoticeType.POSTBOX_MESSAGE_ANIMAL_RECEIVED_ITEM)
                         .build();
 
                 userNoticeRepository.save(userNotice);

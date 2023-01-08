@@ -1,6 +1,7 @@
 package com.mozi.moziserver.repository;
 
 import com.mozi.moziserver.model.entity.*;
+import com.mozi.moziserver.model.mappedenum.UserNoticeType;
 import com.querydsl.core.types.Predicate;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 
@@ -15,7 +16,7 @@ public class UserNoticeRepositoryImpl extends QuerydslRepositorySupport implemen
     public UserNoticeRepositoryImpl(){super(UserNotice.class);}
 
     @Override
-    public Optional<UserNotice> findOneByUserAndType(User user, Integer type){
+    public Optional<UserNotice> findOneByUserAndType(User user, UserNoticeType type){
 
         final Predicate[] predicates = new Predicate[]{
                 qUserNotice.user.eq(user),

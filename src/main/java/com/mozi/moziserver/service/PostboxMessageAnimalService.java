@@ -83,7 +83,7 @@ public class PostboxMessageAnimalService {
         User user = userRepository.findById(userSeq)
                 .orElseThrow(ResponseError.NotFound.USER_NOT_EXISTS::getResponseException);
 
-        return userNoticeRepository.findOneByUserAndType(user,userNoticeType.ordinal())
+        return userNoticeRepository.findOneByUserAndType(user,userNoticeType)
                 .orElseThrow(ResponseError.NotFound.USER_NOTICE_NOT_EXISTS::getResponseException);
     }
 

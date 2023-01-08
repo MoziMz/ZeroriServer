@@ -1,5 +1,6 @@
 package com.mozi.moziserver.model.entity;
 
+import com.mozi.moziserver.model.mappedenum.UserNoticeType;
 import lombok.*;
 
 import javax.persistence.*;
@@ -15,7 +16,8 @@ public class UserNotice {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long seq;
 
-    private Integer type;
+    @Enumerated(EnumType.STRING)
+    private UserNoticeType type;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_seq")
