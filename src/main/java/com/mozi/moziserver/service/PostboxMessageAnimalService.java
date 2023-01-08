@@ -3,7 +3,6 @@ package com.mozi.moziserver.service;
 import com.mozi.moziserver.httpException.ResponseError;
 import com.mozi.moziserver.model.entity.*;
 import com.mozi.moziserver.model.mappedenum.FcmMessageType;
-import com.mozi.moziserver.model.mappedenum.UserChallengeStateType;
 import com.mozi.moziserver.model.mappedenum.UserNoticeType;
 import com.mozi.moziserver.model.req.ReqList;
 import com.mozi.moziserver.repository.PostboxMessageAnimalRepository;
@@ -15,7 +14,6 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @Service
@@ -83,7 +81,7 @@ public class PostboxMessageAnimalService {
         User user = userRepository.findById(userSeq)
                 .orElseThrow(ResponseError.NotFound.USER_NOT_EXISTS::getResponseException);
 
-        return userNoticeRepository.findOneByUserAndTypeAndCheckedState(user,userNoticeType)
+        return userNoticeRepository.findOneByUserAndTypeAndCheckedState(user, userNoticeType)
                 .orElseThrow(ResponseError.NotFound.USER_NOTICE_NOT_EXISTS::getResponseException);
     }
 
@@ -99,11 +97,10 @@ public class PostboxMessageAnimalService {
     @Transactional
     public void checkUserNotice(Long userSeq,UserNoticeType type){
 
-        UserNotice userNotice = getUserNoticeByUserAndType(userSeq,type);
+        UserNotice userNotice = getUserNoticeByUserAndType(userSeq, type);
 
         userNotice.setCheckedState(true);
 
         userNoticeRepository.save(userNotice);
-
     }
 }

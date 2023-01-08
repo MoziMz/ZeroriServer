@@ -1,9 +1,7 @@
 package com.mozi.moziserver.controller;
 
-import com.mozi.moziserver.httpException.ResponseError;
 import com.mozi.moziserver.model.entity.PostboxMessageAnimal;
 import com.mozi.moziserver.model.entity.PreparationItem;
-import com.mozi.moziserver.model.entity.User;
 import com.mozi.moziserver.model.entity.UserNotice;
 import com.mozi.moziserver.model.mappedenum.UserNoticeType;
 import com.mozi.moziserver.model.req.ReqList;
@@ -22,7 +20,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -94,29 +91,25 @@ public class PostboxMessageController {
         return ResAnimal.of(animalService.getAnimal(seq));
     }
 
-    @ApiOperation("동물의 편지 알림 조회")
+    @ApiOperation("유저 알림 조회")
     @GetMapping("/v1/user-notices/{type}")
-    public ResNoticeOfPostboxMessageAnimal getUserNotice(
+    public ResUserNotice getUserNotice(
             @ApiParam(hidden = true) @SessionUser Long userSeq,
             @PathVariable UserNoticeType type
     ) {
-        //가장 최근꺼(마지막) 가져오기
-        PostboxMessageAnimal postboxMessageAnimal = postboxMessageAnimalService.getRecentPostboxMessageAnimalByUser(userSeq);
-
         //UserNotice에서 type: PostboxMessageAnimal이고 checked_state: false인 User 조회한다.
         UserNotice userNotice = postboxMessageAnimalService.getUserNoticeByUserAndType(userSeq,type);
 
-        return ResNoticeOfPostboxMessageAnimal.of(postboxMessageAnimal);
-
+        return ResUserNotice.of(userNotice);
     }
 
-    @ApiOperation("동물의 편지 알림 확인")
+    @ApiOperation("유저 알림 확인")
     @PutMapping("/v1/user-notices/{type}/checked")
-    public ResponseEntity<Void> checkedUserNotice(
+    public ResponseEntity<Void> checkUserNotice(
             @ApiParam(hidden = true) @SessionUser Long userSeq,
             @PathVariable UserNoticeType type
     ) {
-        postboxMessageAnimalService.checkUserNotice(userSeq,type);
+        postboxMessageAnimalService.checkUserNotice(userSeq, type);
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
