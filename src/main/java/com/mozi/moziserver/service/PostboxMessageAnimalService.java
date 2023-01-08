@@ -23,6 +23,7 @@ public class PostboxMessageAnimalService {
     private final PostboxMessageAnimalRepository postboxMessageAnimalRepository;
     private final FcmService fcmService;
 
+    private final UserNoticeService userNoticeService;
     private final UserNoticeRepository userNoticeRepository;
 
     public PostboxMessageAnimal getPostboxMessageAnimal(Long userSeq, Long seq) {
@@ -60,7 +61,7 @@ public class PostboxMessageAnimalService {
 
         postboxMessageAnimalRepository.save(postboxMessageAnimal);
 
-        fcmService.sendMessageToUser(postboxMessageAnimal.getUser(), FcmMessageType.NEW_POST_BOX_MESSAGE);
+//        fcmService.sendMessageToUser(postboxMessageAnimal.getUser(), FcmMessageType.NEW_POST_BOX_MESSAGE);
     }
 
     @Transactional
@@ -74,7 +75,7 @@ public class PostboxMessageAnimalService {
 
         postboxMessageAnimalRepository.save(postboxMessageAnimal);
 
-        fcmService.sendMessageToUser(postboxMessageAnimal.getUser(), FcmMessageType.NEW_POST_BOX_MESSAGE);
+        userNoticeService.upsertUserNotice(user, UserNoticeType.POSTBOX_MESSAGE_ANIMAL_NEW_ARRIVED, postboxMessageAnimal.getSeq());
     }
 
     public UserNotice getUserNoticeByUserAndType(Long userSeq, UserNoticeType userNoticeType){
