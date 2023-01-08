@@ -88,4 +88,6 @@ public interface Constant {
     int islandMaxLevel = 6;
 
     int lastIslandType = 6;
+
+    int postboxAnimalMaxLevel = 3;
 }

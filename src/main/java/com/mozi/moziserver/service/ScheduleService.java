@@ -111,6 +111,13 @@ public class ScheduleService {
 //            }
             PostboxMessageAnimal lastPostboxMessageAnimal = postboxMessageAnimalRepository.findLastOneByUser(user);
 
+            // step. 유저가 섬의 '최종 상태'(마지막 동물이 위시리스트를 모두 받은 상태)인지 확인
+            // 조건문을 만족한다면 continue <- 해당 유저는 현재 단계에서 변화할 부분이 없다.
+            // TODO 추후 메서드로 분리
+            boolean isLastPostboxMessageAnimalStateInIsland = lastPostboxMessageAnimal.getAnimal().getIslandLevel().equals(Constant.islandMaxLevel)
+                    && lastPostboxMessageAnimal.getLevel().equals(Constant.postboxAnimalMaxLevel);
+            if (isLastPostboxMessageAnimalStateInIsland) continue;
+
             withTransaction(() -> {
 
                 lastPostboxMessageAnimal.setLevel(lastPostboxMessageAnimal.getLevel() + 1);
