@@ -13,17 +13,19 @@ public class UserNoticeService {
 
     private final UserNoticeRepository userNoticeRepository;
 
-    public void upsertUserNotice(User user, UserNoticeType type) {
+    public void upsertUserNotice(User user, UserNoticeType type, Long contentSeq) {
 
         UserNotice userNotice = userNoticeRepository.findByUserAndType(user, type)
                 .orElse(
                         UserNotice.builder()
                                 .user(user)
                                 .type(type)
+                                .contentSeq(contentSeq)
                                 .checkedState(false)
                                 .build()
                 );
 
+        userNotice.setContentSeq(contentSeq);
         userNotice.setCheckedState(false);
 
         userNoticeRepository.save(userNotice);

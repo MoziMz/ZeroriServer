@@ -19,9 +19,11 @@ public class UserNotice {
     @Enumerated(EnumType.STRING)
     private UserNoticeType type;
 
+    private Long contentSeq; // 관련 컨텐츠의 seq
+
+    private boolean checkedState;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_seq")
     private User user;
-
-    private boolean checkedState;
 }

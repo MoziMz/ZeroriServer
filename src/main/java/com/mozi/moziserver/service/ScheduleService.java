@@ -132,7 +132,7 @@ public class ScheduleService {
                     userIslandRepository.updateUserIslandRewardLevel(user.getSeq(),lastPostboxMessageAnimal.getAnimal().getIslandType());
                 }
 
-                userNoticeService.upsertUserNotice(user, UserNoticeType.POSTBOX_MESSAGE_ANIMAL_RECEIVED_ITEM);
+                userNoticeService.upsertUserNotice(user, UserNoticeType.POSTBOX_MESSAGE_ANIMAL_RECEIVED_ITEM, lastPostboxMessageAnimal.getSeq());
             });
 
             fcmService.sendMessageToUser(lastPostboxMessageAnimal.getUser(), FcmMessageType.NEW_POST_BOX_MESSAGE);
