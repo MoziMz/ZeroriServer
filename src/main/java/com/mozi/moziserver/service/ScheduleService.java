@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Component
 public class ScheduleService {
+
     private final UserChallengeRepository userChallengeRepository;
     private final PlatformTransactionManager transactionManager;
     private final UserChallengeRecordRepository userChallengeRecordRepository;
@@ -34,8 +35,7 @@ public class ScheduleService {
     private final UserRewardService userRewardService;
     private final UserIslandRepository userIslandRepository;
     private final FcmService fcmService;
-
-    private final UserNoticeRepository userNoticeRepository;
+    private final UserNoticeService userNoticeService;
 
     @Transactional
     @Scheduled(cron = "0 0 0 * * *")
@@ -125,15 +125,7 @@ public class ScheduleService {
                     userIslandRepository.updateUserIslandRewardLevel(user.getSeq(),lastPostboxMessageAnimal.getAnimal().getIslandType());
                 }
 
-                //동물의 편지 알림
-                UserNotice userNotice = UserNotice.builder()
-                        .user(user)
-                        .checkedState(false)
-                        .type(UserNoticeType.POSTBOX_MESSAGE_ANIMAL_RECEIVED_ITEM)
-                        .build();
-
-                userNoticeRepository.save(userNotice);
-
+                userNoticeService.upsertUserNotice(user, UserNoticeType.POSTBOX_MESSAGE_ANIMAL_RECEIVED_ITEM);
             });
 
             fcmService.sendMessageToUser(lastPostboxMessageAnimal.getUser(), FcmMessageType.NEW_POST_BOX_MESSAGE);

@@ -8,5 +8,5 @@ import java.util.List;
 import java.util.Optional;
 
 public interface UserNoticeRepositorySupport {
-    Optional<UserNotice> findOneByUserAndType(User user, UserNoticeType type);
+    Optional<UserNotice> findOneByUserAndTypeAndCheckedState(User user, UserNoticeType type);
 }

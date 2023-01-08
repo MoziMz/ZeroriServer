@@ -16,7 +16,7 @@ public class UserNoticeRepositoryImpl extends QuerydslRepositorySupport implemen
     public UserNoticeRepositoryImpl(){super(UserNotice.class);}
 
     @Override
-    public Optional<UserNotice> findOneByUserAndType(User user, UserNoticeType type){
+    public Optional<UserNotice> findOneByUserAndTypeAndCheckedState(User user, UserNoticeType type) {
 
         final Predicate[] predicates = new Predicate[]{
                 qUserNotice.user.eq(user),
