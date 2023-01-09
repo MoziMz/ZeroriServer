@@ -19,7 +19,7 @@ public class UserNotice {
     @Enumerated(EnumType.STRING)
     private UserNoticeType type;
 
-    private Long contentSeq; // 관련 컨텐츠의 seq
+    private Long relatedSeq; // 관련 컨텐츠의 seq
 
     private boolean checkedState;
 
