@@ -159,6 +159,19 @@ public class ConfirmRepositoryImpl extends QuerydslRepositorySupport implements 
                 .where(predicates)
                 .fetch();
     }
+    @Override
+    public List<Confirm> findByPeriodAndPaging(LocalDateTime startDateTime,Long prevLastConfirmSeq, Integer pageSize){
+        Predicate[] predicates = new Predicate[]{
+                qConfirm.createdAt.goe(startDateTime),
+                predicateOptional(qConfirm.seq::lt,prevLastConfirmSeq)
+        };
+
+        return from(qConfirm)
+                .leftJoin(qConfirm.challenge,qChallenge).fetchJoin()
+                .where(predicates)
+                .limit(pageSize)
+                .fetch();
+    }
 
     private <T> Predicate predicateOptional(final Function<T, Predicate> whereFunc, final T value) {
         return value != null ? whereFunc.apply(value) : null;

@@ -104,22 +104,18 @@ public class ConfirmService {
 
         });
     }
-
+    
     public List<Confirm> getConfirmList(Long userSeq, ReqList req, ConfirmListType confirmListType) {
-        List<Confirm> confirmList = confirmRepository.findAll(req.getPrevLastSeq(), req.getPageSize());
+
+        List<Confirm> confirmList=new ArrayList<>();
 
         if(confirmListType.equals(ConfirmListType.RECENT)){
-            LocalDateTime endDateTime = LocalDateTime.now();
-            LocalDateTime startDateTime = endDateTime.minusDays(7).withHour(0).withMinute(0).withSecond(0);
+            LocalDateTime startDateTime = LocalDateTime.now().minusDays(6).withHour(0).withMinute(0).withSecond(0);
 
-            confirmList = confirmList.stream()
-                        .filter(c -> (c.getCreatedAt().isAfter(startDateTime)
-                                    && c.getCreatedAt().isBefore(endDateTime))
-                                    || c.getCreatedAt().isEqual(startDateTime)
-                                    || c.getCreatedAt().isEqual(endDateTime))
-                        .collect(Collectors.toList());
+            confirmList = confirmRepository.findByPeriodAndPaging(startDateTime,req.getPrevLastSeq(),req.getPageSize());
 
-
+        }else if(confirmListType.equals(ConfirmListType.ALL)){
+            confirmList = confirmRepository.findAll(req.getPrevLastSeq(), req.getPageSize());
         }
 
         toRandomList(confirmList);
