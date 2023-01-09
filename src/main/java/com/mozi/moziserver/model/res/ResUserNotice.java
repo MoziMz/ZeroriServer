@@ -9,11 +9,9 @@ import lombok.Getter;
 @Getter
 public class ResUserNotice {
 
-    private final UserNoticeType userNoticeType;
     private final Long relatedSeq;
 
     private ResUserNotice(UserNotice userNotice){
-        this.userNoticeType = userNotice.getType();
         this.relatedSeq = userNotice.getRelatedSeq();
     }
 
