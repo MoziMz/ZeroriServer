@@ -420,9 +420,10 @@ public class ConfirmService {
     }
 
     public ResWeekConfirm getWeekConfirm(){
-        LocalDateTime today = LocalDateTime.now();
 
-        List<Confirm> confirmList=confirmRepository.findByCreatedAt(today);
+        LocalDateTime startDateTime = LocalDateTime.now().minusDays(6).withHour(0).withMinute(0).withSecond(0);
+
+        List<Confirm> confirmList=confirmRepository.findByCreatedAt(startDateTime);
 
         List<User> userList=confirmList.stream().map(Confirm::getUser).collect(Collectors.toList());
 

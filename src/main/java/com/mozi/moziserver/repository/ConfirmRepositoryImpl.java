@@ -140,8 +140,7 @@ public class ConfirmRepositoryImpl extends QuerydslRepositorySupport implements 
         return from(qConfirm)
                 .innerJoin(qConfirm.challenge, qChallenge).fetchJoin()
                 .innerJoin(qConfirm.user, qUser).fetchJoin()
-                .where(qConfirm.createdAt.before(localDateTime)
-                        .and(qConfirm.createdAt.after(localDateTime.minus(7, ChronoUnit.DAYS))))
+                .where(qConfirm.createdAt.goe(localDateTime))
                 .fetch();
     }
 
