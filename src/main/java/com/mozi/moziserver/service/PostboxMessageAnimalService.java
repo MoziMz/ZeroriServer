@@ -3,7 +3,6 @@ package com.mozi.moziserver.service;
 import com.mozi.moziserver.httpException.ResponseError;
 import com.mozi.moziserver.model.entity.*;
 import com.mozi.moziserver.model.mappedenum.FcmMessageType;
-import com.mozi.moziserver.model.mappedenum.UserChallengeStateType;
 import com.mozi.moziserver.model.mappedenum.UserNoticeType;
 import com.mozi.moziserver.model.req.ReqList;
 import com.mozi.moziserver.repository.PostboxMessageAnimalRepository;
@@ -15,7 +14,6 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @Service
@@ -25,6 +23,7 @@ public class PostboxMessageAnimalService {
     private final PostboxMessageAnimalRepository postboxMessageAnimalRepository;
     private final FcmService fcmService;
 
+    private final UserNoticeService userNoticeService;
     private final UserNoticeRepository userNoticeRepository;
 
     public PostboxMessageAnimal getPostboxMessageAnimal(Long userSeq, Long seq) {
@@ -62,7 +61,7 @@ public class PostboxMessageAnimalService {
 
         postboxMessageAnimalRepository.save(postboxMessageAnimal);
 
-        fcmService.sendMessageToUser(postboxMessageAnimal.getUser(), FcmMessageType.NEW_POST_BOX_MESSAGE);
+//        fcmService.sendMessageToUser(postboxMessageAnimal.getUser(), FcmMessageType.NEW_POST_BOX_MESSAGE);
     }
 
     @Transactional
@@ -76,14 +75,14 @@ public class PostboxMessageAnimalService {
 
         postboxMessageAnimalRepository.save(postboxMessageAnimal);
 
-        fcmService.sendMessageToUser(postboxMessageAnimal.getUser(), FcmMessageType.NEW_POST_BOX_MESSAGE);
+        userNoticeService.upsertUserNotice(user, UserNoticeType.POSTBOX_MESSAGE_ANIMAL_NEW_ARRIVED, postboxMessageAnimal.getSeq());
     }
 
     public UserNotice getUserNoticeByUserAndType(Long userSeq, UserNoticeType userNoticeType){
         User user = userRepository.findById(userSeq)
                 .orElseThrow(ResponseError.NotFound.USER_NOT_EXISTS::getResponseException);
 
-        return userNoticeRepository.findOneByUserAndType(user,userNoticeType.ordinal())
+        return userNoticeRepository.findOneByUserAndTypeAndCheckedState(user, userNoticeType)
                 .orElseThrow(ResponseError.NotFound.USER_NOTICE_NOT_EXISTS::getResponseException);
     }
 
@@ -99,11 +98,10 @@ public class PostboxMessageAnimalService {
     @Transactional
     public void checkUserNotice(Long userSeq,UserNoticeType type){
 
-        UserNotice userNotice = getUserNoticeByUserAndType(userSeq,type);
+        UserNotice userNotice = getUserNoticeByUserAndType(userSeq, type);
 
         userNotice.setCheckedState(true);
 
         userNoticeRepository.save(userNotice);
-
     }
 }

@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Component
 public class ScheduleService {
+
     private final UserChallengeRepository userChallengeRepository;
     private final PlatformTransactionManager transactionManager;
     private final UserChallengeRecordRepository userChallengeRecordRepository;
@@ -34,8 +35,7 @@ public class ScheduleService {
     private final UserRewardService userRewardService;
     private final UserIslandRepository userIslandRepository;
     private final FcmService fcmService;
-
-    private final UserNoticeRepository userNoticeRepository;
+    private final UserNoticeService userNoticeService;
 
     @Transactional
     @Scheduled(cron = "0 0 0 * * *")
@@ -111,6 +111,13 @@ public class ScheduleService {
 //            }
             PostboxMessageAnimal lastPostboxMessageAnimal = postboxMessageAnimalRepository.findLastOneByUser(user);
 
+            // step. 유저가 섬의 '최종 상태'(마지막 동물이 위시리스트를 모두 받은 상태)인지 확인
+            // 조건문을 만족한다면 continue <- 해당 유저는 현재 단계에서 변화할 부분이 없다.
+            // TODO 추후 메서드로 분리
+            boolean isLastPostboxMessageAnimalStateInIsland = lastPostboxMessageAnimal.getAnimal().getIslandLevel().equals(Constant.islandMaxLevel)
+                    && lastPostboxMessageAnimal.getLevel().equals(Constant.postboxAnimalMaxLevel);
+            if (isLastPostboxMessageAnimalStateInIsland) continue;
+
             withTransaction(() -> {
 
                 lastPostboxMessageAnimal.setLevel(lastPostboxMessageAnimal.getLevel() + 1);
@@ -125,15 +132,7 @@ public class ScheduleService {
                     userIslandRepository.updateUserIslandRewardLevel(user.getSeq(),lastPostboxMessageAnimal.getAnimal().getIslandType());
                 }
 
-                //동물의 편지 알림
-                UserNotice userNotice = UserNotice.builder()
-                        .user(user)
-                        .checkedState(false)
-                        .type(UserNoticeType.PostboxMessageAnimal.ordinal())
-                        .build();
-
-                userNoticeRepository.save(userNotice);
-
+                userNoticeService.upsertUserNotice(user, UserNoticeType.POSTBOX_MESSAGE_ANIMAL_RECEIVED_ITEM, lastPostboxMessageAnimal.getSeq());
             });
 
             fcmService.sendMessageToUser(lastPostboxMessageAnimal.getUser(), FcmMessageType.NEW_POST_BOX_MESSAGE);
