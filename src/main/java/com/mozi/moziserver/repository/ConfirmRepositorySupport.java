@@ -28,5 +28,7 @@ public interface ConfirmRepositorySupport {
 
     List<Confirm> findByUserAndPeriod(User user, Challenge challenge, LocalDateTime startDateTime, LocalDateTime endDateTime);
 
+    List<Confirm> findByPeriodAndPaging(LocalDateTime startDateTime,Long prevLastConfirmSeq, Integer pageSize);
+
 
 }

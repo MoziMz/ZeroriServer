@@ -140,8 +140,7 @@ public class ConfirmRepositoryImpl extends QuerydslRepositorySupport implements 
         return from(qConfirm)
                 .innerJoin(qConfirm.challenge, qChallenge).fetchJoin()
                 .innerJoin(qConfirm.user, qUser).fetchJoin()
-                .where(qConfirm.createdAt.before(localDateTime)
-                        .and(qConfirm.createdAt.after(localDateTime.minus(7, ChronoUnit.DAYS))))
+                .where(qConfirm.createdAt.goe(localDateTime))
                 .fetch();
     }
 
@@ -158,6 +157,19 @@ public class ConfirmRepositoryImpl extends QuerydslRepositorySupport implements 
                 .innerJoin(qConfirm.challenge, qChallenge).fetchJoin()
                 .innerJoin(qConfirm.user, qUser).fetchJoin()
                 .where(predicates)
+                .fetch();
+    }
+    @Override
+    public List<Confirm> findByPeriodAndPaging(LocalDateTime startDateTime,Long prevLastConfirmSeq, Integer pageSize){
+        Predicate[] predicates = new Predicate[]{
+                qConfirm.createdAt.goe(startDateTime),
+                predicateOptional(qConfirm.seq::lt,prevLastConfirmSeq)
+        };
+
+        return from(qConfirm)
+                .leftJoin(qConfirm.challenge,qChallenge).fetchJoin()
+                .where(predicates)
+                .limit(pageSize)
                 .fetch();
     }
 
