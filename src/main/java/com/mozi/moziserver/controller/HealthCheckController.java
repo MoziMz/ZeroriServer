@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class HealthCheckController {
     @ApiOperation("API 확인 용도")
     @GetMapping("/health-check")
-    public ResponseEntity<Void> getHealthCheck(
+    public ResponseEntity<Object> getHealthCheck(
     ) {
         return new ResponseEntity<>(HttpStatus.OK);
     }

@@ -24,7 +24,7 @@ public class AdminChallengeController {
 
     @ApiOperation("챌린지 생성")
     @PostMapping("/admin/challenges")
-    public ResponseEntity<Void> createChallenge(
+    public ResponseEntity<Object> createChallenge(
             @Valid ReqAdminChallengeCreate req
     ) {
         challengeService.createChallenge(req);
@@ -34,7 +34,7 @@ public class AdminChallengeController {
 
     @ApiOperation("챌린지 설명 추가")
     @PostMapping("/admin/challenges/{seq}/explanations")
-    public ResponseEntity<Void> createChallengeTest(
+    public ResponseEntity<Object> createChallengeTest(
             @ApiParam(hidden = true) @SessionUser Long userSeq,
             @PathVariable Long seq,
             @RequestParam(required = true) String title,

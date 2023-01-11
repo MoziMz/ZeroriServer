@@ -25,7 +25,7 @@ public class AdminIslandController {
 
     @ApiOperation("섬 등록")
     @PostMapping(value = "/admin/islands",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Void> createIsland(
+    public ResponseEntity<Object> createIsland(
             @ApiParam(hidden = true) @SessionUser Long userSeq,
             @RequestParam("name") String name,
             @RequestParam("type") Integer type,
@@ -48,7 +48,7 @@ public class AdminIslandController {
 
     @ApiOperation("섬 정보 수정")
     @PutMapping(value = "/admin/islands")
-    public ResponseEntity<Void> updateIsland(
+    public ResponseEntity<Object> updateIsland(
             @ApiParam(hidden = true) @SessionUser Long userSeq,
             @RequestParam("name") String name,
             @RequestParam("type") Integer type,
@@ -66,7 +66,7 @@ public class AdminIslandController {
 
     @ApiOperation("섬 이미지 수정")
     @PutMapping(value = "/admin/islandImgs")
-    public ResponseEntity<Void> updateIslandImg(
+    public ResponseEntity<Object> updateIslandImg(
             @ApiParam(hidden = true) @SessionUser Long userSeq,
             @RequestParam(value = "type", required = true) Integer type,
             @RequestParam(value = "level", required = true) Integer level,

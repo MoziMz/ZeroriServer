@@ -51,7 +51,7 @@ public class UserIslandController {
 
     @ApiOperation("섬 오픈하기")
     @PostMapping("/v1/users/me/user-islands/open")
-    public ResponseEntity<Void> openUserIsland(
+    public ResponseEntity<Object> openUserIsland(
             @ApiParam(hidden = true) @SessionUser Long userSeq
     ) {
         islandService.openUserIsland(userSeq);

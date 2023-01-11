@@ -41,7 +41,7 @@ public class AdminAnimalController {
 
     @ApiOperation("동물 생성")
     @PostMapping("/admin/animals")
-    public ResponseEntity<Void> createAnimal(
+    public ResponseEntity<Object> createAnimal(
             @ApiParam(hidden = true) @SessionUser Long userSeq,
             @RequestParam(name = "name") @NotBlank  String name,
             @RequestParam(name = "postboxAnimalContent") @NotBlank String postboxAnimalContent,
@@ -62,7 +62,7 @@ public class AdminAnimalController {
 
     @ApiOperation("동물 수정")
     @PutMapping("/admin/animals/{seq}")
-    public ResponseEntity<Void> updateAnimal(
+    public ResponseEntity<Object> updateAnimal(
             @ApiParam(hidden = true) @SessionUser Long userSeq,
             @PathVariable("seq") Long seq,
             @RequestParam(name = "name", required = false) String name,
@@ -81,7 +81,7 @@ public class AdminAnimalController {
     // TODO 동물의 아이템 등록 URI /admin/animals/{seq}/items
     @ApiOperation("동물의 준비물 아이템 등록")
     @PostMapping("/admin/animals/{seq}/preparation-items")
-    public ResponseEntity<Void> createPreparationItem(
+    public ResponseEntity<Object> createPreparationItem(
             @ApiParam(hidden = true) @SessionUser Long userSeq,
             @PathVariable("seq") Long animalSeq,
             @RequestParam("turn") @Min(1L) @Max(2L) Integer turn,
@@ -100,7 +100,7 @@ public class AdminAnimalController {
 
     @ApiOperation("동물의 준비물 아이템 수정")
     @PutMapping("/admin/animals/{seq}/preparation-items")
-    public ResponseEntity<Void> updatePreparationItem(
+    public ResponseEntity<Object> updatePreparationItem(
             @ApiParam(hidden = true) @SessionUser Long userSeq,
             @PathVariable("seq") Long animalSeq,
             @RequestParam("turn") @Min(1L) @Max(2L) Integer turn,

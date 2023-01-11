@@ -73,7 +73,7 @@ public class PostboxMessageController {
 
     @ApiOperation("관리자 편지 확인 완료")
     @PutMapping("/v1/postbox-message-admins/{seq}/checked")
-    public ResponseEntity<Void> checkUserChallenge(
+    public ResponseEntity<Object> checkUserChallenge(
             @ApiParam(hidden = true) @SessionUser Long userSeq,
             @PathVariable("seq") Long seq
     ) {
@@ -105,7 +105,7 @@ public class PostboxMessageController {
 
     @ApiOperation("유저 알림 확인")
     @PutMapping("/v1/user-notices/{type}/checked")
-    public ResponseEntity<Void> checkUserNotice(
+    public ResponseEntity<Object> checkUserNotice(
             @ApiParam(hidden = true) @SessionUser Long userSeq,
             @PathVariable UserNoticeType type
     ) {

@@ -59,7 +59,7 @@ public class UserChallengeController {
 
     @ApiOperation("유저 챌린지 생성 가능한지 확인")
     @GetMapping("/v1/user-challenges/creatable")
-    public ResponseEntity<Void> checkCreatableUserChallenge(
+    public ResponseEntity<Object> checkCreatableUserChallenge(
             @ApiParam(hidden = true) @SessionUser Long userSeq,
             @Valid ReqChallengeAndDate req
     ) {
@@ -70,7 +70,7 @@ public class UserChallengeController {
 
     @ApiOperation("유저 챌린지 생성")
     @PostMapping("/v1/user-challenges")
-    public ResponseEntity<Void> createUserChallenge(
+    public ResponseEntity<Object> createUserChallenge(
             @ApiParam(hidden = true) @SessionUser Long userSeq,
             @RequestBody @Valid ReqUserChallengeCreate req
     ) {
@@ -81,7 +81,7 @@ public class UserChallengeController {
 
     @ApiOperation("유저 챌린지 그만두기")
     @PutMapping("/v1/user-challenges/{seq}/stop")
-    public ResponseEntity<Void> stopUserChallenge(
+    public ResponseEntity<Object> stopUserChallenge(
             @ApiParam(hidden = true) @SessionUser Long userSeq,
             @PathVariable("userChallengeSeq") Long userChallengeSeq
     ) {
@@ -103,7 +103,7 @@ public class UserChallengeController {
 
     @ApiOperation("완료한 유저 챌린지 확인 완료")
     @PutMapping("/v1/user-challenges/{seq}/checked")
-    public ResponseEntity<Void> checkedUserChallenge(
+    public ResponseEntity<Object> checkedUserChallenge(
             @ApiParam(hidden = true) @SessionUser Long userSeq,
             @PathVariable("seq") Long userChallengeSeq
     ) {

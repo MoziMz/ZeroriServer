@@ -37,7 +37,7 @@ public class ConfigurationController {
 
     @ApiOperation("문의 등록")
     @PostMapping("/v1/questions")
-    public ResponseEntity<Void> createQuestion(
+    public ResponseEntity<Object> createQuestion(
             @ApiParam(hidden = true) @SessionUser Long userSeq,
             @RequestParam(name = "email", required = true) String email,
             @RequestParam(name = "title", required = true) String title,
@@ -69,7 +69,7 @@ public class ConfigurationController {
 
     @ApiOperation("공지사항 확인 완료")
     @PutMapping("/v1/boards/{seq}/checked")
-    public ResponseEntity<Void> checkedBoard(
+    public ResponseEntity<Object> checkedBoard(
             @ApiParam(hidden = true) @SessionUser Long userSeq,
             @PathVariable("seq") Long seq
     ) {
@@ -80,7 +80,7 @@ public class ConfigurationController {
 
     @ApiOperation("챌린지 제안하기")
     @PostMapping("/v1/suggestions")
-    public ResponseEntity<Void> createSuggestion(
+    public ResponseEntity<Object> createSuggestion(
             @ApiParam(hidden = true) @SessionUser Long userSeq,
             @RequestBody @Valid ReqSuggestionCreate req
     ) {
@@ -101,7 +101,7 @@ public class ConfigurationController {
 
     @ApiOperation("닉네임 등록 및 수정")
     @PostMapping("/v1/users/me/nickname/{nickName}")
-    public ResponseEntity<Void> updateUserNickName(
+    public ResponseEntity<Object> updateUserNickName(
             @ApiParam(hidden = true) @SessionUser Long userSeq,
             @PathVariable String nickName
     ) {
@@ -114,7 +114,7 @@ public class ConfigurationController {
 
     @ApiOperation("비밀번호 확인")
     @PostMapping("/v1/users/me/password/check")
-    public ResponseEntity<Void> checkPassword(
+    public ResponseEntity<Object> checkPassword(
             @ApiParam(hidden = true) @SessionUser Long userSeq,
             @RequestBody @Valid ReqUserPw req
     ) {
@@ -129,7 +129,7 @@ public class ConfigurationController {
 
     @ApiOperation("비밀번호 재설정 (이메일 인증 X)")
     @PutMapping("/v1/users/me/password")
-    public ResponseEntity<Void> updateUserPassword(
+    public ResponseEntity<Object> updateUserPassword(
             @ApiParam(hidden = true) @SessionUser Long userSeq,
             @RequestBody @Valid ReqUserPw req
             ) {
@@ -142,7 +142,7 @@ public class ConfigurationController {
 
     @ApiOperation("이메일 변경 (이메일 인증 필수)")
     @PutMapping(value = "/v1/users/me/email/{email}")
-    public ResponseEntity<Void> authUserEmail(
+    public ResponseEntity<Object> authUserEmail(
             @ApiParam(hidden = true) @SessionUser Long userSeq,
             @PathVariable @Valid String email
     ) {
@@ -156,7 +156,7 @@ public class ConfigurationController {
 
     @ApiOperation("탈퇴하기")
     @PostMapping(value = "v1/users/resign")
-    public ResponseEntity<Void> resign(
+    public ResponseEntity<Object> resign(
             @ApiParam(hidden = true) @SessionUser Long userSeq,
             @RequestBody @Valid ReqResign reqResign,
             HttpSession session

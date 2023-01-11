@@ -122,7 +122,7 @@ public class ChallengeController {
 
     @ApiOperation("챌린지 스크랩")
     @PostMapping("/v1/challenges/{seq}/scraps")
-    public ResponseEntity<Void> createChallengeScrap(
+    public ResponseEntity<Object> createChallengeScrap(
             @ApiParam(hidden = true) @SessionUser Long userSeq,
             @PathVariable Long seq
     ) {
@@ -133,7 +133,7 @@ public class ChallengeController {
 
     @ApiOperation("챌린지 스크랩")
     @DeleteMapping("/v1/challenges/{seq}/scraps")
-    public ResponseEntity<Void> deleteChallengeScrap(
+    public ResponseEntity<Object> deleteChallengeScrap(
             @ApiParam(hidden = true) @SessionUser Long userSeq,
             @PathVariable Long seq
     ) {

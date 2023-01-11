@@ -44,7 +44,7 @@ public class UserController {
 
     @ApiOperation("가입 (ID)")
     @PostMapping(value = "/v1/users/signup", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> signUpUser(
+    public ResponseEntity<Object> signUpUser(
             @RequestBody @Valid ReqUserSignUp reqUserSignUp
     ) {
         userService.signUp(reqUserSignUp);
@@ -54,7 +54,7 @@ public class UserController {
 
     @ApiOperation("로그인 (ID, 소셜)")
     @PostMapping(value = "/v1/users/signin", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> signInUser(
+    public ResponseEntity<Object> signInUser(
             @RequestBody @Valid ReqUserSignIn req,
             HttpServletRequest request,
             HttpServletResponse response,
@@ -77,13 +77,13 @@ public class UserController {
 
     @ApiOperation("로그아웃")
     @PostMapping("/v1/users/signout")
-    public ResponseEntity<Void> signOut() {
+    public ResponseEntity<Object> signOut() {
         throw new IllegalStateException("This Method not working");
     }
 
     @ApiOperation("닉네임 중복 확인")
     @GetMapping("/v1/users/nicknames/{nickName}/check")
-    public ResponseEntity<Void> checkNickNameDuplicate(
+    public ResponseEntity<Object> checkNickNameDuplicate(
             @PathVariable String nickName
     ) {
         return new ResponseEntity<>(
@@ -107,7 +107,7 @@ public class UserController {
 
     @ApiOperation("이메일 중복 확인")
     @GetMapping("/v1/users/emails/{email}/check")
-    public ResponseEntity<Void> checkEmailDuplicate(
+    public ResponseEntity<Object> checkEmailDuplicate(
             @PathVariable String email
     ) {
         return new ResponseEntity<>(
@@ -117,7 +117,7 @@ public class UserController {
 
     @ApiOperation("비밀번호 재설정 (이메일 인증 필수)")
     @PostMapping("/v1/users/find-pw")
-    public ResponseEntity<Void> sendPwEmail(
+    public ResponseEntity<Object> sendPwEmail(
             @RequestBody @Valid ReqAuthEmail req
     ) {
         UserAuth userAuth = userService.findUserAuthByTypeAndId(UserAuthType.EMAIL, req.getEmail())
@@ -130,7 +130,7 @@ public class UserController {
 
     @ApiOperation("FCM 토큰 등록")
     @PostMapping("/v1/users/me/fcm")
-    public ResponseEntity<Void> updateFcmToken(
+    public ResponseEntity<Object> updateFcmToken(
             @ApiParam(hidden = true) @SessionUser Long userSeq,
             @RequestBody @Valid ReqFcmToken reqFcmToken
     ) {

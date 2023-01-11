@@ -31,7 +31,7 @@ public class TestController {
 
     @ApiOperation("유저 챌린지 startDate 변경")
     @PutMapping("/user-challenges/{seq}")
-    public ResponseEntity<Void> updateUserChallengeStartDate(
+    public ResponseEntity<Object> updateUserChallengeStartDate(
             @ApiParam(hidden = true) @SessionUser Long userSeq,
             @PathVariable("seq") Long userChallengeSeq,
             @RequestBody @Valid ReqTestUserChallengeStartDateUpdate req
@@ -43,7 +43,7 @@ public class TestController {
 
     @ApiOperation("비속어 생성")
     @PostMapping("/admin/badwords")
-    public ResponseEntity<Void> createBadWord(
+    public ResponseEntity<Object> createBadWord(
             @ApiParam(hidden = true) @SessionUser Long userSeq,
             @RequestParam String content
 

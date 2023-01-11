@@ -25,7 +25,7 @@ public class EmailAuthController {
 
     @ApiOperation(value = "", hidden = true)
     @GetMapping("/{token}")
-    public ResponseEntity<Void> authEmail(@PathVariable String token) throws Exception {
+    public ResponseEntity<Object> authEmail(@PathVariable String token) throws Exception {
         HttpHeaders httpHeaders = new HttpHeaders();
 
         EmailAuthResult result = emailAuthService.authEmail(token);

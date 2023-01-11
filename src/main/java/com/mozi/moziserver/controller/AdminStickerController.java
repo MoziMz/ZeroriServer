@@ -23,7 +23,7 @@ public class AdminStickerController {
 
     @ApiOperation("스티커 생성")
     @PostMapping("/admin/stickers")
-    public ResponseEntity<Void> createSticker(
+    public ResponseEntity<Object> createSticker(
             @ApiParam(hidden = true) @SessionUser Long userSeq,
             @RequestPart MultipartFile image
     ) {
@@ -38,7 +38,7 @@ public class AdminStickerController {
 
     @ApiOperation("스티커 수정")
     @PutMapping("/admin/stickers/{seq}")
-    public ResponseEntity<Void> updateSticker(
+    public ResponseEntity<Object> updateSticker(
             @ApiParam(hidden = true) @SessionUser Long userSeq,
             @PathVariable("seq") Long seq,
             @RequestPart MultipartFile image

@@ -35,7 +35,7 @@ public class ConfirmController {
 
     @ApiOperation("스토리 생성")
     @PostMapping("/v1/challenges/{challengeSeq}/confirms")
-    public ResponseEntity<Void> createConfirm(
+    public ResponseEntity<Object> createConfirm(
             @ApiParam(hidden = true) @SessionUser Long userSeq,
             @PathVariable Long challengeSeq,
             @RequestPart MultipartFile image
@@ -105,7 +105,7 @@ public class ConfirmController {
 
     @ApiOperation("스토리 삭제")
     @DeleteMapping("/v1/confirms/{seq}")
-    public ResponseEntity<Void> deleteConfirm(
+    public ResponseEntity<Object> deleteConfirm(
             @ApiParam(hidden = true) @SessionUser Long userSeq,
             @PathVariable Long seq
     ) {
@@ -116,7 +116,7 @@ public class ConfirmController {
 
     @ApiOperation("신고 생성")
     @PostMapping("/v1/confirms/{confirmSeq}/declarations")
-    public ResponseEntity<Void> createDeclaration(
+    public ResponseEntity<Object> createDeclaration(
             @ApiParam(hidden = true) @SessionUser Long userSeq,
             @PathVariable Long confirmSeq,
             @RequestBody @Valid ReqDeclarationCreate req
@@ -138,7 +138,7 @@ public class ConfirmController {
 
     @ApiOperation("스티커 생성(부착)")
     @PostMapping("/v1/confirms/{seq}/confirm-stickers")
-    public ResponseEntity<Void> createConfirmSticker(
+    public ResponseEntity<Object> createConfirmSticker(
             @ApiParam(hidden = true) @SessionUser Long userSeq,
             @RequestBody @Valid ReqConfirmSticker reqConfirmSticker,
             @PathVariable Long seq
@@ -149,7 +149,7 @@ public class ConfirmController {
 
     @ApiOperation("스토리 좋아요")
     @PostMapping("/v1/confirms/{seq}/like")
-    public ResponseEntity<Void> createConfirmLike(
+    public ResponseEntity<Object> createConfirmLike(
             @ApiParam(hidden = true) @SessionUser Long userSeq,
             @PathVariable Long seq
     ) {
@@ -160,7 +160,7 @@ public class ConfirmController {
 
     @ApiOperation("스토리 좋아요 취소")
     @DeleteMapping ("/v1/confirms/{seq}/like")
-    public ResponseEntity<Void> deleteConfirmLike(
+    public ResponseEntity<Object> deleteConfirmLike(
             @ApiParam(hidden = true) @SessionUser Long userSeq,
             @PathVariable Long seq
     ) {
