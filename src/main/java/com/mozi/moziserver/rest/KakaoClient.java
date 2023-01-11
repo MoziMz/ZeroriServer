@@ -42,7 +42,7 @@ public interface KakaoClient {
 //        "appId":1234
 //    }
 
-    @GetMapping("/v2/user/me")
+    @GetMapping("/v1/user/me")
     ResponseEntity<ResUserByAdminKey> getUserByAdminKey(
             @RequestHeader("Authorization") String adminKey, // "KakaoAK ${social.kakao.adminkey}"
             @RequestParam("target_id_type") String targetIdType, // "user_id"
