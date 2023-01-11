@@ -255,7 +255,7 @@ public class ConfirmService {
        }
 
        if(user.equals(confirm.getUser())){
-           throw ResponseError.BadRequest.INVALID_CONFIRM.getResponseException();
+           throw ResponseError.BadRequest.INVALID_DECLARATION.getResponseException();
        }
 
        Declaration declaration=declarationRepository.findByConfirmAndUser(confirm,user);

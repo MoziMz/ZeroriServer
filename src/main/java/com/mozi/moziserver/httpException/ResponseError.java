@@ -46,7 +46,8 @@ public interface ResponseError {
         INVALID_NICKNAME("invalid nick name"),
         //The nickname includes slang
         NICKNAME_WITH_BAD_WORD("nick name with bad word"),
-        INVALID_START_DATE_END_DATE("start date must be earlier than or equal to end date");
+        INVALID_START_DATE_END_DATE("start date must be earlier than or equal to end date"),
+        INVALID_DECLARATION("invalid declaration");
 
 
         // INVALID 는 한가지로 명확하지 않을때 쓴다.
