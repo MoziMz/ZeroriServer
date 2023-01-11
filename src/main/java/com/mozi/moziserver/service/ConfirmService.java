@@ -444,8 +444,10 @@ public class ConfirmService {
     }
 
     public void toRandomList(List<Confirm> confirmList){
+        
+        int idx=(confirmList.size()==0)? 0 : confirmList.size()-1;
 
-        Confirm lastConfirm=confirmList.remove(confirmList.size()-1);
+        Confirm lastConfirm=confirmList.remove(idx);
 
         Collections.shuffle(confirmList);
 

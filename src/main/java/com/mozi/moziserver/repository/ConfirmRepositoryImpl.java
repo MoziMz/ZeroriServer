@@ -40,7 +40,7 @@ public class ConfirmRepositoryImpl extends QuerydslRepositorySupport implements 
                 .innerJoin(qConfirm.challenge, qChallenge).fetchJoin()
                 .innerJoin(qConfirm.user, qUser).fetchJoin()
                 .leftJoin(qConfirm.confirmStickerList, qConfirmSticker).fetchJoin()
-                .orderBy(qConfirm.createdAt.desc())
+                .orderBy(qConfirm.seq.desc())
                 .where(predicates)
                 .limit(pageSize)
                 .fetch();
@@ -169,6 +169,7 @@ public class ConfirmRepositoryImpl extends QuerydslRepositorySupport implements 
         return from(qConfirm)
                 .leftJoin(qConfirm.challenge,qChallenge).fetchJoin()
                 .where(predicates)
+                .orderBy(qConfirm.seq.desc())
                 .limit(pageSize)
                 .fetch();
     }
