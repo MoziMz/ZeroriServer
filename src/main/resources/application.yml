@@ -52,3 +52,9 @@ cloud:
 
 server:
   port: 8080
+
+sentry:
+  dsn: ${SENTRY_DSN}
+  stacktrace:
+    app-packages:
+      - com.mozi.moziserver
