@@ -134,10 +134,6 @@ public class UserController {
             @ApiParam(hidden = true) @SessionUser Long userSeq,
             @RequestBody @Valid ReqFcmToken reqFcmToken
     ) {
-        if (!userSeq.equals(userSeq)) {
-            throw ResponseError.Forbidden.NO_AUTHORITY.getResponseException();
-        }
-
         User user = userService.getUserBySeq(userSeq)
                 .orElseThrow(ResponseError.InternalServerError.UNEXPECTED_ERROR::getResponseException);
 

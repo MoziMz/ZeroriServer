@@ -1,7 +1,6 @@
 package com.mozi.moziserver.model.entity;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 import javax.swing.text.StyledEditorKit;
@@ -12,6 +11,9 @@ import javax.swing.text.StyledEditorKit;
  */
 @Getter
 @Setter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity(name = "user_fcm")
 public class UserFcm extends AbstractTimeEntity {
     @Id

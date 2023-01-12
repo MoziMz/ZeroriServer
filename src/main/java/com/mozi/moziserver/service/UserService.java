@@ -29,6 +29,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 
@@ -389,26 +390,19 @@ public class UserService {
         return userRepository.findById(userSeq);
     }
 
+    @Transactional
     public void upsertUserFcm(User user, String deviceId, String token) {
-        UserFcm userFcm = new UserFcm();
+        UserFcm userFcm = userFcmRepository.findByUser(user)
+                .orElse(UserFcm.builder()
+                        .user(user)
+                        .deviceId(deviceId)
+                        .token(token)
+                        .state(true)
+                        .build());
+
         userFcm.setDeviceId(deviceId);
         userFcm.setToken(token);
-        userFcm.setUser(user);
         userFcm.setState(Boolean.TRUE);
-
-        try {
-            userFcmRepository.save(userFcm);
-            return;
-        } catch (DataIntegrityViolationException e) {
-            if (!JpaUtil.isDuplicateKeyException(e)) {
-                throw ResponseError.InternalServerError.UNEXPECTED_ERROR.getResponseException();
-            }
-        }
-
-        userFcm = userFcmRepository.findUserFcmByUser(user)
-                .orElseThrow(ResponseError.InternalServerError.UNEXPECTED_ERROR::getResponseException);
-        userFcm.setToken(token);
-        userFcm.setUser(user);
 
         userFcmRepository.save(userFcm);
     }
