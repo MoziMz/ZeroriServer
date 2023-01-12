@@ -12,7 +12,6 @@ import java.util.Optional;
 
 @Repository
 public interface UserFcmRepository extends JpaRepository<UserFcm, Long> {
-    Optional<UserFcm> findUserFcmByUser(User user);
+    Optional<UserFcm> findByUser(User user);
     UserFcm findByToken(String token);
-    List<UserFcm> findAllByUserSeqAndState(Long userSeq, Boolean state);
 }

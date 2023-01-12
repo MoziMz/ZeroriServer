@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -31,11 +32,9 @@ public class FcmService {
             String response = FirebaseMessaging.getInstance().send(message);
             log.debug(response);
         } catch (FirebaseMessagingException e) {
-            log.error("FirebaseMessagingException", e);
+            log.error("FIREBASE_MESSAGING_EXCEPTION", e);
             if (e.getMessagingErrorCode().equals(MessagingErrorCode.UNREGISTERED)) {
-                UserFcm userFcm = userFcmRepository.findByToken(token);
-                userFcm.setState(Boolean.FALSE);
-                userFcmRepository.save(userFcm);
+                log.error("UNREGISTERED_TOKEN", e);
             }
         }
     }
@@ -51,16 +50,14 @@ public class FcmService {
             String response = FirebaseMessaging.getInstance().send(message);
             log.debug(response);
         } catch (FirebaseMessagingException e) {
-            log.error("FirebaseMessagingException", e);
+            log.error("FIREBASE_MESSAGING_EXCEPTION", e);
         }
     }
 
     public void sendMessageToUser(User user, FcmMessageType type) {
-        List<UserFcm> userFcmList = userFcmRepository.findAllByUserSeqAndState(user.getSeq(), Boolean.TRUE);
-        // TODO userFcmList 길이가 0일 때 에러처리 추가
+        UserFcm userFcm = userFcmRepository.findByUser(user)
+                .orElseThrow(() -> new RuntimeException("USER_FCM_TOKEN_IS_NOT_EXIST"));
 
-        for(UserFcm userFcm : userFcmList) {
-            sendMessage(userFcm.getToken(), FcmMessageType.NEW_POST_BOX_MESSAGE);
-        }
+        sendMessage(userFcm.getToken(), type);
     }
 }
