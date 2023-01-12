@@ -106,11 +106,13 @@ public class ScheduleService {
                 userNoticeService.upsertUserNotice(user, UserNoticeType.POSTBOX_MESSAGE_ANIMAL_RECEIVED_ITEM, lastPostboxMessageAnimal.getSeq());
             });
 
-            if (lastPostboxMessageAnimal.getLevel() == 3 && lastPostboxMessageAnimal.getAnimal().getIslandLevel() < Constant.islandMaxLevel)
-                fcmService.sendMessageToUser(lastPostboxMessageAnimal.getUser(), FcmMessageType.POSTBOX_MESSAGE_ANIMAL_RECEIVED_ITEM);
+            if (lastPostboxMessageAnimal.getLevel() == 3 && lastPostboxMessageAnimal.getAnimal().getIslandLevel() < Constant.islandMaxLevel) {
+                fcmService.sendMessageToUser(lastPostboxMessageAnimal.getUser(), FcmMessageType.POSTBOX_MESSAGE_ANIMAL_NEW_ARRIVED);
+            }
+
 
             fcmService.sendMessageToUser(lastPostboxMessageAnimal.getUser(), FcmMessageType.NEW_POST_BOX_MESSAGE);
-            fcmService.sendMessageToUser(lastPostboxMessageAnimal.getUser(), FcmMessageType.POSTBOX_MESSAGE_ANIMAL_NEW_ARRIVED);
+            fcmService.sendMessageToUser(lastPostboxMessageAnimal.getUser(), FcmMessageType.POSTBOX_MESSAGE_ANIMAL_RECEIVED_ITEM);
         }
     }
 
