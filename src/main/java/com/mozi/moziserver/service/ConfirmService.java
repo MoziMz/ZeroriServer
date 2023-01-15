@@ -118,11 +118,15 @@ public class ConfirmService {
             confirmList = confirmRepository.findAll(req.getPrevLastSeq(), req.getPageSize());
         }
 
-        toRandomList(confirmList);
+        if( confirmList.isEmpty() == false ){
 
-        setConfirmLike(userSeq, confirmList);
+            toRandomList(confirmList);
 
-        setConfirmDeclaration(userSeq, confirmList);
+            setConfirmLike(userSeq, confirmList);
+
+            setConfirmDeclaration(userSeq, confirmList);
+
+        }
 
         return confirmList.stream()
                 .filter(c -> !c.isDeclared())
@@ -444,10 +448,8 @@ public class ConfirmService {
     }
 
     public void toRandomList(List<Confirm> confirmList){
-        
-        int idx=(confirmList.size()==0)? 0 : confirmList.size()-1;
 
-        Confirm lastConfirm=confirmList.remove(idx);
+        Confirm lastConfirm=confirmList.remove(confirmList.size()-1);
 
         Collections.shuffle(confirmList);
 
