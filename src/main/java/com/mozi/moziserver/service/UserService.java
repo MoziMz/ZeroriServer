@@ -301,7 +301,7 @@ public class UserService {
             throw ResponseError.BadRequest.INVALID_EMAIL.getResponseException();
         }
 
-        emailAuthService.sendResetEmailEmail(userAuth, email);
+        emailAuthService.sendResetEmail(userAuth, email);
     }
 
     public UserAuth findUserAuthByNicknameAndPw(String nickName, String pw) {
