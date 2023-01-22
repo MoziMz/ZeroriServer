@@ -72,8 +72,8 @@ public class EmailAuthService {
 
         boolean isSend = sendEmail(
                 emailAuth.getId(),
-                "가입 인증 메일",
-                "<html> <body><h1></h1>" + "<br/>아래 [인증] 버튼을 눌러주세요." + "<form action=\"" + serverDomain + "/email/auth/" + emailAuth.getToken() + "\"> <input type=\"submit\" value=\"인증\" /> </form>"
+                "[제로리] 가입 인증 메일",
+                "<html> <body><h3>안녕하세요. 제로리입니다.</h3>" + "아래 [인증] 버튼을 눌러주세요." + "<form action=\"" + serverDomain + "/email/auth/" + emailAuth.getToken() + "\"> <input type=\"submit\" value=\"인증\" /> </form>"
                         + "</body></html>"
 //                "인증링크 : " + serverDomain + "/email/auth/" + emailAuth.getToken()
         );
@@ -110,11 +110,13 @@ public class EmailAuthService {
 
         saveEmailAuth(emailAuth);
 
-        String content="<h1>회원님의 임시 비밀번호는 " + tempPassword + " 입니다." + "로그인 후에 비밀번호를 변경을 해주세요</h1>";
+
+        String content="<h1>안녕하세요. 제로리입니다.<br/> 회원님의 임시 비밀번호는 " + tempPassword + " 입니다.<br/>" + "로그인 후에 비밀번호를 변경을 해주세요.</h1>";
 
         boolean isSend = sendEmail(
                 emailAuth.getId(),
-                "비밀번호 재설정 메일",content
+                "[제로리] 비밀번호 재설정 메일",
+                content
         );
 
         if (!isSend) {
@@ -139,7 +141,7 @@ public class EmailAuthService {
      * @param userAuth
      * @param newEmail
      */
-    public void sendResetEmailEmail(UserAuth userAuth, String newEmail) {
+    public void sendResetEmail(UserAuth userAuth, String newEmail) {
         if (userAuth.getType() != UserAuthType.EMAIL) {
             throw ResponseError.InternalServerError.UNEXPECTED_ERROR.getResponseException();
         }
@@ -154,8 +156,8 @@ public class EmailAuthService {
 
         boolean isSend = sendEmail(
                 newEmail,
-                "이메일 변경 인증 메일",
-                "<html> <body><h1></h1>" + "<br/>아래 [인증] 버튼을 눌러주세요." + "<form action=\"" + serverDomain + "/email/auth/" + emailAuth.getToken() + "\"> <input type=\"submit\" value=\"인증\" /> </form>"
+                "[제로리] 이메일 변경 인증 메일",
+                "<html> <body><h3>안녕하세요. 제로리입니다.</h3>" + "아래 [인증] 버튼을 눌러주세요." + "<form action=\"" + serverDomain + "/email/auth/" + emailAuth.getToken() + "\"> <input type=\"submit\" value=\"인증\" /> </form>"
                         + "</body></html>"
         );
 
@@ -262,7 +264,7 @@ public class EmailAuthService {
             MimeMessageHelper messageHelper = new MimeMessageHelper(message, true, "UTF-8");
             messageHelper.setSubject(title);
             messageHelper.setTo(to);
-            messageHelper.setFrom(emailAddress);
+            messageHelper.setFrom("제로리 "+"<"+emailAddress+">");
             messageHelper.setText(content, true);
             emailSender.send(message);
         } catch (Exception e) {
