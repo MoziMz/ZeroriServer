@@ -34,22 +34,22 @@ public class EmailAuthController {
             case SUCC:
                 switch (result.getType()) {
                     case JOIN:
-                        httpHeaders.setLocation(new URI("/email-auth-join-valid.html"));
+                        httpHeaders.setLocation(new URI("/email/email-auth-join-valid.html"));
                         break;
                     case RESET_PW:
-                        httpHeaders.setLocation(new URI("/email-auth-reset-pw-valid.html"));
+                        httpHeaders.setLocation(new URI("/email/email-auth-reset-pw-valid.html"));
                         break;
                         // TODO ?JSESSIONID=
                     case RESET_EMAIL:
-                        httpHeaders.setLocation(new URI("/email-auth-reset-email-valid.html"));
+                        httpHeaders.setLocation(new URI("/email/email-auth-reset-email-valid.html"));
                         break;
                 }
                 break;
             case ALREADY_SUCC:
-                httpHeaders.setLocation(new URI("/email-auth-already-valid.html"));
+                httpHeaders.setLocation(new URI("/email/email-auth-already-valid.html"));
                 break;
             default:
-                httpHeaders.setLocation(new URI("/email-auth-invalid.html"));
+                httpHeaders.setLocation(new URI("/email/email-auth-invalid.html"));
                 break;
         }
 
