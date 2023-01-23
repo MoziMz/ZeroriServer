@@ -83,7 +83,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .logoutSuccessHandler((request, response, authentication) -> {
                     response.setStatus(HttpServletResponse.SC_OK);
                 })
-                .deleteCookies("JSESSIONID");
+                .deleteCookies("JSESSIONID",  "remember-me");
     }
 
     @Bean
