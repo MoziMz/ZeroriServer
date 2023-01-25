@@ -83,7 +83,7 @@ public class UserChallengeController {
     @PutMapping("/v1/user-challenges/{seq}/stop")
     public ResponseEntity<Object> stopUserChallenge(
             @ApiParam(hidden = true) @SessionUser Long userSeq,
-            @PathVariable("userChallengeSeq") Long userChallengeSeq
+            @PathVariable("seq") Long userChallengeSeq
     ) {
         userChallengeService.stopUserChallenge(userSeq, userChallengeSeq);
 
