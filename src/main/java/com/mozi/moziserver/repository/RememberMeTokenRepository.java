@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import javax.transaction.Transactional;
 import java.util.Optional;
 
 @Repository
@@ -18,6 +19,7 @@ public interface RememberMeTokenRepository extends JpaRepository<RememberMeToken
     // SELECT * FROM remember_me_token WHERE series = #{series}
     //List<RememberMeToken> findRememberMeTokensByUser(@Param("user") User user);
 
+    @Transactional
     @Modifying
     @Query(value = "DELETE FROM remember_me_token WHERE user_seq = :userSeq", nativeQuery = true)
     int deleteRememberMeTokensByUserSeq(@Param("userSeq") Long userSeq);

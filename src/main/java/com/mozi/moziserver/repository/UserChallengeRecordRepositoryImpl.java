@@ -4,6 +4,7 @@ import com.mozi.moziserver.model.entity.*;
 import com.querydsl.core.types.Predicate;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
@@ -31,6 +32,7 @@ public class UserChallengeRecordRepositoryImpl extends QuerydslRepositorySupport
                 .findFirst();
     }
 
+    @Transactional
     @Override
     public void updateAcquisitionPoint(
             Long challengeSeq,

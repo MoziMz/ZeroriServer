@@ -6,6 +6,7 @@ import com.mozi.moziserver.model.mappedenum.UserChallengeStateType;
 import com.querydsl.core.types.Predicate;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 
+import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.Collection;
@@ -140,6 +141,7 @@ public class UserChallengeRepositoryImpl extends QuerydslRepositorySupport imple
         // update 실행됨
     }
 
+    @Transactional
     @Override
     public Long updateState(
             LocalDate date,

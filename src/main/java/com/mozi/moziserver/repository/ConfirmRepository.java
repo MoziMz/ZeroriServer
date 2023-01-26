@@ -12,6 +12,7 @@ import java.util.Date;
 
 @Repository
 public interface ConfirmRepository extends JpaRepository<Confirm, Long>, ConfirmRepositorySupport{
+    @Transactional
     @Modifying
     @Query(value = "DELETE FROM confirm WHERE seq = :confirmSeq", nativeQuery = true)
     int deleteConfirm(@Param("confirmSeq") Long confirmSeq);

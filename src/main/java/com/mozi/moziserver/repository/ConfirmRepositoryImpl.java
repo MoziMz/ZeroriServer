@@ -6,6 +6,7 @@ import com.mozi.moziserver.model.entity.QConfirm;
 import com.mozi.moziserver.model.entity.QUser;
 import com.querydsl.core.types.Predicate;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -103,6 +104,7 @@ public class ConfirmRepositoryImpl extends QuerydslRepositorySupport implements 
         return confirm;
     }
 
+    @Transactional
     @Override
     public void updateDeclarationCnt(Confirm confirm,Byte state,Integer cnt){
         update(qConfirm)
