@@ -5,7 +5,7 @@ import com.mozi.moziserver.model.entity.User;
 import com.mozi.moziserver.model.entity.UserChallenge;
 import com.mozi.moziserver.model.entity.UserChallengeRecord;
 
-import javax.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 

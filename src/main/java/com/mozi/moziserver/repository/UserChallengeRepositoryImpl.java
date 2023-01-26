@@ -5,8 +5,8 @@ import com.mozi.moziserver.model.mappedenum.UserChallengeResultType;
 import com.mozi.moziserver.model.mappedenum.UserChallengeStateType;
 import com.querydsl.core.types.Predicate;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.Collection;
