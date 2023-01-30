@@ -58,3 +58,5 @@ sentry:
   stacktrace:
     app-packages:
       - com.mozi.moziserver
+  logging:
+    minimum-event-level: warn

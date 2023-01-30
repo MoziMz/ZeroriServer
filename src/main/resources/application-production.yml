@@ -6,3 +6,6 @@ server:
 springfox:
   documentation:
     enabled: false
+
+sentry:
+  environment: production

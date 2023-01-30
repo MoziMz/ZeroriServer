@@ -1,2 +1,5 @@
 server:
   domain: https://dev.zero-ri.com
+
+sentry:
+  environment: dev

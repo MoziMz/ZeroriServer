@@ -1,2 +1,6 @@
 server:
   domain: http://localhost:8080
+
+sentry:
+  logging:
+    enabled: false
