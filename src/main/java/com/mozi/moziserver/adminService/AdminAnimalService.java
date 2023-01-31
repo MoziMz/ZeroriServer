@@ -1,4 +1,4 @@
-package com.mozi.moziserver.service;
+package com.mozi.moziserver.adminService;
 
 import com.mozi.moziserver.common.JpaUtil;
 import com.mozi.moziserver.httpException.ResponseError;
@@ -6,6 +6,7 @@ import com.mozi.moziserver.model.entity.Animal;
 import com.mozi.moziserver.model.entity.PreparationItem;
 import com.mozi.moziserver.repository.AnimalRepository;
 import com.mozi.moziserver.repository.PreparationItemRepository;
+import com.mozi.moziserver.service.S3ImageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -20,13 +21,12 @@ import java.util.List;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class AnimalService {
-    private final S3ImageService s3ImageService;
+public class AdminAnimalService {
+
     private final AnimalRepository animalRepository;
     private final PreparationItemRepository preparationItemRepository;
-
+    private final S3ImageService s3ImageService;
     private final PlatformTransactionManager transactionManager;
-
 
     public Animal getAnimal(Long seq) {
         Animal animal = animalRepository.findById(seq)
@@ -186,7 +186,6 @@ public class AnimalService {
             }
         }
 
-
         if(blackImage != null ){
             String blackImgUrl = null;
             try {
@@ -205,7 +204,6 @@ public class AnimalService {
                 throw ResponseError.BadRequest.ALREADY_CREATED.getResponseException(); // for duplicate exception
             }
         });
-
     }
 
     private void withTransaction(Runnable runnable) {

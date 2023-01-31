@@ -1,5 +1,6 @@
-package com.mozi.moziserver.controller;
+package com.mozi.moziserver.adminController;
 
+import com.mozi.moziserver.adminService.AdminChallengeService;
 import com.mozi.moziserver.model.req.ReqAdminChallengeCreate;
 import com.mozi.moziserver.security.SessionUser;
 import com.mozi.moziserver.service.ChallengeService;
@@ -20,14 +21,15 @@ import java.util.List;
 @RequestMapping("/api")
 @RequiredArgsConstructor
 public class AdminChallengeController {
-    private final ChallengeService challengeService;
+
+    private final AdminChallengeService adminChallengeService;
 
     @ApiOperation("챌린지 생성")
     @PostMapping("/admin/challenges")
     public ResponseEntity<Object> createChallenge(
             @Valid ReqAdminChallengeCreate req
     ) {
-        challengeService.createChallenge(req);
+        adminChallengeService.createChallenge(req);
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
@@ -40,10 +42,8 @@ public class AdminChallengeController {
             @RequestParam(required = true) String title,
             @RequestParam(value = "content",required = true) List<String> contentList
     ) {
-        challengeService.createChallengeExplanation(seq, title, contentList);//        challengeService.createChallenge(req);
+        adminChallengeService.createChallengeExplanation(seq, title, contentList);//        challengeService.createChallenge(req);
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
-
-
 }

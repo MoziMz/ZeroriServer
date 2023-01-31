@@ -173,6 +173,7 @@ public class ChallengeService {
         challenge.setExplanation(challengeExplanation);
         challengeRepository.save(challenge);
     }
+
     public List<ChallengeTheme> getChallengeThemeList() {
         return challengeThemeRepository.findAll();
     }

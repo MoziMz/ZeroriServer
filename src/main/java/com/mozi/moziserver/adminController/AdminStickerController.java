@@ -1,5 +1,6 @@
-package com.mozi.moziserver.controller;
+package com.mozi.moziserver.adminController;
 
+import com.mozi.moziserver.adminService.AdminStickerService;
 import com.mozi.moziserver.httpException.ResponseError;
 import com.mozi.moziserver.security.SessionUser;
 import com.mozi.moziserver.service.StickerService;
@@ -19,7 +20,8 @@ import javax.validation.constraints.NotBlank;
 @RequestMapping("/api")
 @RequiredArgsConstructor
 public class AdminStickerController {
-    private final StickerService stickerService;
+
+    private final AdminStickerService adminStickerService;
 
     @ApiOperation("스티커 생성")
     @PostMapping("/admin/stickers")
@@ -31,7 +33,7 @@ public class AdminStickerController {
             throw ResponseError.BadRequest.INVALID_IMAGE.getResponseException("need to images");
         }
 
-        stickerService.createSticker(image);
+        adminStickerService.createSticker(image);
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
@@ -47,7 +49,7 @@ public class AdminStickerController {
             throw ResponseError.BadRequest.INVALID_IMAGE.getResponseException("need to images");
         }
 
-        stickerService.updateSticker(seq, image);
+        adminStickerService.updateSticker(seq, image);
 
         return new ResponseEntity<>(HttpStatus.OK);
     }

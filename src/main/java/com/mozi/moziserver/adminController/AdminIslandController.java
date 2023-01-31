@@ -1,5 +1,6 @@
-package com.mozi.moziserver.controller;
+package com.mozi.moziserver.adminController;
 
+import com.mozi.moziserver.adminService.AdminIslandService;
 import com.mozi.moziserver.common.Constant;
 import com.mozi.moziserver.httpException.ResponseError;
 import com.mozi.moziserver.security.SessionUser;
@@ -21,7 +22,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AdminIslandController {
 
-    private final IslandService islandService;
+    private final AdminIslandService adminIslandService;
 
     @ApiOperation("섬 등록")
     @PostMapping(value = "/admin/islands",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -40,7 +41,7 @@ public class AdminIslandController {
             throw ResponseError.BadRequest.INVALID_IMAGE.getResponseException("need to 6 images");
         }
 
-        islandService.createIsland(name,type,description,maxPoint,maxRewardLevel,islandImgUrlList, islandThumbnailImgUrlList);
+        adminIslandService.createIsland(name,type,description,maxPoint,maxRewardLevel,islandImgUrlList, islandThumbnailImgUrlList);
 
 
         return new ResponseEntity<>(HttpStatus.OK);
@@ -57,15 +58,14 @@ public class AdminIslandController {
             @RequestParam("maxRewardLevel") Integer maxRewardLevel
     ) {
         if (name != null || type != null || description != null || maxPoint !=null || maxRewardLevel !=null) {
-            islandService.updateIsland(name,type,description,maxPoint,maxRewardLevel);
+            adminIslandService.updateIsland(name,type,description,maxPoint,maxRewardLevel);
         }
 
         return new ResponseEntity<>(HttpStatus.OK);
-
     }
 
     @ApiOperation("섬 이미지 수정")
-    @PutMapping(value = "/admin/islandImgs")
+    @PutMapping(value = "/admin/island-imgs")
     public ResponseEntity<Object> updateIslandImg(
             @ApiParam(hidden = true) @SessionUser Long userSeq,
             @RequestParam(value = "type", required = true) Integer type,
@@ -74,10 +74,9 @@ public class AdminIslandController {
             @RequestPart(value = "islandThumbnailImg", required = false) MultipartFile islandThumbnailImg
     ) {
         if (islandImg != null || islandThumbnailImg != null) {
-            islandService.updateIslandImg(type, level, islandImg, islandThumbnailImg);
+            adminIslandService.updateIslandImg(type, level, islandImg, islandThumbnailImg);
         }
 
         return new ResponseEntity<>(HttpStatus.OK);
-
     }
 }

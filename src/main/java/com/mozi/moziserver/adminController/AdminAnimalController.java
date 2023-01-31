@@ -1,5 +1,6 @@
-package com.mozi.moziserver.controller;
+package com.mozi.moziserver.adminController;
 
+import com.mozi.moziserver.adminService.AdminAnimalService;
 import com.mozi.moziserver.httpException.ResponseError;
 import com.mozi.moziserver.model.entity.Animal;
 import com.mozi.moziserver.model.entity.User;
@@ -28,7 +29,8 @@ import java.util.List;
 @RequestMapping("/api")
 @RequiredArgsConstructor
 public class AdminAnimalController {
-    private final AnimalService animalService;
+
+    private final AdminAnimalService adminAnimalService;
 
     // TODO 동물의 아이템까지 정보를 어떻게 제시할지 논의 필요
     @ApiOperation("동물 리스트 조회")
@@ -36,7 +38,7 @@ public class AdminAnimalController {
     public List<Animal> getAnimalList(
             @ApiParam(hidden = true) @SessionUser Long userSeq
     ) {
-        return animalService.getAnimalList();
+        return adminAnimalService.getAnimalList();
     }
 
     @ApiOperation("동물 생성")
@@ -55,7 +57,7 @@ public class AdminAnimalController {
             throw ResponseError.BadRequest.INVALID_IMAGE.getResponseException("need to images");
         }
 
-        animalService.createAnimal(name, postboxAnimalContent, image, fullBodyImage, islandType, islandLevel);
+        adminAnimalService.createAnimal(name, postboxAnimalContent, image, fullBodyImage, islandType, islandLevel);
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
@@ -72,7 +74,7 @@ public class AdminAnimalController {
     ) {
 
         if (name != null || postboxAnimalContent != null || image != null || fullBodyImage != null) {
-            animalService.updateAnimal(seq, name, postboxAnimalContent, image, fullBodyImage);
+            adminAnimalService.updateAnimal(seq, name, postboxAnimalContent, image, fullBodyImage);
         }
 
         return new ResponseEntity<>(HttpStatus.OK);
@@ -93,7 +95,7 @@ public class AdminAnimalController {
             throw ResponseError.BadRequest.INVALID_IMAGE.getResponseException("need to images");
         }
 
-        animalService.createPreparationItem(animalSeq, turn, name, colorImage, blackImage);
+        adminAnimalService.createPreparationItem(animalSeq, turn, name, colorImage, blackImage);
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
@@ -109,7 +111,7 @@ public class AdminAnimalController {
             @RequestPart(name = "blackImage",required = false) MultipartFile blackImage
     ) {
         if ((animalSeq != null && turn != null)&&( name != null || colorImage != null || blackImage != null)) {
-            animalService.updatePreparationItem(animalSeq, turn, name, colorImage, blackImage);
+            adminAnimalService.updatePreparationItem(animalSeq, turn, name, colorImage, blackImage);
         }
 
         return new ResponseEntity<>(HttpStatus.OK);
