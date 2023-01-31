@@ -345,6 +345,5 @@ public class UserChallengeService {
     ) {
 
         return userChallengeRecordRepository.findByUserAndConfirmCnt(userSeq,reqList.getPrevLastSeq(),reqList.getPageSize());
-
     }
 }
