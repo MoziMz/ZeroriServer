@@ -42,4 +42,6 @@ public interface UserChallengeRepositorySupport {
             UserChallengeStateType beforeState,
             UserChallengeStateType afterState
     );
+
+    List<UserChallenge> findAllByStateAndStartDate(UserChallengeStateType stateType, LocalDate startDate);
 }

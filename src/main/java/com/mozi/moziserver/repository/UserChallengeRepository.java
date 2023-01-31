@@ -16,6 +16,7 @@ import java.util.Optional;
 
 @Repository
 public interface UserChallengeRepository extends JpaRepository<UserChallenge, Long>, UserChallengeRepositorySupport {
+
     @Transactional
     @Modifying(clearAutomatically = true)
     @Query("UPDATE user_challenge SET state = :afterState WHERE seq = :seq AND state = :beforeState")
@@ -24,8 +25,6 @@ public interface UserChallengeRepository extends JpaRepository<UserChallenge, Lo
             @Param("beforeState") UserChallengeStateType beforeState,
             @Param("afterState") UserChallengeStateType afterState
     );
-
-    List<UserChallenge> findAllByStateAndStartDate(UserChallengeStateType stateType, LocalDate startDate);
 
     Optional<UserChallenge> findFirstByStateNotAndUserSeqOrderByStartDateAsc(UserChallengeStateType userChallengeStateType, Long userSeq);
 }

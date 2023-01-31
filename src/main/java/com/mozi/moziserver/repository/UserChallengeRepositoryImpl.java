@@ -161,8 +161,16 @@ public class UserChallengeRepositoryImpl extends QuerydslRepositorySupport imple
         return resultCount;
     }
 
+    @Override
+    public List<UserChallenge> findAllByStateAndStartDate(UserChallengeStateType stateType, LocalDate startDate) {
+        return from(qUserChallenge)
+                .innerJoin(qUserChallenge.challenge, qChallenge).fetchJoin()
+                .where(qUserChallenge.state.eq(stateType)
+                        .and(qUserChallenge.startDate.eq(startDate)))
+                .fetch();
+    }
+
     private <T> Predicate predicateOptional(final Function<T, Predicate> whereFunc, final T value) {
         return value != null ? whereFunc.apply(value) : null;
     }
-
 }
