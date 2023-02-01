@@ -33,7 +33,7 @@ public class FcmService {
             log.debug(response);
         } catch (FirebaseMessagingException e) {
             log.error("FIREBASE_MESSAGING_EXCEPTION", e);
-            if (e.getMessagingErrorCode().equals(MessagingErrorCode.UNREGISTERED)) {
+            if (e.getMessagingErrorCode() == MessagingErrorCode.UNREGISTERED) {
                 log.error("UNREGISTERED_TOKEN", e);
             }
         }
