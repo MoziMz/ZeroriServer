@@ -7,6 +7,7 @@ import com.mozi.moziserver.model.entity.IslandImg;
 import com.mozi.moziserver.repository.IslandImgRepository;
 import com.mozi.moziserver.repository.IslandRepository;
 import com.mozi.moziserver.service.S3ImageService;
+import io.swagger.models.auth.In;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -29,11 +30,15 @@ public class AdminIslandService {
     private final S3ImageService s3ImageService;
     private final PlatformTransactionManager transactionManager;
 
-    private Island getIsland(Integer type) {
+    public Island getIsland(Integer type) {
         Island island = islandRepository.findById(type)
                 .orElseThrow(ResponseError.NotFound.ISLAND_NOT_EXISTS::getResponseException);
 
         return island;
+    }
+
+    public List<Island> getIslandList() {
+        return islandRepository.findAll();
     }
 
     private IslandImg getIslandImg(Integer type, Integer level) {
@@ -46,9 +51,13 @@ public class AdminIslandService {
         return islandImg;
     }
 
+    public List<IslandImg> getIslandImgListByType(Integer islandType) {
+        return islandImgRepository.findAllByType(islandType);
+    }
+
     public void createIsland(
-            String name,
             Integer type,
+            String name,
             String description,
             Integer maxPoint,
             Integer maxRewardLevel,
@@ -100,13 +109,12 @@ public class AdminIslandService {
 
     @Transactional
     public void updateIsland(
-            String name,
             Integer type,
+            String name,
             String description,
             Integer maxPoint,
             Integer maxRewardLevel
     ) {
-
         final Island island = getIsland(type);
 
         if (name != null && name.length() != 0) {
@@ -138,7 +146,6 @@ public class AdminIslandService {
             MultipartFile islandImgFile,
             MultipartFile islandThumbnailImgFile
     ) {
-
         final IslandImg islandImg = getIslandImg(type, level);
 
         String islandImgUrl = null;

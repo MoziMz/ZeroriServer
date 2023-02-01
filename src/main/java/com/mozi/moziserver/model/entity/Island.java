@@ -2,8 +2,8 @@ package com.mozi.moziserver.model.entity;
 
 import lombok.*;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.util.*;
 
 @Getter
 @Setter
