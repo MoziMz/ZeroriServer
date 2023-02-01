@@ -22,6 +22,15 @@
         </filter>
     </appender>
 
+    <appender name="Slack" class="com.mozi.moziserver.common.SlackAppender">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>WARN</level>
+        </filter>
+        <webhookUrl>${SLACK_WEBHOOK_URL}</webhookUrl>
+        <channelName>${SLACK_CHANNEL_NAME}</channelName>
+
+    </appender>
+
     <springProfile name="default">
         <root level="INFO">
             <appender-ref ref="STDOUT" />
@@ -32,6 +41,7 @@
         <root level="INFO">
             <appender-ref ref="STDOUT" />
             <appender-ref ref="Sentry" />
+            <appender-ref ref="Slack"/>
         </root>
         <logger name="com.mozi.moziserver.log.ApiLogFilter" level="INFO" additivity="false">
             <appender-ref ref="JSON" />
@@ -42,6 +52,7 @@
         <root level="INFO">
             <appender-ref ref="STDOUT" />
             <appender-ref ref="Sentry" />
+            <appender-ref ref="Slack"/>
         </root>
         <logger name="com.mozi.moziserver.log.ApiLogFilter" level="INFO" additivity="false">
             <appender-ref ref="JSON" />
