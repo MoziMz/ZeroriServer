@@ -106,7 +106,6 @@ public class AdminIslandService {
         });
     }
 
-    @Transactional
     public void updateIsland(
             Integer type,
             String name,
@@ -191,7 +190,6 @@ public class AdminIslandService {
         }
     }
 
-    @Transactional
     public void deleteIsland(Integer type) {
         final Island island = getIsland(type);
 
