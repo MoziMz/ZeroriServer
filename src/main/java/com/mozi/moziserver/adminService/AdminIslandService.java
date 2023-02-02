@@ -7,7 +7,6 @@ import com.mozi.moziserver.model.entity.IslandImg;
 import com.mozi.moziserver.repository.IslandImgRepository;
 import com.mozi.moziserver.repository.IslandRepository;
 import com.mozi.moziserver.service.S3ImageService;
-import io.swagger.models.auth.In;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -190,6 +189,14 @@ public class AdminIslandService {
         } catch (Exception e) {
             throw new RuntimeException(e.getCause());
         }
+    }
+
+    @Transactional
+    public void deleteIsland(Integer type) {
+        final Island island = getIsland(type);
+
+        islandRepository.delete(island);
+        islandImgRepository.deleteByType(island.getType());
     }
 
     private void withTransaction(Runnable runnable) {
