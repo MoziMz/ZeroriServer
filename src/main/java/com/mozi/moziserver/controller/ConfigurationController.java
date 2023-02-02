@@ -78,6 +78,16 @@ public class ConfigurationController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    @ApiOperation("튜토리얼 확인 완료")
+    @PutMapping("/v1/users/me/tutorial/checked")
+    public ResponseEntity<Object> checkedTutorial(
+            @ApiParam(hidden = true) @SessionUser Long userSeq
+    ) {
+        userService.checkTutorial(userSeq);
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
     @ApiOperation("챌린지 제안하기")
     @PostMapping("/v1/suggestions")
     public ResponseEntity<Object> createSuggestion(
