@@ -418,6 +418,16 @@ public class UserService {
         // TODO DeleteLog에 삭제된 회원정보 넣기
     }
 
+    @Transactional
+    public void checkTutorial(Long userSeq) {
+        User user = userRepository.findById(userSeq)
+                .orElseThrow(ResponseError.NotFound.USER_NOT_EXISTS::getResponseException);
+
+        user.setTutorialCheckedState(true);
+
+        userRepository.save(user);
+    }
+
     private void withTransaction(Runnable runnable) {
         DefaultTransactionDefinition definition = new DefaultTransactionDefinition();
 

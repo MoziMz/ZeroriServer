@@ -1,6 +1,7 @@
 package com.mozi.moziserver.model.entity;
 
 import com.mozi.moziserver.common.UserState;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -22,6 +23,9 @@ public class User extends AbstractTimeEntity {
     private UserState state = UserState.ACTIVE;
 
     private String stateReason;
+
+    @Builder.Default
+    private boolean tutorialCheckedState = false;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "seq")
