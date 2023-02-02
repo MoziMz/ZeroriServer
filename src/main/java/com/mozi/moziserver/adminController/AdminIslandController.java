@@ -47,23 +47,23 @@ public class AdminIslandController {
     }
 
     @ApiOperation("섬 등록")
-    @PostMapping(value = "/admin/islands",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/admin/islands", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Object> createIsland(
             @ApiParam(hidden = true) @SessionUser Long userSeq,
             @RequestParam(value = "name", required = true) String name,
             @RequestParam(value = "type", required = true) Integer type,
             @RequestParam(value = "description", required = true) String description,
-            @RequestParam(value = "maxPoint",required = true) Integer maxPoint,
+            @RequestParam(value = "maxPoint", required = true) Integer maxPoint,
             @RequestParam(value = "maxRewardLevel", required = true) Integer maxRewardLevel,
-            @RequestPart(value = "islandImgUrlList",required = true) List<MultipartFile> islandImgUrlList,
-            @RequestPart(value = "islandThumbnailImgUrlList",required = true) List<MultipartFile> islandThumbnailImgUrlList
+            @RequestPart(value = "islandImgUrlList", required = true) List<MultipartFile> islandImgUrlList,
+            @RequestPart(value = "islandThumbnailImgUrlList", required = true) List<MultipartFile> islandThumbnailImgUrlList
     ) {
         if (islandImgUrlList.size() != Constant.islandMaxLevel ||
-                islandThumbnailImgUrlList.size() != Constant.islandMaxLevel){
+                islandThumbnailImgUrlList.size() != Constant.islandMaxLevel) {
             throw ResponseError.BadRequest.INVALID_IMAGE.getResponseException("need to 6 images");
         }
 
-        adminIslandService.createIsland(type, name, description,maxPoint,maxRewardLevel,islandImgUrlList, islandThumbnailImgUrlList);
+        adminIslandService.createIsland(type, name, description, maxPoint, maxRewardLevel, islandImgUrlList, islandThumbnailImgUrlList);
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
@@ -73,12 +73,12 @@ public class AdminIslandController {
     public ResponseEntity<Object> updateIsland(
             @ApiParam(hidden = true) @SessionUser Long userSeq,
             @PathVariable(value = "type", required = true) Integer type,
-            @RequestParam("name") String name,
-            @RequestParam("description") String description,
-            @RequestParam("maxPoint") Integer maxPoint,
-            @RequestParam("maxRewardLevel") Integer maxRewardLevel
+            @RequestParam(value = "name", required = false) String name,
+            @RequestParam(value = "description", required = false) String description,
+            @RequestParam(value = "maxPoint", required = false) Integer maxPoint,
+            @RequestParam(value = "maxRewardLevel", required = false) Integer maxRewardLevel
     ) {
-        if (name != null || description != null || maxPoint !=null || maxRewardLevel !=null) {
+        if (name != null || description != null || maxPoint != null || maxRewardLevel != null) {
             adminIslandService.updateIsland(type, name, description, maxPoint, maxRewardLevel);
         }
 
@@ -97,6 +97,17 @@ public class AdminIslandController {
         if (islandImg != null || islandThumbnailImg != null) {
             adminIslandService.updateIslandImg(type, level, islandImg, islandThumbnailImg);
         }
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @ApiOperation("섬 삭제")
+    @DeleteMapping("/admin/islands/{type}")
+    public ResponseEntity<Object> deleteIsland(
+            @ApiParam(hidden = true) @SessionUser Long userSeq,
+            @PathVariable(value = "type", required = true) Integer type
+    ) {
+        adminIslandService.deleteIsland(type);
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
