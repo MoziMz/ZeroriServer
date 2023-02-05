@@ -2,6 +2,7 @@ package com.mozi.moziserver.common;
 
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
+import java.security.SecureRandom;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
@@ -17,6 +18,8 @@ public interface Constant {
 
     String ROLE_USER = "USER";
     Collection<SimpleGrantedAuthority> USER_AUTHORITIES = Collections.singleton(new SimpleGrantedAuthority("ROLE_" + ROLE_USER));
+    String ROLE_ADMIN = "ADMIN";
+    Collection<SimpleGrantedAuthority> ADMIN_AUTHORITIES = Collections.singleton(new SimpleGrantedAuthority("ROLE_" + ROLE_ADMIN));
 
     String PW_FIELD_NAME = "pw";
 
@@ -62,6 +65,10 @@ public interface Constant {
 
     String[] ROLE_USER_PATHS = new String[]{
             "/api/**"
+    };
+
+    String[] ROLE_ADMIN_PATHS = new String[]{
+        "/api/admin/*"
     };
 
     String EMAIL_REGEX = "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@"
