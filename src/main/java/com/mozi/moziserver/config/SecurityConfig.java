@@ -59,6 +59,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         final String activeProfiles = String.join(",", env.getActiveProfiles());
 
         http
+                .cors()
+                .and()
                 .csrf().disable()
                 .headers().frameOptions().disable()
                 .and()
