@@ -2,9 +2,9 @@ package com.mozi.moziserver.log;
 
 import co.elastic.apm.api.ElasticApm;
 import co.elastic.apm.api.Transaction;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mozi.moziserver.common.Constant;
+import com.mozi.moziserver.security.ResUserSignIn;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +13,8 @@ import org.slf4j.MDC;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.servlet.HandlerMapping;
@@ -30,14 +32,14 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
-import java.util.Optional;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.mozi.moziserver.common.Constant.PW_FIELD_NAME;
 import static com.mozi.moziserver.common.Constant.CURRENT_PW_FIELD_NAME;
+import static com.mozi.moziserver.common.Constant.PW_FIELD_NAME;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -74,11 +76,10 @@ public class ApiLogFilter extends OncePerRequestFilter {
             MDC.put(Constant.MDC_KEY_THREAD_ID, traceId);
         }
 
-//         TODO 로그인 구현 후 손보기
-//        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-//        if(auth != null && auth.isAuthenticated()) {
-//            MDC.put(Constant.MDC_KEY_USER_SEQ, ((User)auth.getPrincipal()).getSeq().toString());
-//        }
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.isAuthenticated()) {
+            MDC.put(Constant.MDC_KEY_USER_SEQ, ((ResUserSignIn) auth.getPrincipal()).getUserSeq().toString());
+        }
 
         ContentCachingRequestWrapper wrappedRequest = request instanceof ContentCachingRequestWrapper
                 ? (ContentCachingRequestWrapper) request
@@ -109,8 +110,8 @@ public class ApiLogFilter extends OncePerRequestFilter {
 
             setRequestLog(wrappedRequest, apiLogBuilder);
             setResponseLog(wrappedResponse, apiLogBuilder);
-            
-            if(!wrappedRequest.getRequestURI().equals("/api/health-check")){
+
+            if (!wrappedRequest.getRequestURI().equals("/api/health-check")) {
                 try {
                     log.info(objectMapper.writeValueAsString(apiLogBuilder.build()));
                 } catch (Exception ignored) {
@@ -152,7 +153,7 @@ public class ApiLogFilter extends OncePerRequestFilter {
 
         apiLogBuilder.userSeq(
                 Optional.ofNullable(MDC.get(Constant.MDC_KEY_USER_SEQ))
-                        .filter(v -> !StringUtils.hasLength(v))
+                        .filter(v -> StringUtils.hasLength(v))
                         .map(Long::parseLong)
                         .orElse(null));
     }
@@ -204,10 +205,10 @@ public class ApiLogFilter extends OncePerRequestFilter {
     }
 
     private String hidePw(String reqParam) {
-        if (!StringUtils.hasLength(reqParam) ) {
+        if (!StringUtils.hasLength(reqParam)) {
             return reqParam;
         }
-        if(!(reqParam.contains("\"" + PW_FIELD_NAME + "\"") || reqParam.contains("\"" + CURRENT_PW_FIELD_NAME + "\""))){
+        if (!(reqParam.contains("\"" + PW_FIELD_NAME + "\"") || reqParam.contains("\"" + CURRENT_PW_FIELD_NAME + "\""))) {
             return reqParam;
         }
 
