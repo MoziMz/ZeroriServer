@@ -2,9 +2,6 @@ package com.mozi.moziserver.common;
 
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
-import java.security.SecureRandom;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -41,6 +38,7 @@ public interface Constant {
 
     String[] PERMIT_ALL_PATHS = new String[]{
             "/health",
+            "/api/admin/signin",
             "/api/*/users/signin",
             "/api/*/users/signup",
             "/api/*/users/signout",
@@ -56,7 +54,7 @@ public interface Constant {
             "/api/*/users/emails/{email}/check",
             "/api/*/users/find-pw",
             "/api/*/find/emails",
-            "/api/health-check"
+            "/api/health-check",
     };
 
     String[] AUTHENTICATED_PATHS = new String[]{
