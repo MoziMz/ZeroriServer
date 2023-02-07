@@ -27,6 +27,11 @@ public class AdminUserService {
     private final UserAuthRepository userAuthRepository;
     private final AuthenticationManager authenticationManager;
 
+    public User getById(Long seq) {
+        return userRepository.findById(seq)
+                .orElseThrow(ResponseError.NotFound.USER_NOT_EXISTS::getResponseException);
+    }
+
     public Authentication signIn(ReqAdminSignIn req) {
 
         Authentication auth = null;

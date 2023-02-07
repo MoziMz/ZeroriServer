@@ -4,19 +4,18 @@ import com.mozi.moziserver.adminService.AdminUserRewardService;
 import com.mozi.moziserver.adminService.AdminUserService;
 import com.mozi.moziserver.common.UserState;
 import com.mozi.moziserver.model.adminRes.AdminResUserList;
+import com.mozi.moziserver.model.adminRes.AdminResUserPointRecordList;
 import com.mozi.moziserver.model.adminRes.AdminResUserRewardList;
 import com.mozi.moziserver.model.entity.User;
 import com.mozi.moziserver.model.entity.UserAuth;
 import com.mozi.moziserver.model.entity.UserIsland;
 import com.mozi.moziserver.model.entity.UserReward;
+import com.mozi.moziserver.model.mappedenum.PointReasonType;
 import com.mozi.moziserver.model.mappedenum.UserAuthType;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.Max;
 import java.util.List;
@@ -64,6 +63,17 @@ public class AdminUserController {
 
         return IntStream.range(0, userRewardList.size())
                 .mapToObj(i -> AdminResUserRewardList.of(userRewardList.get(i).getUser(), userRewardList.get(i), userIslandList.get(i)))
+                .collect(Collectors.toList());
+    }
+
+    @ApiOperation("유저별 포인트 이력 조회")
+    @GetMapping("/admin/users/{seq}/user_point_records")
+    public List<AdminResUserPointRecordList> getUserPointRecordList(
+            @PathVariable("seq") Long userSeq,
+            @RequestParam(name = "reasonType", required = false) List<PointReasonType> reasonTypeList
+    ) {
+        return adminUserRewardService.getUserPointRecordByUserAndType(userSeq, reasonTypeList)
+                .stream().map(AdminResUserPointRecordList::of)
                 .collect(Collectors.toList());
     }
 }

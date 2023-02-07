@@ -66,7 +66,8 @@ public interface Constant {
     };
 
     String[] ROLE_ADMIN_PATHS = new String[]{
-        "/api/admin/*"
+            "/api/admin/*",
+            "/api/admin/**"
     };
 
     String EMAIL_REGEX = "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@"
