@@ -47,7 +47,13 @@ public interface ResponseError {
         //The nickname includes slang
         NICKNAME_WITH_BAD_WORD("nick name with bad word"),
         INVALID_START_DATE_END_DATE("start date must be earlier than or equal to end date"),
-        INVALID_DECLARATION("invalid declaration");
+        INVALID_DECLARATION("invalid declaration"),
+
+        INVALID_EMAIL_AUTH("email authentication is required"),
+        EXPIRED_EMAIL_AUTH("expired email authentication");
+
+
+
 
 
         // INVALID 는 한가지로 명확하지 않을때 쓴다.
@@ -170,8 +176,8 @@ public interface ResponseError {
         CONFIRM_NOT_EXISTS("confirm not exists"),
         CONFIRM_LIKE_NOT_EXISTS("confirm like not exists"),
         BOARD_NOT_EXISTS("board not exists"),
-
-        USER_NOTICE_NOT_EXISTS("user notice not exists");
+        USER_NOTICE_NOT_EXISTS("user notice not exists"),
+        EMAIL_AUTH_NOT_EXISTS("email auth not exists");
 
         private final String message;
 

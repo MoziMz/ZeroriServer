@@ -3,10 +3,8 @@ package com.mozi.moziserver.service;
 import com.mozi.moziserver.common.JpaUtil;
 import com.mozi.moziserver.common.UserState;
 import com.mozi.moziserver.httpException.ResponseError;
-import com.mozi.moziserver.model.entity.Animal;
-import com.mozi.moziserver.model.entity.User;
-import com.mozi.moziserver.model.entity.UserAuth;
-import com.mozi.moziserver.model.entity.UserFcm;
+import com.mozi.moziserver.model.entity.*;
+import com.mozi.moziserver.model.mappedenum.EmailAuthResultState;
 import com.mozi.moziserver.model.mappedenum.UserAuthType;
 import com.mozi.moziserver.model.req.ReqResign;
 import com.mozi.moziserver.model.req.ReqUserSignIn;
@@ -27,9 +25,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
-import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 
@@ -104,6 +102,9 @@ public class UserService {
         Authentication auth = null;
 
         if (req.getType() == UserAuthType.EMAIL) {
+
+            emailAuthService.checkEmailAuth(req.getId());
+
             try {
                 auth = authenticationManager.authenticate(
                         new UsernamePasswordAuthenticationToken(req.getId(), req.getPw())

@@ -1,6 +1,6 @@
 package com.mozi.moziserver.controller;
 
-import com.mozi.moziserver.model.EmailAuthResult;
+import com.mozi.moziserver.model.entity.EmailAuth;
 import com.mozi.moziserver.service.EmailAuthService;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
@@ -28,11 +28,11 @@ public class EmailAuthController {
     public ResponseEntity<Object> authEmail(@PathVariable String token) throws Exception {
         HttpHeaders httpHeaders = new HttpHeaders();
 
-        EmailAuthResult result = emailAuthService.authEmail(token);
+        EmailAuth emailAuth= emailAuthService.authEmail(token);
 
-        switch (result.getStatus()) {
-            case SUCC:
-                switch (result.getType()) {
+        switch (emailAuth.getEmailAuthResultState()) {
+            case SUCCESS:
+                switch (emailAuth.getType()) {
                     case JOIN:
                         httpHeaders.setLocation(new URI("/email/email-auth-join-valid.html"));
                         break;
@@ -45,7 +45,7 @@ public class EmailAuthController {
                         break;
                 }
                 break;
-            case ALREADY_SUCC:
+            case ALREADY_SUCCESS:
                 httpHeaders.setLocation(new URI("/email/email-auth-already-valid.html"));
                 break;
             default:
