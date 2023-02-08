@@ -38,7 +38,7 @@ public class AdminUserController {
             @RequestParam(name = "type", required = false) UserAuthType type,
             @RequestParam(name = "state", required = false) UserState state,
             @RequestParam(name = "pageNumber", required = false, defaultValue = "0") Integer pageNumber,
-            @RequestParam(name = "pageSize", required = false, defaultValue = "20") Integer pageSize
+            @RequestParam(name = "pageSize", required = false, defaultValue = "20") @Max(30) Integer pageSize
     ) {
         List<UserAuth> userAuthList = adminUserService.getUserAuthList(keyword, type, state, pageNumber, pageSize);
 
@@ -70,9 +70,11 @@ public class AdminUserController {
     @GetMapping("/admin/users/{seq}/user_point_records")
     public List<AdminResUserPointRecordList> getUserPointRecordList(
             @PathVariable("seq") Long userSeq,
-            @RequestParam(name = "reasonType", required = false) List<PointReasonType> reasonTypeList
+            @RequestParam(name = "reasonType", required = false) List<PointReasonType> reasonTypeList,
+            @RequestParam(name = "pageNumber", required = false, defaultValue = "0") Integer pageNumber,
+            @RequestParam(name = "pageSize", required = false, defaultValue = "20") @Max(30) Integer pageSize
     ) {
-        return adminUserRewardService.getUserPointRecordByUserAndType(userSeq, reasonTypeList)
+        return adminUserRewardService.getUserPointRecordByUserAndType(userSeq, reasonTypeList, pageNumber, pageSize)
                 .stream().map(AdminResUserPointRecordList::of)
                 .collect(Collectors.toList());
     }

@@ -10,6 +10,7 @@ import com.mozi.moziserver.repository.UserPointRecordRepository;
 import com.mozi.moziserver.repository.UserRewardRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -65,13 +66,14 @@ public class AdminUserRewardService {
                 .collect(Collectors.toList());
     }
 
-    public List<UserPointRecord> getUserPointRecordByUserAndType(Long userSeq, List<PointReasonType> reasonTypeList) {
+    public List<UserPointRecord> getUserPointRecordByUserAndType(Long userSeq, List<PointReasonType> reasonTypeList, Integer pageNumber, Integer pageSize) {
+
         User user = adminUserService.getById(userSeq);
 
         if (reasonTypeList != null && reasonTypeList.size() > 0) {
-            return userPointRecordRepository.findAllByUserAndReasonIn(user, reasonTypeList);
+            return userPointRecordRepository.findAllByUserAndReasonInOrderByCreatedAtDesc(user, reasonTypeList, PageRequest.of(pageNumber, pageSize));
         } else {
-            return userPointRecordRepository.findAllByUser(user);
+            return userPointRecordRepository.findAllByUserOrderByCreatedAtDesc(user, PageRequest.of(pageNumber, pageSize));
         }
     }
 }
