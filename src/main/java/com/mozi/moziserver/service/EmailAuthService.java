@@ -6,6 +6,7 @@ import com.mozi.moziserver.model.EmailAuthResult;
 import com.mozi.moziserver.model.entity.*;
 import com.mozi.moziserver.model.mappedenum.EmailAuthType;
 import com.mozi.moziserver.model.mappedenum.UserAuthType;
+import com.mozi.moziserver.model.mappedenum.UserRoleType;
 import com.mozi.moziserver.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,6 +23,7 @@ import javax.mail.internet.MimeMessage;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -290,6 +292,7 @@ public class EmailAuthService {
         userAuth.setId(emailAuth.getId());
         userAuth.setPw(emailAuth.getPw());
         userAuth.setUser(emailAuth.getUser());
+        userAuth.setRoleList(Arrays.asList(UserRoleType.ROLE_USER));
 
         try {
             withTransaction(() -> {
