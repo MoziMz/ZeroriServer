@@ -19,11 +19,7 @@ public class UserRoleTypeConverter implements AttributeConverter<List<UserRoleTy
             return null;
         }
 
-        String userRoleTypeListString = "";
-        for (UserRoleType userRoleType: userRoleTypeList) {
-            userRoleTypeListString.concat(userRoleType.toString());
-        }
-        return userRoleTypeListString;
+        return userRoleTypeList.stream().map(UserRoleType::toString).collect(Collectors.joining(","));
     }
 
     @Override

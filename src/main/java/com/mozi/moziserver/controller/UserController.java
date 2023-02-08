@@ -8,7 +8,6 @@ import com.mozi.moziserver.model.mappedenum.UserAuthType;
 import com.mozi.moziserver.model.req.*;
 import com.mozi.moziserver.model.res.ResEmail;
 import com.mozi.moziserver.model.res.ResUserPoint;
-import com.mozi.moziserver.repository.UserRepository;
 import com.mozi.moziserver.security.RememberMeService;
 import com.mozi.moziserver.security.SessionUser;
 import com.mozi.moziserver.service.EmailAuthService;

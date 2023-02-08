@@ -1,5 +1,6 @@
 package com.mozi.moziserver.model.entity;
 
+import com.mozi.moziserver.model.mappedenum.EmailAuthResultState;
 import com.mozi.moziserver.model.mappedenum.EmailAuthType;
 import lombok.Getter;
 import lombok.Setter;
@@ -25,7 +26,9 @@ public class EmailAuth extends AbstractTimeEntity {
 
     private LocalDateTime usedDt;
 
-    private boolean checkedState;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "result_state")
+    private EmailAuthResultState emailAuthResultState;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_seq")

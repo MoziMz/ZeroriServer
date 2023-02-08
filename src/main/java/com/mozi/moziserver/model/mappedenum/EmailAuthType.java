@@ -5,9 +5,9 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public enum EmailAuthType {
-    JOIN(1, 3 * 3600),
-    RESET_PW(2, 3 * 3600),
-    RESET_EMAIL(3,30 * 3600);
+    JOIN(0, 3 * 3600),
+    RESET_PW(1, 3 * 3600),
+    RESET_EMAIL(2,30 * 3600);
 
     @Getter
     private final int type;

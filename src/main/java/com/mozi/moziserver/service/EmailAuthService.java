@@ -2,10 +2,14 @@ package com.mozi.moziserver.service;
 
 import com.mozi.moziserver.common.JpaUtil;
 import com.mozi.moziserver.httpException.ResponseError;
-import com.mozi.moziserver.model.EmailAuthResult;
-import com.mozi.moziserver.model.entity.*;
+import com.mozi.moziserver.model.entity.Animal;
+import com.mozi.moziserver.model.entity.EmailAuth;
+import com.mozi.moziserver.model.entity.User;
+import com.mozi.moziserver.model.entity.UserAuth;
+import com.mozi.moziserver.model.mappedenum.EmailAuthResultState;
 import com.mozi.moziserver.model.mappedenum.EmailAuthType;
 import com.mozi.moziserver.model.mappedenum.UserAuthType;
+import com.mozi.moziserver.model.mappedenum.UserRoleType;
 import com.mozi.moziserver.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,9 +23,9 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import javax.mail.internet.MimeMessage;
-import org.springframework.transaction.annotation.Transactional;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -55,6 +59,7 @@ public class EmailAuthService {
 
     /**
      * 가입 이메일 전송
+     *
      * @param userAuth
      */
     public void sendJoinEmail(UserAuth userAuth) {
@@ -75,7 +80,6 @@ public class EmailAuthService {
                 "[제로리] 가입 인증 메일",
                 "<html> <body><h3>안녕하세요. 제로리입니다.</h3>" + "아래 [인증] 버튼을 눌러주세요." + "<form action=\"" + serverDomain + "/email/auth/" + emailAuth.getToken() + "\"> <input type=\"submit\" value=\"인증\" /> </form>"
                         + "</body></html>"
-//                "인증링크 : " + serverDomain + "/email/auth/" + emailAuth.getToken()
         );
 
         if (!isSend) {
@@ -168,39 +172,29 @@ public class EmailAuthService {
 
     /**
      * 이메일 인증
+     *
      * @param token
      * @return
      */
-    public EmailAuthResult authEmail(String token) {
-        Optional<EmailAuth> emailAuthOptional = emailAuthRepository.findByToken(token);
-
-        if (emailAuthOptional.isEmpty()) {
-            return EmailAuthResult.builder()
-                    .status(EmailAuthResult.Status.INVALID)
-                    .build();
-        }
-
-        if (emailAuthOptional.get().isCheckedState()) {
-            throw ResponseError.BadRequest.ALREADY_CHECKED_EMAIL.getResponseException();
-        }
-
-        EmailAuth emailAuth = emailAuthOptional.get();
+    public EmailAuth authEmail(String token) {
+        EmailAuth emailAuth = emailAuthRepository.findByToken(token)
+                .orElseThrow(ResponseError.NotFound.EMAIL_AUTH_NOT_EXISTS::getResponseException);
 
         if (emailAuth.getUsedDt() != null) {
-            return EmailAuthResult.builder()
-                    .type(emailAuth.getType())
-                    .status(EmailAuthResult.Status.ALREADY_SUCC)
-                    .build();
+
+            createEmailAuth(emailAuth, EmailAuthResultState.ALREADY_SUCCESS);
+            return emailAuth;
+
         }
 
         Duration duration = Duration.between(emailAuth.getCreatedAt(), LocalDateTime.now());
         boolean isExpired = duration.getSeconds() > emailAuth.getType().getExpiredSeconds();
 
         if (isExpired) {
-            return EmailAuthResult.builder()
-                    .type(emailAuth.getType())
-                    .status(EmailAuthResult.Status.INVALID)
-                    .build();
+
+            createEmailAuth(emailAuth, EmailAuthResultState.EXPIRATION);
+            return emailAuth;
+
         }
 
         switch (emailAuth.getType()) {
@@ -215,13 +209,9 @@ public class EmailAuthService {
                 break;
         }
 
-        emailAuth.setUsedDt(LocalDateTime.now());
-        emailAuthRepository.save(emailAuth);
+        createEmailAuth(emailAuth, EmailAuthResultState.SUCCESS);
 
-        return EmailAuthResult.builder()
-                .type(emailAuth.getType())
-                .status(EmailAuthResult.Status.SUCC)
-                .build();
+        return emailAuth;
     }
 
     private void saveEmailAuth(EmailAuth emailAuth) {
@@ -290,6 +280,7 @@ public class EmailAuthService {
         userAuth.setId(emailAuth.getId());
         userAuth.setPw(emailAuth.getPw());
         userAuth.setUser(emailAuth.getUser());
+        userAuth.setRoleList(Arrays.asList(UserRoleType.ROLE_USER));
 
         try {
             withTransaction(() -> {
@@ -376,6 +367,29 @@ public class EmailAuthService {
         if (userAuth.getSeq() == null) {
             throw ResponseError.InternalServerError.UNEXPECTED_ERROR.getResponseException();
         }
+    }
+
+    public void createEmailAuth(EmailAuth emailAuth, EmailAuthResultState status) {
+
+        if (status == EmailAuthResultState.SUCCESS) {
+            emailAuth.setUsedDt(LocalDateTime.now());
+        }
+        emailAuth.setEmailAuthResultState(status);
+        emailAuthRepository.save(emailAuth);
+
+    }
+
+    public void checkEmailAuth(String id) {
+
+        EmailAuth emailAuth = emailAuthRepository.findByIdAndTypeOrderByCreatedAt(id, EmailAuthType.JOIN.getType())
+                .orElseThrow(ResponseError.NotFound.EMAIL_AUTH_NOT_EXISTS::getResponseException);
+
+        if (emailAuth.getEmailAuthResultState() == null) {
+            throw ResponseError.BadRequest.INVALID_EMAIL_AUTH.getResponseException();
+        } else if (emailAuth.getEmailAuthResultState() == EmailAuthResultState.EXPIRATION) {
+            throw ResponseError.BadRequest.EXPIRED_EMAIL_AUTH.getResponseException();
+        }
+
     }
 
     private void withTransaction(Runnable runnable) {
