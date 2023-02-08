@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
 
 @Repository
-public interface UserRewardRepository extends JpaRepository<UserReward, Long> {
+public interface UserRewardRepository extends JpaRepository<UserReward, Long>, UserRewardRepositorySupport {
     UserReward findByUser(User user); // TODO 유저 생성시 UserReward 동시 생성?
 
 //    @Transactional

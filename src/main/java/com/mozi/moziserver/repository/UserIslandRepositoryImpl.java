@@ -25,4 +25,13 @@ public class UserIslandRepositoryImpl extends QuerydslRepositorySupport implemen
                 .orderBy(qIsland.type.asc())
                 .fetch();
     }
+
+    // -------------------- -------------------- below admin methods -------------------- -------------------- //
+    @Override
+    public List<UserIsland> findAllByUserIn(List<User> userList) {
+        return from(qUserIsland)
+                .leftJoin(qUserIsland.user, qUser).fetchJoin()
+                .where(qUser.in(userList))
+                .fetch();
+    }
 }

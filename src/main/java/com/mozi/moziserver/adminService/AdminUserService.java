@@ -4,10 +4,10 @@ import com.mozi.moziserver.common.UserState;
 import com.mozi.moziserver.httpException.ResponseError;
 import com.mozi.moziserver.model.adminReq.ReqAdminSignIn;
 import com.mozi.moziserver.model.entity.User;
+import com.mozi.moziserver.model.entity.UserAuth;
 import com.mozi.moziserver.model.mappedenum.UserAuthType;
-import com.mozi.moziserver.model.req.ReqUserSignIn;
+import com.mozi.moziserver.repository.UserAuthRepository;
 import com.mozi.moziserver.repository.UserRepository;
-import com.mozi.moziserver.security.ReqUserSocialSignIn;
 import com.mozi.moziserver.security.ResUserSignIn;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,13 +16,21 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Slf4j
 @RequiredArgsConstructor
 @Service
 public class AdminUserService {
 
     private final UserRepository userRepository;
+    private final UserAuthRepository userAuthRepository;
     private final AuthenticationManager authenticationManager;
+
+    public User getById(Long seq) {
+        return userRepository.findById(seq)
+                .orElseThrow(ResponseError.NotFound.USER_NOT_EXISTS::getResponseException);
+    }
 
     public Authentication signIn(ReqAdminSignIn req) {
 
@@ -50,5 +58,15 @@ public class AdminUserService {
         }
 
         return auth;
+    }
+
+    public List<UserAuth> getUserAuthList(
+            String keyword,
+            UserAuthType userAuthType,
+            UserState userState,
+            Integer pageNumber,
+            Integer pageSize
+    ) {
+        return userAuthRepository.findAllByKeywordAndTypeAndState(keyword, userAuthType, userState, pageNumber, pageSize);
     }
 }
