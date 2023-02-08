@@ -8,6 +8,7 @@ import com.mozi.moziserver.model.entity.User;
 import com.mozi.moziserver.model.entity.UserAuth;
 import com.mozi.moziserver.model.entity.UserFcm;
 import com.mozi.moziserver.model.mappedenum.UserAuthType;
+import com.mozi.moziserver.model.mappedenum.UserRoleType;
 import com.mozi.moziserver.model.req.ReqResign;
 import com.mozi.moziserver.model.req.ReqUserSignIn;
 import com.mozi.moziserver.model.req.ReqUserSignUp;
@@ -30,6 +31,8 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -84,6 +87,7 @@ public class UserService {
         userAuth.setId(reqUserSignUp.getId());
         userAuth.setPw(passwordEncoder.encode(reqUserSignUp.getPw()));
         userAuth.setType(UserAuthType.EMAIL);
+        userAuth.setRoleList(Arrays.asList(UserRoleType.ROLE_USER));
 
         User user = new User();
         userRepository.save(user);
@@ -206,6 +210,7 @@ public class UserService {
             userAuth.setType(userAuthType);
             userAuth.setId(socialId);
             userAuth.setUser(user);
+            userAuth.setRoleList(Arrays.asList(UserRoleType.ROLE_USER));
 
             userAuthRepository.save(userAuth);
 
