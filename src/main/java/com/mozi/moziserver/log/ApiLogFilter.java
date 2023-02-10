@@ -103,13 +103,13 @@ public class ApiLogFilter extends OncePerRequestFilter {
             final long durationMillis = ChronoUnit.MILLIS.between(startDatetime, endDatetime);
             apiLogBuilder.duration(durationMillis);
 
+            setRequestLog(wrappedRequest, apiLogBuilder);
+            setResponseLog(wrappedResponse, apiLogBuilder);
+
             try {
                 wrappedResponse.copyBodyToResponse();
             } catch (IOException ignored) {
             }
-
-            setRequestLog(wrappedRequest, apiLogBuilder);
-            setResponseLog(wrappedResponse, apiLogBuilder);
 
             if (!wrappedRequest.getRequestURI().equals("/api/health-check")) {
                 try {
