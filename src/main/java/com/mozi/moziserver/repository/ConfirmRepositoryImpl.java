@@ -173,6 +173,24 @@ public class ConfirmRepositoryImpl extends QuerydslRepositorySupport implements 
                 .fetch();
     }
 
+    // -------------------- -------------------- below admin methods -------------------- -------------------- //
+    @Override
+    public List<Confirm> findAllByUserSeqAndState(Long userSeq, List<ConfirmStateType> confirmSateList, Integer pageNumber, Integer pageSize) {
+        Predicate[] predicates = new Predicate[]{
+                predicateOptional(qUser.seq::eq, userSeq),
+                predicateOptional(qConfirm.state::in, confirmSateList)
+        };
+
+        return from(qConfirm)
+                .innerJoin(qConfirm.challenge, qChallenge).fetchJoin()
+                .innerJoin(qConfirm.user, qUser).fetchJoin()
+                .where(predicates)
+                .orderBy(qConfirm.createdAt.desc())
+                .offset(pageNumber * pageSize)
+                .limit(pageSize)
+                .fetch();
+    }
+
     private <T> Predicate predicateOptional(final Function<T, Predicate> whereFunc, final T value) {
         return value != null ? whereFunc.apply(value) : null;
     }

@@ -50,7 +50,8 @@ public interface ResponseError {
         INVALID_DECLARATION("invalid declaration"),
 
         INVALID_EMAIL_AUTH("email authentication is required"),
-        EXPIRED_EMAIL_AUTH("expired email authentication");
+        EXPIRED_EMAIL_AUTH("expired email authentication"),
+        INVALID_CONFIRM_STATE_TYPE("invalid confirm update sate type");
 
 
 

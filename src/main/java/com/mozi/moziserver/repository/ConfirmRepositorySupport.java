@@ -29,5 +29,6 @@ public interface ConfirmRepositorySupport {
 
     List<Confirm> findByPeriodAndPaging(LocalDateTime startDateTime,Long prevLastConfirmSeq, Integer pageSize);
 
-
+    // -------------------- -------------------- below admin methods -------------------- -------------------- //
+    List<Confirm> findAllByUserSeqAndState(Long userSeq, List<ConfirmStateType> confirmSateList, Integer pageNumber, Integer pageSize);
 }
