@@ -236,15 +236,8 @@ public class ConfirmService {
 
         if (!confirm.getUser().equals(user)) throw ResponseError.BadRequest.INVALID_USER.getResponseException();
 
-        try {
-            int deleteCount = confirmRepository.deleteConfirm(confirmSeq);
-            if (deleteCount == 0) {
-                // 동시성 처리: 지울려고 했는데 못 지웠으면 함수실행을 끝낸다.
-                throw ResponseError.BadRequest.ALREADY_DELETED.getResponseException();
-            }
-        } catch (Exception e) {
-            throw ResponseError.BadRequest.ALREADY_DELETED.getResponseException(); // for duplicate exception
-        } // FIXME DuplicateKeyException
+        confirm.setState(ConfirmStateType.DELETED);
+        confirmRepository.save(confirm);
     }
 
     //신고 생성
