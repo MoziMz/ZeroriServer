@@ -6,12 +6,10 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-
 import org.springframework.transaction.annotation.Transactional;
-import java.util.Date;
 
 @Repository
-public interface ConfirmRepository extends JpaRepository<Confirm, Long>, ConfirmRepositorySupport{
+public interface ConfirmRepository extends JpaRepository<Confirm, Long>, ConfirmRepositorySupport {
     @Transactional
     @Modifying
     @Query(value = "DELETE FROM confirm WHERE seq = :confirmSeq", nativeQuery = true)
