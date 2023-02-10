@@ -3,7 +3,10 @@ package com.mozi.moziserver.service;
 import com.mozi.moziserver.common.JpaUtil;
 import com.mozi.moziserver.common.UserState;
 import com.mozi.moziserver.httpException.ResponseError;
-import com.mozi.moziserver.model.entity.*;
+import com.mozi.moziserver.model.entity.Animal;
+import com.mozi.moziserver.model.entity.User;
+import com.mozi.moziserver.model.entity.UserAuth;
+import com.mozi.moziserver.model.entity.UserFcm;
 import com.mozi.moziserver.model.mappedenum.UserAuthType;
 import com.mozi.moziserver.model.mappedenum.UserRoleType;
 import com.mozi.moziserver.model.req.ReqResign;
@@ -28,7 +31,6 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
-import org.springframework.transaction.annotation.Transactional;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -106,8 +108,6 @@ public class UserService {
 
         if (req.getType() == UserAuthType.EMAIL) {
 
-            emailAuthService.checkEmailAuth(req.getId());
-
             try {
                 auth = authenticationManager.authenticate(
                         new UsernamePasswordAuthenticationToken(req.getId(), req.getPw())
@@ -125,8 +125,8 @@ public class UserService {
             if ((auth == null || !auth.isAuthenticated()) && req.getType().isSocial()) {
                 if (req.getType() == UserAuthType.KAKAO) kakaoSignUp(req);
                 else if (req.getType() == UserAuthType.APPLE) appleSignUp(req);
-                else if(req.getType() == UserAuthType.NAVER) naverSignUp(req);
-                else if(req.getType() == UserAuthType.GOOGLE) googleSignUp(req);
+                else if (req.getType() == UserAuthType.NAVER) naverSignUp(req);
+                else if (req.getType() == UserAuthType.GOOGLE) googleSignUp(req);
 
                 auth = authenticationManager.authenticate(reqUserSocialSignIn);
             }
@@ -142,6 +142,10 @@ public class UserService {
 
             if (user.getState() == UserState.DELETED) {
                 throw ResponseError.BadRequest.USER_IS_DELETED.getResponseException();
+            }
+
+            if (req.getType() == UserAuthType.EMAIL) {
+                emailAuthService.checkEmailAuth(user);
             }
         }
 
@@ -218,8 +222,8 @@ public class UserService {
             islandService.firstCreateUserIsland(user);
 
             //동물의 편지 생성
-            Animal firstAnimal = animalRepository.findByIslandTypeAndIslandLevel(1,2);
-            postboxMessageAnimalService.createPostboxMessageAnimal(user,firstAnimal);
+            Animal firstAnimal = animalRepository.findByIslandTypeAndIslandLevel(1, 2);
+            postboxMessageAnimalService.createPostboxMessageAnimal(user, firstAnimal);
 
             //UserReword 생성
             userRewardService.firstCreateUserReward(user);
@@ -233,11 +237,11 @@ public class UserService {
     public void updateNickname(User user, String nickname) {
 
 
-        if (badWordService.isBadWord(nickname)){
+        if (badWordService.isBadWord(nickname)) {
             throw ResponseError.BadRequest.NICKNAME_WITH_BAD_WORD.getResponseException();
         }
 
-        if (!nickname.matches(NICKNAME_REGEX)){
+        if (!nickname.matches(NICKNAME_REGEX)) {
             throw ResponseError.BadRequest.INVALID_NICKNAME.getResponseException();
         }
 
@@ -263,12 +267,12 @@ public class UserService {
         }
 
         //기존 비밀번호와 currentPw 같은지
-        if(!checkPassword(user,currentPw)){
+        if (!checkPassword(user, currentPw)) {
             throw ResponseError.BadRequest.NOT_MATCH_AN_EXISTING_PASSWORD.getResponseException();
         }
 
         //기존 비밀번호와 새로운 비밀번호가 같은지 확인 또는 새 비밀번호 정규식 확인
-        if (checkPassword(user,newPw) || !newPw.matches(PW_REGEX)) {
+        if (checkPassword(user, newPw) || !newPw.matches(PW_REGEX)) {
             throw ResponseError.BadRequest.INVALID_PASSWORD.getResponseException();
         }
 
@@ -281,14 +285,14 @@ public class UserService {
         }
     }
 
-    public boolean checkPassword(User user,String pw){
+    public boolean checkPassword(User user, String pw) {
         UserAuth userAuth = userAuthRepository.findByUserAndType(user, UserAuthType.EMAIL);
 
         if (userAuth == null) {
             throw ResponseError.BadRequest.SOCIAL_LOGIN_USER.getResponseException("social login user cannot change password");
         }
 
-        if(pw==null || pw.equals("")){
+        if (pw == null || pw.equals("")) {
             throw ResponseError.BadRequest.METHOD_ARGUMENT_NOT_VALID.getResponseException("password is null");
         }
 
@@ -302,7 +306,7 @@ public class UserService {
     public void updateEmail(User user, String email) {
         UserAuth userAuth = userAuthRepository.findByUser(user);
 
-        if (!isValidEmail(email)){
+        if (!isValidEmail(email)) {
             throw ResponseError.BadRequest.INVALID_EMAIL.getResponseException();
         }
 
@@ -352,7 +356,7 @@ public class UserService {
 
     public boolean checkNickNameDuplicate(String nickName) {
 
-        if (badWordService.isBadWord(nickName)){
+        if (badWordService.isBadWord(nickName)) {
             throw ResponseError.BadRequest.NICKNAME_WITH_BAD_WORD.getResponseException();
         }
 

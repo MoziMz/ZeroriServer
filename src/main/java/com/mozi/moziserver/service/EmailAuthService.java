@@ -26,7 +26,6 @@ import javax.mail.internet.MimeMessage;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Arrays;
-import java.util.Optional;
 import java.util.UUID;
 
 import static com.mozi.moziserver.common.Constant.PW_REGEX;
@@ -96,7 +95,7 @@ public class EmailAuthService {
             throw ResponseError.InternalServerError.UNEXPECTED_ERROR.getResponseException();
         }
 
-        String tempPassword=getTempPassword();
+        String tempPassword = getTempPassword();
 
         userAuth.setPw(passwordEncoder.encode(tempPassword));
 
@@ -115,7 +114,7 @@ public class EmailAuthService {
         saveEmailAuth(emailAuth);
 
 
-        String content="<h1>안녕하세요. 제로리입니다.<br/> 회원님의 임시 비밀번호는 " + tempPassword + " 입니다.<br/>" + "로그인 후에 비밀번호를 변경을 해주세요.</h1>";
+        String content = "<h1>안녕하세요. 제로리입니다.<br/> 회원님의 임시 비밀번호는 " + tempPassword + " 입니다.<br/>" + "로그인 후에 비밀번호를 변경을 해주세요.</h1>";
 
         boolean isSend = sendEmail(
                 emailAuth.getId(),
@@ -128,10 +127,10 @@ public class EmailAuthService {
         }
     }
 
-    public String getTempPassword(){
-        UUID uuidPassword=UUID.randomUUID();
+    public String getTempPassword() {
+        UUID uuidPassword = UUID.randomUUID();
 
-        String tempPassword=uuidPassword.toString().substring(0,8)+"!";
+        String tempPassword = uuidPassword.toString().substring(0, 8) + "!";
 
         if (!tempPassword.matches(PW_REGEX)) {
             throw ResponseError.BadRequest.INVALID_PASSWORD.getResponseException();
@@ -254,7 +253,7 @@ public class EmailAuthService {
             MimeMessageHelper messageHelper = new MimeMessageHelper(message, true, "UTF-8");
             messageHelper.setSubject(title);
             messageHelper.setTo(to);
-            messageHelper.setFrom("제로리 "+"<"+emailAddress+">");
+            messageHelper.setFrom("제로리 " + "<" + emailAddress + ">");
             messageHelper.setText(content, true);
             emailSender.send(message);
         } catch (Exception e) {
@@ -294,8 +293,8 @@ public class EmailAuthService {
                 islandService.firstCreateUserIsland(user);
 
                 //동물의 편지 생성
-                Animal firstAnimal = animalRepository.findByIslandTypeAndIslandLevel(1,2);
-                postboxMessageAnimalService.createPostboxMessageAnimal(user,firstAnimal);
+                Animal firstAnimal = animalRepository.findByIslandTypeAndIslandLevel(1, 2);
+                postboxMessageAnimalService.createPostboxMessageAnimal(user, firstAnimal);
 
                 //UserReword 생성
                 userRewardService.firstCreateUserReward(user);
@@ -379,9 +378,9 @@ public class EmailAuthService {
 
     }
 
-    public void checkEmailAuth(String id) {
+    public void checkEmailAuth(User user) {
 
-        EmailAuth emailAuth = emailAuthRepository.findByIdAndTypeOrderByCreatedAt(id, EmailAuthType.JOIN.getType())
+        EmailAuth emailAuth = emailAuthRepository.findByUserAndTypeOrderByCreatedAt(user, EmailAuthType.JOIN.getType())
                 .orElseThrow(ResponseError.NotFound.EMAIL_AUTH_NOT_EXISTS::getResponseException);
 
         if (emailAuth.getEmailAuthResultState() == null) {
