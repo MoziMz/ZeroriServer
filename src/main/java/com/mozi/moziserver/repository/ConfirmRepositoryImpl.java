@@ -4,6 +4,7 @@ import com.mozi.moziserver.model.entity.*;
 import com.mozi.moziserver.model.entity.QChallenge;
 import com.mozi.moziserver.model.entity.QConfirm;
 import com.mozi.moziserver.model.entity.QUser;
+import com.mozi.moziserver.model.mappedenum.ConfirmStateType;
 import com.querydsl.core.types.Predicate;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 import org.springframework.transaction.annotation.Transactional;
@@ -106,22 +107,14 @@ public class ConfirmRepositoryImpl extends QuerydslRepositorySupport implements 
 
     @Transactional
     @Override
-    public void updateDeclarationCnt(Confirm confirm,Byte state,Integer cnt){
+    public void updateStateSupportedCnt(Confirm confirm, ConfirmStateType state, Integer cnt){
         update(qConfirm)
-                .set(qConfirm.declarationState,state)
-                .set(qConfirm.declarationCnt,cnt)
+                .set(qConfirm.state,state)
+                .set(qConfirm.reportedCnt,cnt)
                 .where(qConfirm.eq(confirm))
                 .execute();
 
         return;
-    }
-
-    @Override
-    public Long findSeq() {
-        return from(qConfirm)
-                .select(qConfirm.seq)
-                .orderBy(qConfirm.seq.desc())
-                .fetchFirst();
     }
 
     @Override

@@ -4,7 +4,8 @@ import com.mozi.moziserver.common.JpaUtil;
 import com.mozi.moziserver.httpException.ResponseError;
 import com.mozi.moziserver.model.entity.*;
 import com.mozi.moziserver.model.mappedenum.ConfirmListType;
-import com.mozi.moziserver.model.mappedenum.DeclarationType;
+import com.mozi.moziserver.model.mappedenum.ConfirmReportType;
+import com.mozi.moziserver.model.mappedenum.ConfirmStateType;
 import com.mozi.moziserver.model.mappedenum.PointReasonType;
 import com.mozi.moziserver.model.req.ReqConfirmOfUser;
 import com.mozi.moziserver.model.req.ReqConfirmSticker;
@@ -38,7 +39,7 @@ public class ConfirmService {
 
     private final ConfirmRepository confirmRepository;
 
-    private final DeclarationRepository declarationRepository;
+    private final ConfirmReportRepository confirmReportRepository;
 
     private final ConfirmStickerRepository confirmStickerRepository;
 
@@ -80,7 +81,7 @@ public class ConfirmService {
                 .user(user)
                 .challenge(challenge)
                 .imgUrl(imgUrl)
-                .declarationState(state)
+                .state(ConfirmStateType.ACTIVE)
                 .build();
 
         withTransaction(() -> {
@@ -93,43 +94,44 @@ public class ConfirmService {
                 throw ResponseError.BadRequest.ALREADY_CREATED.getResponseException(); // for duplicate exception
             }
 
-            userChallengeService.updateUserChallengeResultComplete(curUserChallenge,LocalDate.now());
+            userChallengeService.updateUserChallengeResultComplete(curUserChallenge, LocalDate.now());
 
             ChallengeRecord challengeRecord = challengeRecordRepository.findByChallenge(challenge);
 
             challengeRecord.setTotalPlayerConfirmCnt(challengeRecord.getTotalPlayerConfirmCnt() + 1);
             challengeRecordRepository.save(challengeRecord);
 
-            userRewardService.createUserPointRecord(user, PointReasonType.CHALLENGE_CONFIRM,challenge.getPoint());
+            userRewardService.createUserPointRecord(user, PointReasonType.CHALLENGE_CONFIRM, challenge.getPoint());
 
         });
     }
-    
+
     public List<Confirm> getConfirmList(Long userSeq, ReqList req, ConfirmListType confirmListType) {
 
-        List<Confirm> confirmList=new ArrayList<>();
+        List<Confirm> confirmList = new ArrayList<>();
 
-        if(confirmListType.equals(ConfirmListType.RECENT)){
+        if (confirmListType.equals(ConfirmListType.RECENT)) {
             LocalDateTime startDateTime = LocalDateTime.now().minusDays(6).withHour(0).withMinute(0).withSecond(0);
 
-            confirmList = confirmRepository.findByPeriodAndPaging(startDateTime,req.getPrevLastSeq(),req.getPageSize());
+            confirmList = confirmRepository.findByPeriodAndPaging(startDateTime, req.getPrevLastSeq(), req.getPageSize());
 
-        }else if(confirmListType.equals(ConfirmListType.ALL)){
+        } else if (confirmListType.equals(ConfirmListType.ALL)) {
             confirmList = confirmRepository.findAll(req.getPrevLastSeq(), req.getPageSize());
         }
 
-        if( confirmList.isEmpty() == false ){
+        if (confirmList.isEmpty() == false) {
 
             toRandomList(confirmList);
 
             setConfirmLike(userSeq, confirmList);
 
-            setConfirmDeclaration(userSeq, confirmList);
+            setConfirmReported(userSeq, confirmList);
 
         }
 
+        // TODO 이 방식이면 페이징 제대로 동작안함
         return confirmList.stream()
-                .filter(c -> !c.isDeclared())
+                .filter(c -> !c.isReported())
                 .collect(Collectors.toList());
     }
 
@@ -142,10 +144,10 @@ public class ConfirmService {
 
         setConfirmLike(userSeq, confirmList);
 
-        setConfirmDeclaration(userSeq, confirmList);
+        setConfirmReported(userSeq, confirmList);
 
         return confirmList.stream()
-                .filter(c -> !c.isDeclared())
+                .filter(c -> !c.isReported())
                 .collect(Collectors.toList());
     }
 
@@ -155,16 +157,16 @@ public class ConfirmService {
         List<Confirm> confirmList = confirmRepository.findByUserAndPeriod(
                 userChallenge.getUser(),
                 userChallenge.getChallenge(),
-                userChallenge.getStartDate().atTime(0,0),
-                userChallenge.getEndDate().plusDays(1).atTime(0,0)
+                userChallenge.getStartDate().atTime(0, 0),
+                userChallenge.getEndDate().plusDays(1).atTime(0, 0)
         );
 
         setConfirmLike(userSeq, confirmList);
 
-        setConfirmDeclaration(userSeq, confirmList);
+        setConfirmReported(userSeq, confirmList);
 
         return confirmList.stream()
-                .filter(c -> !c.isDeclared())
+                .filter(c -> !c.isReported())
                 .collect(Collectors.toList());
     }
 
@@ -181,28 +183,27 @@ public class ConfirmService {
                 .map(confirmLike -> confirmLike.getConfirm().getSeq())
                 .collect(Collectors.toSet()));
 
-        for (Confirm confirm: confirmList) {
-            boolean isLiked  = likedConfirmSeqSet.contains(confirm.getSeq());
+        for (Confirm confirm : confirmList) {
+            boolean isLiked = likedConfirmSeqSet.contains(confirm.getSeq());
             confirm.setLiked(isLiked);
         }
 
         //return confirmList;
     }
 
-    private void setConfirmDeclaration(Long userSeq, List<Confirm> confirmList) {
+    private void setConfirmReported(Long userSeq, List<Confirm> confirmList) {
         User user = userService.getUserBySeq(userSeq)
                 .orElseThrow(ResponseError.InternalServerError.UNEXPECTED_ERROR::getResponseException);
 
-        List<Declaration> declarationList = declarationRepository.findByUser(user);
-        HashSet<Long> declarationConfirmSeqSet = new HashSet<>(declarationList.stream()
-                .map( declaration -> declaration.getConfirm().getSeq())
+        List<ConfirmReport> confirmReportList = confirmReportRepository.findByUser(user);
+        HashSet<Long> reportedConfirmSeqSet = new HashSet<>(confirmReportList.stream()
+                .map(declaration -> declaration.getConfirm().getSeq())
                 .collect(Collectors.toSet()));
 
-        for (Confirm confirm: confirmList) {
-            boolean isDeclared  = declarationConfirmSeqSet.contains(confirm.getSeq());
-            confirm.setDeclared(isDeclared);
+        for (Confirm confirm : confirmList) {
+            boolean isReported = reportedConfirmSeqSet.contains(confirm.getSeq());
+            confirm.setReported(isReported);
         }
-
     }
 
     @Transactional
@@ -248,36 +249,35 @@ public class ConfirmService {
 
     //신고 생성
     @Transactional
-    public void createDeclaration(Long userSeq, Long confirmSeq, DeclarationType type) {
+    public void createDeclaration(Long userSeq, Long confirmSeq, ConfirmReportType type) {
 
         User user = userRepository.findById(userSeq)
                 .orElseThrow(ResponseError.NotFound.USER_NOT_EXISTS::getResponseException);
 
-       Confirm confirm = confirmRepository.findBySeq(confirmSeq);
-       if(confirm == null){
-           throw ResponseError.NotFound.CONFIRM_NOT_EXISTS.getResponseException();
-       }
+        Confirm confirm = confirmRepository.findBySeq(confirmSeq);
+        if (confirm == null) {
+            throw ResponseError.NotFound.CONFIRM_NOT_EXISTS.getResponseException();
+        }
 
-       if(user.equals(confirm.getUser())){
-           throw ResponseError.BadRequest.INVALID_DECLARATION.getResponseException();
-       }
+        if (user.equals(confirm.getUser())) {
+            throw ResponseError.BadRequest.INVALID_DECLARATION.getResponseException();
+        }
 
-       Declaration declaration=declarationRepository.findByConfirmAndUser(confirm,user);
-       if(declaration != null){
-           throw ResponseError.BadRequest.ALREADY_CREATED.getResponseException();
-       }
+        ConfirmReport confirmReport = confirmReportRepository.findByConfirmAndUser(confirm, user);
+        if (confirmReport != null) {
+            throw ResponseError.BadRequest.ALREADY_CREATED.getResponseException();
+        }
 
-        Byte state=1;
-        confirmRepository.updateDeclarationCnt(confirm,state,confirm.getDeclarationCnt()+1);
+        confirmRepository.updateStateSupportedCnt(confirm, ConfirmStateType.REPORTED, confirm.getReportedCnt() + 1);
 
-        declaration = Declaration.builder()
+        confirmReport = ConfirmReport.builder()
                 .confirm(confirm)
                 .user(user)
-                .declarationType(type)
+                .confirmReportType(type)
                 .build();
 
         try {
-            declarationRepository.save(declaration);
+            confirmReportRepository.save(confirmReport);
         } catch (Exception e) {
             throw ResponseError.BadRequest.ALREADY_CREATED.getResponseException(); // for duplicate exception
         }
@@ -419,17 +419,17 @@ public class ConfirmService {
         confirmRepository.decrementLikeCnt(confirm.getSeq());
     }
 
-    public ResWeekConfirm getWeekConfirm(){
+    public ResWeekConfirm getWeekConfirm() {
 
         LocalDateTime startDateTime = LocalDateTime.now().minusDays(6).withHour(0).withMinute(0).withSecond(0);
 
-        List<Confirm> confirmList=confirmRepository.findByCreatedAt(startDateTime);
+        List<Confirm> confirmList = confirmRepository.findByCreatedAt(startDateTime);
 
-        List<User> userList=confirmList.stream().map(Confirm::getUser).collect(Collectors.toList());
+        List<User> userList = confirmList.stream().map(Confirm::getUser).collect(Collectors.toList());
 
-        userList=userList.stream().distinct().collect(Collectors.toList());
+        userList = userList.stream().distinct().collect(Collectors.toList());
 
-        return ResWeekConfirm.of(userList,confirmList);
+        return ResWeekConfirm.of(userList, confirmList);
     }
 
     public List<Confirm> getConfirmListAboutPeriod(Long userSeq, ReqConfirmOfUser req) {
@@ -440,16 +440,16 @@ public class ConfirmService {
                 .orElseThrow(ResponseError.BadRequest.INVALID_SEQ::getResponseException);
 
         List<Confirm> confirmList = confirmRepository.findByUserAndPeriod(
-               user, challenge, req.getStartDate().atTime(0,0), req.getEndDate().plusDays(1).atTime(0,0));
+                user, challenge, req.getStartDate().atTime(0, 0), req.getEndDate().plusDays(1).atTime(0, 0));
 
         setConfirmLike(userSeq, confirmList);
 
         return confirmList;
     }
 
-    public void toRandomList(List<Confirm> confirmList){
+    public void toRandomList(List<Confirm> confirmList) {
 
-        Confirm lastConfirm=confirmList.remove(confirmList.size()-1);
+        Confirm lastConfirm = confirmList.remove(confirmList.size() - 1);
 
         Collections.shuffle(confirmList);
 

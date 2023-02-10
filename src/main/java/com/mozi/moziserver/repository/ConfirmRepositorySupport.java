@@ -3,6 +3,7 @@ package com.mozi.moziserver.repository;
 import com.mozi.moziserver.model.entity.Challenge;
 import com.mozi.moziserver.model.entity.Confirm;
 import com.mozi.moziserver.model.entity.User;
+import com.mozi.moziserver.model.mappedenum.ConfirmStateType;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -14,13 +15,11 @@ public interface ConfirmRepositorySupport {
     List<Confirm> findByUserByOrderDesc(Long userSeq,Long prevLastConfirmSeq, Integer pageSize);
     Confirm findBySeq(Long ConfirmSeq);
 
-    void updateDeclarationCnt(Confirm confirm,Byte state,Integer cnt);
+    void updateStateSupportedCnt(Confirm confirm, ConfirmStateType state, Integer cnt);
 
     List<Confirm> findAll(Long prevLastConfirmSeq, Integer pageSize);
 
     List<Confirm> findAllByChallenge(Challenge challenge, Long prevLastConfirmSeq, Integer pageSize);
-
-    Long findSeq();
 
     Optional<Confirm> findByChallenge(Challenge challenge);
 
