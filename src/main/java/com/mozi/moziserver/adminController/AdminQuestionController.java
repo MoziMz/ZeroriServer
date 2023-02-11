@@ -39,7 +39,7 @@ public class AdminQuestionController {
     }
 
     @ApiOperation("문의 (상태, 우선순위) 변경")
-    @PutMapping("admin/questions/{seq}")
+    @PutMapping("/admin/questions/{seq}")
     public ResponseEntity<Object> updateQuestion(
             @PathVariable(value = "seq", required = true) Long seq,
             @RequestParam(name = "state", required = false) QuestionStateType state,
@@ -51,7 +51,7 @@ public class AdminQuestionController {
     }
 
     @ApiOperation("문의 삭제")
-    @DeleteMapping("admin/questions/{seq}")
+    @DeleteMapping("/admin/questions/{seq}")
     public ResponseEntity<Object> updateQuestion(
             @PathVariable(value = "seq", required = true) Long seq
     ) {
