@@ -8,6 +8,8 @@ import com.mozi.moziserver.model.mappedenum.QuestionStateType;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.Max;
@@ -34,5 +36,27 @@ public class AdminQuestionController {
         return adminQuestionService.getQuestionList(category, state, priority, pageNumber, pageSize)
                 .stream().map(AdminResQuestionList::of)
                 .collect(Collectors.toList());
+    }
+
+    @ApiOperation("문의 (상태, 우선순위) 변경")
+    @PutMapping("admin/questions/{seq}")
+    public ResponseEntity<Object> updateQuestion(
+            @PathVariable(value = "seq", required = true) Long seq,
+            @RequestParam(name = "state", required = false) QuestionStateType state,
+            @RequestParam(name = "priority", required = false) PriorityType priority
+    ) {
+        adminQuestionService.updateStateAndPriority(seq, state, priority);
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @ApiOperation("문의 삭제")
+    @DeleteMapping("admin/questions/{seq}")
+    public ResponseEntity<Object> updateQuestion(
+            @PathVariable(value = "seq", required = true) Long seq
+    ) {
+        adminQuestionService.deleteQuestion(seq);
+
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

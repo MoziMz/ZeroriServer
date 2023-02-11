@@ -3,14 +3,12 @@ package com.mozi.moziserver.model.entity;
 import com.mozi.moziserver.model.mappedenum.PriorityType;
 import com.mozi.moziserver.model.mappedenum.QuestionCategoryType;
 import com.mozi.moziserver.model.mappedenum.QuestionStateType;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 
 @Getter
+@Setter
 @Builder
 @Entity(name = "question")
 @NoArgsConstructor

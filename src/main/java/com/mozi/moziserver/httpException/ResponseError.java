@@ -178,7 +178,8 @@ public interface ResponseError {
         CONFIRM_LIKE_NOT_EXISTS("confirm like not exists"),
         BOARD_NOT_EXISTS("board not exists"),
         USER_NOTICE_NOT_EXISTS("user notice not exists"),
-        EMAIL_AUTH_NOT_EXISTS("email auth not exists");
+        EMAIL_AUTH_NOT_EXISTS("email auth not exists"),
+        QUESTION_NOT_EXISTS("question not exists");
 
         private final String message;
 

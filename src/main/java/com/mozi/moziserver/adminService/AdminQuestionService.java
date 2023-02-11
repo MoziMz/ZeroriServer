@@ -1,5 +1,6 @@
 package com.mozi.moziserver.adminService;
 
+import com.mozi.moziserver.httpException.ResponseError;
 import com.mozi.moziserver.model.entity.Question;
 import com.mozi.moziserver.model.mappedenum.PriorityType;
 import com.mozi.moziserver.model.mappedenum.QuestionCategoryType;
@@ -18,7 +19,32 @@ public class AdminQuestionService {
 
     private final QuestionRepository questionRepository;
 
+    public Question getById(Long seq) {
+        return questionRepository.findById(seq)
+                .orElseThrow(ResponseError.NotFound.QUESTION_NOT_EXISTS::getResponseException);
+    }
+
     public List<Question> getQuestionList(QuestionCategoryType category, QuestionStateType state, PriorityType priorityType, Integer pageNumber, Integer pageSize) {
         return questionRepository.findAllByCategoryAndStateAndPriority(category, state, priorityType, pageNumber, pageSize);
+    }
+
+    public void updateStateAndPriority(Long seq, QuestionStateType state, PriorityType priority) {
+        Question question = getById(seq);
+
+        if (state != null) {
+            question.setState(state);
+        }
+
+        if (priority != null) {
+            question.setPriority(priority);
+        }
+
+        questionRepository.save(question);
+    }
+
+    public void deleteQuestion(Long seq) {
+        Question question = getById(seq);
+
+        questionRepository.delete(question);
     }
 }
