@@ -3,7 +3,7 @@ package com.mozi.moziserver.controller;
 import com.mozi.moziserver.httpException.ResponseError;
 import com.mozi.moziserver.model.entity.Board;
 import com.mozi.moziserver.model.entity.User;
-import com.mozi.moziserver.model.mappedenum.QuestionCategory;
+import com.mozi.moziserver.model.mappedenum.QuestionCategoryType;
 import com.mozi.moziserver.model.req.*;
 import com.mozi.moziserver.model.res.ResUserInfo;
 import com.mozi.moziserver.security.SessionUser;
@@ -42,7 +42,7 @@ public class ConfigurationController {
             @RequestParam(name = "email", required = true) String email,
             @RequestParam(name = "title", required = true) String title,
             @RequestParam(name = "content", required = true) String content,
-            @RequestParam(name = "questionCategory", required = true) QuestionCategory questionCategory,
+            @RequestParam(name = "questionCategory", required = true) QuestionCategoryType category,
             @RequestPart(name = "image", required = false) MultipartFile image
     ) {
         // TODO @RequestPart 사용 request 객체로 받는 방향으로 전환?
@@ -50,7 +50,7 @@ public class ConfigurationController {
         reqQuestionCreate.setEmail(email);
         reqQuestionCreate.setTitle(title);
         reqQuestionCreate.setContent(content);
-        reqQuestionCreate.setQuestionCategory(questionCategory);
+        reqQuestionCreate.setQuestionCategory(category);
         reqQuestionCreate.setImage(image);
 
         questionService.createQuestion(userSeq, reqQuestionCreate);

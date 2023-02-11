@@ -1,7 +1,7 @@
 package com.mozi.moziserver.model.entity;
 
 import com.mozi.moziserver.model.mappedenum.PriorityType;
-import com.mozi.moziserver.model.mappedenum.QuestionCategory;
+import com.mozi.moziserver.model.mappedenum.QuestionCategoryType;
 import com.mozi.moziserver.model.mappedenum.QuestionStateType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,11 +20,7 @@ public class Question extends AbstractTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long seq;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_seq")
-    private User user;
-
-    private QuestionCategory category;
+    private QuestionCategoryType category;
 
     private String title;
 
@@ -41,4 +37,8 @@ public class Question extends AbstractTimeEntity {
     @Builder.Default
     @Enumerated(EnumType.STRING)
     private PriorityType priority = PriorityType.NONE;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_seq")
+    private User user;
 }
