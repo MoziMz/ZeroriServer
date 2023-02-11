@@ -40,6 +40,7 @@ public class QuestionRepositoryImpl extends QuerydslRepositorySupport implements
         return from(qQuestion)
                 .innerJoin(qQuestion.user, qUser).fetchJoin()
                 .where(predicates)
+                .orderBy(qQuestion.createdAt.desc())
                 .offset(pageNumber * pageSize)
                 .limit(pageSize)
                 .fetch();
