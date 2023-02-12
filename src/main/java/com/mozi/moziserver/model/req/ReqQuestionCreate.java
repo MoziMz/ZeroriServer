@@ -1,6 +1,6 @@
 package com.mozi.moziserver.model.req;
 
-import com.mozi.moziserver.model.mappedenum.QuestionCategory;
+import com.mozi.moziserver.model.mappedenum.QuestionCategoryType;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.web.multipart.MultipartFile;
@@ -21,7 +21,7 @@ public class ReqQuestionCreate {
     private String content;
 
     @NotNull
-    private QuestionCategory questionCategory;
+    private QuestionCategoryType questionCategory;
 
     private MultipartFile image;
 }
