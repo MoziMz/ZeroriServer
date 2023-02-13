@@ -1,7 +1,9 @@
 package com.mozi.moziserver.adminController;
 
 import com.mozi.moziserver.adminService.AdminQuestionService;
+import com.mozi.moziserver.adminService.AdminSuggestionService;
 import com.mozi.moziserver.model.adminRes.AdminResQuestionList;
+import com.mozi.moziserver.model.adminRes.AdminResSuggestionList;
 import com.mozi.moziserver.model.mappedenum.PriorityType;
 import com.mozi.moziserver.model.mappedenum.QuestionCategoryType;
 import com.mozi.moziserver.model.mappedenum.QuestionStateType;
@@ -23,6 +25,8 @@ import java.util.stream.Collectors;
 public class AdminQuestionController {
 
     private final AdminQuestionService adminQuestionService;
+
+    private final AdminSuggestionService adminSuggestionService;
 
     @ApiOperation("문의 리스트 조회")
     @GetMapping("/admin/questions")
@@ -56,6 +60,27 @@ public class AdminQuestionController {
             @PathVariable(value = "seq", required = true) Long seq
     ) {
         adminQuestionService.deleteQuestion(seq);
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @ApiOperation("챌린지 제안 리스트 조회")
+    @GetMapping("/admin/suggestions")
+    public List<AdminResSuggestionList> getSuggestionList(
+            @RequestParam(name = "pageNumber", required = false, defaultValue = "0") Integer pageNumber,
+            @RequestParam(name = "pageSize", required = false, defaultValue = "20") @Max(30) Integer pageSize
+    ) {
+        return adminSuggestionService.getSuggestionList(pageNumber, pageSize)
+                .stream().map(AdminResSuggestionList::of)
+                .collect(Collectors.toList());
+    }
+
+    @ApiOperation("챌린지 제안 삭제")
+    @DeleteMapping("/admin/suggestions/{seq}")
+    public ResponseEntity<Object> deleteSuggestion(
+            @PathVariable(value = "seq", required = true) Long seq
+    ) {
+        adminSuggestionService.deleteSuggestion(seq);
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
