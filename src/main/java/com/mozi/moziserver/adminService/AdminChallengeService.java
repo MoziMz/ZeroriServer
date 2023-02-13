@@ -3,11 +3,9 @@ package com.mozi.moziserver.adminService;
 import com.mozi.moziserver.httpException.ResponseError;
 import com.mozi.moziserver.model.ChallengeExplanation;
 import com.mozi.moziserver.model.ChallengeExplanationContent;
-import com.mozi.moziserver.model.entity.Challenge;
-import com.mozi.moziserver.model.entity.ChallengeRecord;
-import com.mozi.moziserver.model.req.ReqAdminChallengeCreate;
-import com.mozi.moziserver.repository.ChallengeRecordRepository;
-import com.mozi.moziserver.repository.ChallengeRepository;
+import com.mozi.moziserver.model.entity.*;
+import com.mozi.moziserver.model.mappedenum.ChallengeTagType;
+import com.mozi.moziserver.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -23,6 +21,8 @@ public class AdminChallengeService {
 
     private final ChallengeRepository challengeRepository;
     private final ChallengeRecordRepository challengeRecordRepository;
+    private final TagRepository tagRepository;
+    private final ChallengeTagRepository challengeTagRepository;
 
     @Transactional
     public void createChallenge(ReqAdminChallengeCreate req) {
@@ -38,8 +38,6 @@ public class AdminChallengeService {
         try {
             challengeRepository.save(challenge);
 
-            // TODO 챌린지 태그 리스트 저장
-
             final ChallengeRecord challengeRecord = ChallengeRecord.builder()
                     .challenge(challenge)
                     .build();
@@ -53,6 +51,8 @@ public class AdminChallengeService {
 
     public void createChallengeExplanation(Long challengeSeq, String title, List<String> contentList) {
         Challenge challenge = challengeRepository.getById(challengeSeq);
+
+        createChallengeTag(challenge);
 
         List<ChallengeExplanationContent> challengeExplanationContentList = new ArrayList<>();
         for (int i = 0; i < contentList.size(); i++) {
@@ -71,5 +71,23 @@ public class AdminChallengeService {
 
         challenge.setExplanation(challengeExplanation);
         challengeRepository.save(challenge);
+    }
+    public Tag getTag(ChallengeTagType tagType) {
+        Tag tag = tagRepository.findByName(tagType.getName())
+                .orElseThrow(ResponseError.NotFound.TAG_NOT_EXISTS::getResponseException);
+
+        return tag;
+    }
+    public void createChallengeTag(Challenge challenge) {
+
+        Tag tag = getTag(challenge.getMainTag());
+
+        ChallengeTag challengeTag = ChallengeTag.builder()
+                .tag(tag)
+                .challenge(challenge)
+                .turn(1)
+                .build();
+
+        challengeTagRepository.save(challengeTag);
     }
 }
