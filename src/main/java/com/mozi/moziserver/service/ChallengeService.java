@@ -4,7 +4,6 @@ import com.mozi.moziserver.httpException.ResponseError;
 import com.mozi.moziserver.model.ChallengeExplanation;
 import com.mozi.moziserver.model.ChallengeExplanationContent;
 import com.mozi.moziserver.model.entity.*;
-import com.mozi.moziserver.model.req.ReqAdminChallengeCreate;
 import com.mozi.moziserver.model.req.ReqChallengeList;
 import com.mozi.moziserver.model.req.ReqList;
 import com.mozi.moziserver.repository.*;
@@ -26,7 +25,6 @@ public class ChallengeService {
     private final ChallengeRepository challengeRepository;
     private final UserRepository userRepository;
     private final ChallengeScrapRepository challengeScrapRepository;
-    private final ChallengeRecordRepository challengeRecordRepository;
     private final ChallengeThemeRepository challengeThemeRepository;
     private final UserService userService;
 
@@ -122,34 +120,6 @@ public class ChallengeService {
         } // FIXME DuplicateKeyException
 
 
-    }
-
-    //     챌린지 생성
-    @Transactional
-    public void createChallenge(ReqAdminChallengeCreate req) {
-        final Challenge challenge = Challenge.builder()
-                .name(req.getName())
-                .description(req.getDescription())
-                .recommendedCnt(req.getRecommendedCnt())
-                .mainTag(req.getMainTag())
-                .themeSeq(req.getThemeSeq())
-                .point(req.getPoint())
-                .build();
-
-        try {
-            challengeRepository.save(challenge);
-
-            // TODO 챌린지 태그 리스트 저장
-
-            final ChallengeRecord challengeRecord = ChallengeRecord.builder()
-                    .challenge(challenge)
-                    .build();
-
-            challengeRecordRepository.save(challengeRecord);
-
-        } catch (Exception e) {
-            throw ResponseError.BadRequest.ALREADY_CREATED.getResponseException();
-        }
     }
 
     public void createChallengeExplanation(Long challengeSeq, String title, List<String> contentList) {

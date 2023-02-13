@@ -4,7 +4,6 @@ import com.mozi.moziserver.adminService.AdminAnimalService;
 import com.mozi.moziserver.httpException.ResponseError;
 import com.mozi.moziserver.model.entity.Animal;
 import com.mozi.moziserver.model.entity.User;
-import com.mozi.moziserver.model.req.ReqAdminChallengeCreate;
 import com.mozi.moziserver.security.SessionUser;
 import com.mozi.moziserver.service.AnimalService;
 import com.mozi.moziserver.service.PostboxMessageAnimalService;

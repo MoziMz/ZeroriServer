@@ -1,7 +1,6 @@
 package com.mozi.moziserver.adminController;
 
 import com.mozi.moziserver.adminService.AdminChallengeService;
-import com.mozi.moziserver.model.req.ReqAdminChallengeCreate;
 import com.mozi.moziserver.security.SessionUser;
 import com.mozi.moziserver.service.ChallengeService;
 import io.swagger.annotations.ApiOperation;
