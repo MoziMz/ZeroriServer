@@ -1,17 +1,12 @@
 package com.mozi.moziserver.repository;
 
-import com.fasterxml.jackson.databind.util.ArrayBuilders;
 import com.mozi.moziserver.model.entity.*;
-import com.mozi.moziserver.model.mappedenum.ChallengeTagType;
-import com.mozi.moziserver.model.mappedenum.ChallengeThemeType;
 import com.querydsl.core.types.Predicate;
-import com.querydsl.core.types.dsl.BooleanExpression;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
-import java.util.ArrayList;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 public class ChallengeRepositoryImpl extends QuerydslRepositorySupport implements ChallengeRepositorySupport {
     private final QChallenge qChallenge = QChallenge.challenge;
@@ -24,7 +19,7 @@ public class ChallengeRepositoryImpl extends QuerydslRepositorySupport implement
     }
 
     @Override
-    public Optional<Challenge> findBySeq (Long seq ) {
+    public Optional<Challenge> findBySeq(Long seq) {
         return Optional.ofNullable(from(qChallenge)
                 .innerJoin(qChallengeRecord)
                 .on(qChallenge.seq.eq(qChallengeRecord.challenge.seq))
@@ -34,7 +29,7 @@ public class ChallengeRepositoryImpl extends QuerydslRepositorySupport implement
     }
 
     @Override
-    public List<Challenge> findAll (
+    public List<Challenge> findAll(
             Long userSeq,
             List<Long> tagSeqList,
             List<Long> themeSeqList,
@@ -62,7 +57,7 @@ public class ChallengeRepositoryImpl extends QuerydslRepositorySupport implement
             List<Long> tagSeqList,
             List<Long> themeSeqList,
             String keyword
-    ){
+    ) {
         final Predicate[] predicates = new Predicate[]{
                 predicateOptional(qChallenge.themeSeq::in, themeSeqList),
                 predicateOptional(qChallengeTag.tag.seq::in, tagSeqList),
@@ -74,6 +69,34 @@ public class ChallengeRepositoryImpl extends QuerydslRepositorySupport implement
                 .where(predicates)
                 .orderBy(qChallenge.seq.desc())
                 .fetchCount();
+    }
+
+    // -------------------- -------------------- below admin methods -------------------- -------------------- //
+
+    @Override
+    public List<Challenge> findAllByThemeAndTagAndName(
+            Long themeSeq,
+            Long tagSeq,
+            String keyword,
+            Integer pageNumber,
+            Integer pageSize
+    ) {
+        final Predicate[] predicates = new Predicate[]{
+                predicateOptional(qChallenge.themeSeq::eq, themeSeq),
+                predicateOptional(qChallengeTag.tag.seq::eq, tagSeq),
+                keyword != null ? predicateOptional(qChallenge.name::like, '%' + keyword + '%') : null
+        };
+
+        return from(qChallenge)
+                .innerJoin(qChallenge.challengeRecord,qChallengeRecord).fetchJoin()
+                .innerJoin(qChallengeTag).on(qChallenge.seq.eq(qChallengeTag.challenge.seq)).fetchJoin()
+                .where(predicates)
+                .offset(pageNumber * pageSize)
+                .limit(pageSize)
+                .orderBy(qChallenge.seq.asc())
+                .fetch();
+
+
     }
 
     private <T> Predicate predicateOptional(final Function<T, Predicate> whereFunc, final T value) {

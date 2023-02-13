@@ -48,7 +48,6 @@ public interface ResponseError {
         NICKNAME_WITH_BAD_WORD("nick name with bad word"),
         INVALID_START_DATE_END_DATE("start date must be earlier than or equal to end date"),
         INVALID_DECLARATION("invalid declaration"),
-
         INVALID_EMAIL_AUTH("email authentication is required"),
         EXPIRED_EMAIL_AUTH("expired email authentication"),
         INVALID_CONFIRM_STATE_TYPE("invalid confirm update sate type");
@@ -180,7 +179,10 @@ public interface ResponseError {
         USER_NOTICE_NOT_EXISTS("user notice not exists"),
         EMAIL_AUTH_NOT_EXISTS("email auth not exists"),
         QUESTION_NOT_EXISTS("question not exists"),
-        SUGGESTION_NOT_EXISTS("suggestion not exists");
+        SUGGESTION_NOT_EXISTS("suggestion not exists"),
+        CHALLENGE_THEME_NOT_EXISTS("challenge theme not exists"),
+        TAG_NOT_EXISTS("tag not exists"),
+        CHALLENGE_TAG_NOT_EXISTS("challenge tag not exists");
 
         private final String message;
 
