@@ -20,6 +20,7 @@
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
             <level>WARN</level>
         </filter>
+        <minimumEventLevel>WARN</minimumEventLevel>
     </appender>
 
     <appender name="Slack" class="com.mozi.moziserver.common.SlackAppender">
