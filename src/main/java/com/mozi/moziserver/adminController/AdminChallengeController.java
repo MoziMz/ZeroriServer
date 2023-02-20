@@ -1,10 +1,10 @@
 package com.mozi.moziserver.adminController;
 
 import com.mozi.moziserver.adminService.AdminChallengeService;
-import com.mozi.moziserver.model.adminReq.ReqAdminChallengeCreate;
-import com.mozi.moziserver.model.adminReq.ReqAdminChallengeUpdate;
-import com.mozi.moziserver.model.adminRes.AdminResChallenge;
-import com.mozi.moziserver.model.adminRes.AdminResChallengeList;
+import com.mozi.moziserver.httpException.ResponseError;
+import com.mozi.moziserver.model.adminReq.AdminReqChallengeCreate;
+import com.mozi.moziserver.model.adminReq.AdminReqChallengeUpdate;
+import com.mozi.moziserver.model.adminRes.*;
 import com.mozi.moziserver.model.entity.Challenge;
 import com.mozi.moziserver.model.entity.ChallengeStatistics;
 import com.mozi.moziserver.model.entity.ChallengeTheme;
@@ -34,7 +34,7 @@ public class AdminChallengeController {
     @ApiOperation("챌린지 생성")
     @PostMapping("/admin/challenges")
     public ResponseEntity<Object> createChallenge(
-            @Valid ReqAdminChallengeCreate req
+            @Valid AdminReqChallengeCreate req
     ) {
         adminChallengeService.createChallenge(req);
 
@@ -93,7 +93,7 @@ public class AdminChallengeController {
     public ResponseEntity<Object> updateChallenge(
             @ApiParam(hidden = true) @SessionUser Long userSeq,
             @PathVariable Long seq,
-            @Valid ReqAdminChallengeUpdate req,
+            @Valid AdminReqChallengeUpdate req,
             @RequestParam(required = false) String title,
             @RequestParam(value = "content", required = false) List<String> contentList
 

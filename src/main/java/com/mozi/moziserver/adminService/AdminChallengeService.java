@@ -3,8 +3,8 @@ package com.mozi.moziserver.adminService;
 import com.mozi.moziserver.httpException.ResponseError;
 import com.mozi.moziserver.model.ChallengeExplanation;
 import com.mozi.moziserver.model.ChallengeExplanationContent;
-import com.mozi.moziserver.model.adminReq.ReqAdminChallengeCreate;
-import com.mozi.moziserver.model.adminReq.ReqAdminChallengeUpdate;
+import com.mozi.moziserver.model.adminReq.AdminReqChallengeCreate;
+import com.mozi.moziserver.model.adminReq.AdminReqChallengeUpdate;
 import com.mozi.moziserver.model.entity.*;
 import com.mozi.moziserver.model.mappedenum.ChallengeTagType;
 import com.mozi.moziserver.repository.*;
@@ -17,9 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -35,7 +33,7 @@ public class AdminChallengeService {
     private final PlatformTransactionManager transactionManager;
 
     @Transactional
-    public void createChallenge(ReqAdminChallengeCreate req) {
+    public void createChallenge(AdminReqChallengeCreate req) {
         final Challenge challenge = Challenge.builder()
                 .name(req.getName())
                 .description(req.getDescription())
@@ -198,7 +196,7 @@ public class AdminChallengeService {
     }
 
     @Transactional
-    public void updateChallenge(Long seq, ReqAdminChallengeUpdate req, String title, List<String> contentList) {
+    public void updateChallenge(Long seq, AdminReqChallengeUpdate req, String title, List<String> contentList) {
         final Challenge challenge = getChallenge(seq);
 
         if (req.getName() != null) {
