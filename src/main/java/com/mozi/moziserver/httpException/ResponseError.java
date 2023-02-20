@@ -50,7 +50,9 @@ public interface ResponseError {
         INVALID_DECLARATION("invalid declaration"),
         INVALID_EMAIL_AUTH("email authentication is required"),
         EXPIRED_EMAIL_AUTH("expired email authentication"),
-        INVALID_CONFIRM_STATE_TYPE("invalid confirm update sate type");
+        INVALID_CONFIRM_STATE_TYPE("invalid confirm update sate type"),
+        INVALID_CURRENT_TAG_LIST("invalid current tag list"),
+        INVALID_CURRENT_THEME_LIST("invalid current theme list");
 
 
 
@@ -182,7 +184,9 @@ public interface ResponseError {
         SUGGESTION_NOT_EXISTS("suggestion not exists"),
         CHALLENGE_THEME_NOT_EXISTS("challenge theme not exists"),
         TAG_NOT_EXISTS("tag not exists"),
-        CHALLENGE_TAG_NOT_EXISTS("challenge tag not exists");
+        CHALLENGE_TAG_NOT_EXISTS("challenge tag not exists"),
+
+        NOT_EXISTS("not exists");
 
         private final String message;
 

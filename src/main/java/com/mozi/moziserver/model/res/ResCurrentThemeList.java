@@ -5,12 +5,13 @@ import lombok.Getter;
 
 @Getter
 public class ResCurrentThemeList {
-    private String name;
+    private final String name;
 
     private ResCurrentThemeList(CurrentThemeList currentThemeList) {
-        this.name = currentThemeList.getName();
+        this.name = currentThemeList.getChallengeTheme().getName();
     }
-    public static ResCurrentThemeList of(CurrentThemeList currentThemeList){
+
+    public static ResCurrentThemeList of(CurrentThemeList currentThemeList) {
         return new ResCurrentThemeList(currentThemeList);
     }
 }
