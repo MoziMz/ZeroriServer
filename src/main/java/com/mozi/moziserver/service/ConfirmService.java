@@ -417,7 +417,9 @@ public class ConfirmService {
 
     public ResWeekConfirm getWeekConfirm() {
 
-        LocalDateTime startDateTime = LocalDateTime.now().minusDays(6).withHour(0).withMinute(0).withSecond(0);
+        //LocalDateTime startDateTime = LocalDateTime.now().minusDays(6).withHour(0).withMinute(0).withSecond(0);
+        //최근 3주
+        LocalDateTime startDateTime = LocalDateTime.now().minusDays(20).withHour(0).withMinute(0).withSecond(0);
 
         List<Confirm> confirmList = confirmRepository.findByCreatedAt(startDateTime);
 
