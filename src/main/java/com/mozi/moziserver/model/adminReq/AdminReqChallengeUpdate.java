@@ -6,7 +6,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class ReqAdminChallengeUpdate {
+public class AdminReqChallengeUpdate {
 
     private String name;
 

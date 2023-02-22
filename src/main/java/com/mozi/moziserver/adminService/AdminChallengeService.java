@@ -3,8 +3,10 @@ package com.mozi.moziserver.adminService;
 import com.mozi.moziserver.httpException.ResponseError;
 import com.mozi.moziserver.model.ChallengeExplanation;
 import com.mozi.moziserver.model.ChallengeExplanationContent;
-import com.mozi.moziserver.model.adminReq.ReqAdminChallengeCreate;
-import com.mozi.moziserver.model.adminReq.ReqAdminChallengeUpdate;
+import com.mozi.moziserver.model.adminReq.AdminReqChallengeCreate;
+import com.mozi.moziserver.model.adminReq.AdminReqChallengeUpdate;
+import com.mozi.moziserver.model.adminReq.AdminReqCurrentTagList;
+import com.mozi.moziserver.model.adminReq.AdminReqCurrentThemeList;
 import com.mozi.moziserver.model.entity.*;
 import com.mozi.moziserver.model.mappedenum.ChallengeTagType;
 import com.mozi.moziserver.repository.*;
@@ -17,9 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -32,10 +32,12 @@ public class AdminChallengeService {
     private final ChallengeStatisticsRepository challengeStatisticsRepository;
     private final TagRepository tagRepository;
     private final ChallengeTagRepository challengeTagRepository;
+    private final CurrentTagListRepository currentTagListRepository;
+    private final CurrentThemeListRepository currentThemeListRepository;
     private final PlatformTransactionManager transactionManager;
 
     @Transactional
-    public void createChallenge(ReqAdminChallengeCreate req) {
+    public void createChallenge(AdminReqChallengeCreate req) {
         final Challenge challenge = Challenge.builder()
                 .name(req.getName())
                 .description(req.getDescription())
@@ -90,16 +92,23 @@ public class AdminChallengeService {
         return challenge;
     }
 
-    public ChallengeTheme getChallengeTheme(Long seq) {
-        ChallengeTheme challengeTheme = challengeThemeRepository.findById(seq.intValue())
+    public ChallengeTheme getChallengeTheme(Integer seq) {
+        ChallengeTheme challengeTheme = challengeThemeRepository.findById(seq)
                 .orElseThrow(ResponseError.NotFound.CHALLENGE_THEME_NOT_EXISTS::getResponseException);
 
         return challengeTheme;
     }
 
-    public Tag getTag(ChallengeTagType tagType) {
-        Tag tag = tagRepository.findByName(tagType.getName())
+    public Tag getTagByName(String name) {
+        Tag tag = tagRepository.findByName(name)
                 .orElseThrow(ResponseError.NotFound.TAG_NOT_EXISTS::getResponseException);
+
+        return tag;
+    }
+
+    public Tag getTagBySeq(Long seq) {
+        Tag tag = tagRepository.findById(seq).
+                orElseThrow(ResponseError.NotFound.TAG_NOT_EXISTS::getResponseException);
 
         return tag;
     }
@@ -156,12 +165,12 @@ public class AdminChallengeService {
     public List<Challenge> getChallengeListByThemeAndTagAndName(Long themeSeq, ChallengeTagType challengeTagType, String keyword, Integer pageNumber, Integer pageSize) {
 
         if (themeSeq != null) {
-            getChallengeTheme(themeSeq);
+            getChallengeTheme(themeSeq.intValue());
         }
 
         Long tagSeq = null;
         if (challengeTagType != null) {
-            tagSeq = getTag(challengeTagType).getSeq();
+            tagSeq = getTagByName(challengeTagType.getName()).getSeq();
         }
 
 
@@ -170,7 +179,7 @@ public class AdminChallengeService {
 
     public void createChallengeTag(Challenge challenge) {
 
-        Tag tag = getTag(challenge.getMainTag());
+        Tag tag = getTagByName(challenge.getMainTag().getName());
 
         ChallengeTag challengeTag = ChallengeTag.builder()
                 .tag(tag)
@@ -184,11 +193,10 @@ public class AdminChallengeService {
     public void updateChallengeTag(Challenge challenge, ChallengeTagType challengeTagType) {
 
 
-        Tag beforeTag = getTag(challenge.getMainTag());
+        Tag beforeTag = getTagByName(challenge.getMainTag().getName());
 
-        Tag newTag = getTag(challengeTagType);
+        Tag newTag = getTagByName(challengeTagType.getName());
 
-        //challenge와 tag로 찾는다.->유니크는 아니지만 일단은 하나
         ChallengeTag challengeTag = challengeTagRepository.findByChallengeAndTag(challenge, beforeTag)
                 .orElseThrow(ResponseError.NotFound.CHALLENGE_TAG_NOT_EXISTS::getResponseException);
 
@@ -198,7 +206,7 @@ public class AdminChallengeService {
     }
 
     @Transactional
-    public void updateChallenge(Long seq, ReqAdminChallengeUpdate req, String title, List<String> contentList) {
+    public void updateChallenge(Long seq, AdminReqChallengeUpdate req, String title, List<String> contentList) {
         final Challenge challenge = getChallenge(seq);
 
         if (req.getName() != null) {
@@ -235,7 +243,13 @@ public class AdminChallengeService {
 
         }
 
-        challengeRepository.save(challenge);
+        withTransaction(() -> {
+            try {
+                challengeRepository.save(challenge);
+            } catch (Exception e) {
+                throw ResponseError.BadRequest.ALREADY_CREATED.getResponseException(); // for duplicate exception
+            }
+        });
     }
 
     public ChallengeExplanation updateChallengeExplanation(Challenge challenge, String title, List<String> contentList) {
@@ -262,6 +276,358 @@ public class AdminChallengeService {
         }
 
         return challengeExplanation;
+    }
+
+    public List<Tag> getTagList(String name) {
+        if (name == null) {
+            return tagRepository.findAll();
+        }
+        return tagRepository.findAllByNameContaining(name);
+    }
+
+    public void createTag(String name) {
+        Optional<Tag> optionalTag = tagRepository.findByName(name);
+
+        if (optionalTag.isPresent()) {
+            throw ResponseError.BadRequest.ALREADY_CREATED.getResponseException("already created tag");
+        }
+
+        Tag tag = Tag.builder().name(name).build();
+
+        withTransaction(() -> {
+            try {
+                tagRepository.save(tag);
+            } catch (Exception e) {
+                throw ResponseError.BadRequest.ALREADY_CREATED.getResponseException(); // for duplicate exception
+            }
+        });
+    }
+
+    public void updateTag(Long seq, String name) {
+        final Tag tag = getTagBySeq(seq);
+
+        tag.setName(name);
+
+        tagRepository.save(tag);
+    }
+
+    public void deleteTag(Long seq) {
+        Tag tag = getTagBySeq(seq);
+
+        Optional<CurrentTagList> currentTagList = currentTagListRepository.findByTag(tag);
+
+        withTransaction(() -> {
+            try {
+
+                if (currentTagList.isPresent()) {
+                    deleteCurrentTagList(currentTagList.get().getSeq());
+                }
+
+                tagRepository.delete(tag);
+
+            } catch (Exception e) {
+                throw ResponseError.BadRequest.ALREADY_DELETED.getResponseException(); // for duplicate exception
+            }
+
+        });
+
+    }
+
+    public void createChallengeTheme(String name, String color, String inactiveColor) {
+        Optional<ChallengeTheme> optionalChallengeTheme = challengeThemeRepository.findByName(name);
+
+        if (optionalChallengeTheme.isPresent()) {
+            throw ResponseError.BadRequest.ALREADY_CREATED.getResponseException("already created challengeTheme");
+        }
+
+        ChallengeTheme challengeTheme = ChallengeTheme.builder()
+                .name(name)
+                .color(color)
+                .inactiveColor(inactiveColor)
+                .build();
+
+        withTransaction(() -> {
+            try {
+                challengeThemeRepository.save(challengeTheme);
+            } catch (Exception e) {
+                throw ResponseError.BadRequest.ALREADY_CREATED.getResponseException(); // for duplicate exception
+            }
+        });
+    }
+
+    public List<ChallengeTheme> getChallengeThemeList(String name) {
+        if (name == null) {
+            return challengeThemeRepository.findAll();
+        }
+        return challengeThemeRepository.findAllByNameContaining(name);
+    }
+
+    public void updateChallengeTheme(Integer seq, String name, String color, String inactiveColor) {
+
+        if (name != null && challengeThemeRepository.findByName(name).isPresent()) {
+            throw ResponseError.BadRequest.ALREADY_CREATED.getResponseException("already created challengeTheme");
+        }
+
+        final ChallengeTheme challengeTheme = getChallengeTheme(seq);
+
+        if (name != null) {
+            challengeTheme.setName(name);
+        }
+
+        if (color != null) {
+            challengeTheme.setColor(color);
+        }
+
+        if (inactiveColor != null) {
+            challengeTheme.setInactiveColor(inactiveColor);
+        }
+
+        withTransaction(() -> {
+            try {
+                challengeThemeRepository.save(challengeTheme);
+            } catch (Exception e) {
+                throw ResponseError.BadRequest.ALREADY_CREATED.getResponseException(); // for duplicate exception
+            }
+        });
+    }
+
+    public void deleteChallengeTheme(Integer seq) {
+        ChallengeTheme challengeTheme = getChallengeTheme(seq);
+
+        Optional<CurrentThemeList> currentThemeList = currentThemeListRepository.findByChallengeTheme(challengeTheme);
+
+        withTransaction(() -> {
+            try {
+
+                if (currentThemeList.isPresent()) {
+                    deleteCurrentThemeList(currentThemeList.get().getSeq());
+                }
+
+                challengeThemeRepository.delete(challengeTheme);
+
+            } catch (Exception e) {
+                throw ResponseError.BadRequest.ALREADY_DELETED.getResponseException(); // for duplicate exception
+            }
+
+        });
+
+        challengeThemeRepository.delete(challengeTheme);
+    }
+
+    public void createCurrentTagList(Integer turn, Long tagSeq) {
+        final Tag tag = tagRepository.findById(tagSeq).
+                orElseThrow(ResponseError.NotFound.TAG_NOT_EXISTS::getResponseException);
+
+        if (currentTagListRepository.findByTag(tag).isPresent()) {
+            throw ResponseError.BadRequest.ALREADY_CREATED.getResponseException();
+        }
+
+        Integer lastTurn = getAllCurrentTagList().stream().max(Comparator.comparing(currentTagList -> currentTagList.getTurn())).get().getTurn();
+
+        if (turn != lastTurn + 1) {
+            throw ResponseError.BadRequest.INVALID_CURRENT_TAG_LIST.getResponseException("invalid turn of CurrentTagList");
+        }
+
+        CurrentTagList currentTagList = CurrentTagList.builder()
+                .turn(turn)
+                .tag(tag)
+                .build();
+
+        withTransaction(() -> {
+            try {
+                currentTagListRepository.save(currentTagList);
+            } catch (Exception e) {
+                throw ResponseError.BadRequest.ALREADY_CREATED.getResponseException(); // for duplicate exception
+            }
+        });
+    }
+
+    public List<CurrentTagList> getAllCurrentTagList() {
+        return currentTagListRepository.findAll();
+    }
+
+    public void deleteCurrentTagList(Long seq) {
+        final CurrentTagList currentTagList = currentTagListRepository.findById(seq)
+                .orElseThrow(ResponseError.NotFound.NOT_EXISTS::getResponseException);
+
+        List<CurrentTagList> currentTagLists = getAllCurrentTagList();
+
+        withTransaction(() -> {
+            try {
+                currentTagLists.removeIf(c -> c.equals(currentTagList));
+
+                currentTagListRepository.delete(currentTagList);
+
+                currentTagLists.forEach(c -> {
+                    if (c.getTurn() > currentTagList.getTurn()) {
+                        c.setTurn(c.getTurn() - 1);
+                    }
+                });
+
+                currentTagListRepository.saveAll(currentTagLists);
+            } catch (Exception e) {
+                throw ResponseError.BadRequest.ALREADY_DELETED.getResponseException(); // for duplicate exception
+            }
+        });
+    }
+
+    public void updateAllCurrentTagList(List<AdminReqCurrentTagList> reqList) {
+        List<CurrentTagList> currentTagLists = new ArrayList<>();
+
+        for (AdminReqCurrentTagList req : reqList) {
+            Tag tag = getTagBySeq(req.getTagSeq());
+            if (tag != null) {
+                CurrentTagList currentTag = currentTagListRepository.findById(req.getSeq())
+                        .orElseThrow(ResponseError.NotFound.NOT_EXISTS::getResponseException);
+
+                currentTag.setTurn(req.getTurn());
+                currentTag.setTag(tag);
+
+                currentTagLists.add(currentTag);
+            }
+        }
+
+        boolean duplicated = currentTagLists.stream()
+                .map(CurrentTagList::getTurn)
+                .distinct()
+                .count() != currentTagLists.size();
+
+        if (duplicated == true) {
+            throw ResponseError.BadRequest.INVALID_CURRENT_TAG_LIST.getResponseException();
+        }
+
+        Set<Integer> set = new HashSet<>();
+        for (int i = 1; i <= currentTagLists.size(); i++) {
+            set.add(i);
+        }
+
+        Long cnt = 0L;
+        for (CurrentTagList c : currentTagLists) {
+            if (set.contains(c.getTurn())) {
+                cnt += 1;
+            }
+        }
+
+        if (cnt != set.size()) {
+            throw ResponseError.BadRequest.INVALID_CURRENT_TAG_LIST.getResponseException();
+        }
+
+        withTransaction(() -> {
+            try {
+                currentTagListRepository.saveAll(currentTagLists);
+            } catch (Exception e) {
+                throw ResponseError.BadRequest.ALREADY_CREATED.getResponseException(); // for duplicate exception
+            }
+        });
+    }
+
+    public void createCurrentThemeList(Integer turn, Integer challengeThemeSeq) {
+        final ChallengeTheme challengeTheme = challengeThemeRepository.findById(challengeThemeSeq).
+                orElseThrow(ResponseError.NotFound.CHALLENGE_THEME_NOT_EXISTS::getResponseException);
+
+        if (currentThemeListRepository.findByChallengeTheme(challengeTheme).isPresent()) {
+            throw ResponseError.BadRequest.ALREADY_CREATED.getResponseException();
+        }
+
+        Integer lastTurn = getAllCurrentThemeList().stream().max(Comparator.comparing(currentThemeList -> currentThemeList.getTurn())).get().getTurn();
+
+        if (turn != lastTurn + 1) {
+            throw ResponseError.BadRequest.INVALID_CURRENT_THEME_LIST.getResponseException("invalid turn of CurrentThemeList");
+        }
+
+        final CurrentThemeList currentThemeList = CurrentThemeList.builder()
+                .turn(turn)
+                .challengeTheme(challengeTheme)
+                .build();
+
+        withTransaction(() -> {
+            try {
+                currentThemeListRepository.save(currentThemeList);
+            } catch (Exception e) {
+                throw ResponseError.BadRequest.ALREADY_CREATED.getResponseException(); // for duplicate exception
+            }
+        });
+    }
+
+    public List<CurrentThemeList> getAllCurrentThemeList() {
+        return currentThemeListRepository.findAll();
+    }
+
+    public void deleteCurrentThemeList(Long seq) {
+        final CurrentThemeList currentThemeList = currentThemeListRepository.findById(seq)
+                .orElseThrow(ResponseError.NotFound.NOT_EXISTS::getResponseException);
+
+        List<CurrentThemeList> currentThemeLists = getAllCurrentThemeList();
+
+        withTransaction(() -> {
+            try {
+                currentThemeLists.removeIf(c -> c.equals(currentThemeList));
+
+                currentThemeListRepository.delete(currentThemeList);
+
+                currentThemeLists.forEach(c -> {
+                    if (c.getTurn() > currentThemeList.getTurn()) {
+                        c.setTurn(c.getTurn() - 1);
+                    }
+                });
+
+                currentThemeListRepository.saveAll(currentThemeLists);
+
+            } catch (Exception e) {
+                throw ResponseError.BadRequest.ALREADY_DELETED.getResponseException(); // for duplicate exception
+            }
+        });
+
+    }
+
+    public void updateAllCurrentThemeList(List<AdminReqCurrentThemeList> reqList) {
+        List<CurrentThemeList> currentThemeLists = new ArrayList<>();
+
+        for (AdminReqCurrentThemeList req : reqList) {
+            ChallengeTheme challengeTheme = getChallengeTheme(req.getChallengeThemeSeq());
+            if (challengeTheme != null) {
+                CurrentThemeList currentTheme = currentThemeListRepository.findById(req.getSeq())
+                        .orElseThrow(ResponseError.NotFound.NOT_EXISTS::getResponseException);
+
+                currentTheme.setTurn(req.getTurn());
+                currentTheme.setChallengeTheme(challengeTheme);
+
+                currentThemeLists.add(currentTheme);
+            }
+        }
+
+        boolean duplicated = currentThemeLists.stream()
+                .map(CurrentThemeList::getTurn)
+                .distinct()
+                .count() != currentThemeLists.size();
+
+        if (duplicated == true) {
+            throw ResponseError.BadRequest.INVALID_CURRENT_THEME_LIST.getResponseException();
+        }
+
+        Set<Integer> set = new HashSet<>();
+        for (int i = 1; i <= currentThemeLists.size(); i++) {
+            set.add(i);
+        }
+
+        Long cnt = 0L;
+        for (CurrentThemeList c : currentThemeLists) {
+            if (set.contains(c.getTurn())) {
+                cnt += 1;
+            }
+        }
+
+        if (cnt != set.size()) {
+            throw ResponseError.BadRequest.INVALID_CURRENT_THEME_LIST.getResponseException();
+        }
+
+        withTransaction(() -> {
+            try {
+                currentThemeListRepository.saveAll(currentThemeLists);
+            } catch (Exception e) {
+                throw ResponseError.BadRequest.ALREADY_CREATED.getResponseException(); // for duplicate exception
+            }
+        });
     }
 
     private void withTransaction(Runnable runnable) {

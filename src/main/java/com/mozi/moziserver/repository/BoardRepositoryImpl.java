@@ -4,6 +4,7 @@ import com.mozi.moziserver.model.entity.Board;
 import com.mozi.moziserver.model.entity.QBoard;
 import com.querydsl.core.types.Predicate;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.function.Function;
@@ -27,6 +28,18 @@ public class BoardRepositoryImpl extends QuerydslRepositorySupport implements Bo
         return from(qBoard)
                 .orderBy(qBoard.seq.desc())
                 .where(predicates)
+                .limit(pageSize)
+                .fetch();
+    }
+
+    // -------------------- -------------------- below admin methods -------------------- -------------------- //
+    @Override
+    public List<Board> findAllByPaging(
+            Integer pageNumber,
+            Integer pageSize
+    ){
+        return from(qBoard)
+                .offset(pageNumber * pageSize)
                 .limit(pageSize)
                 .fetch();
     }

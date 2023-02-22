@@ -1,21 +1,24 @@
 package com.mozi.moziserver.model.entity;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Entity(name = "current_theme_list")
 public class CurrentThemeList extends AbstractTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private String name;
+    private Long seq;
 
     private Integer turn;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "challenge_theme_seq")
+    private ChallengeTheme challengeTheme;
 }

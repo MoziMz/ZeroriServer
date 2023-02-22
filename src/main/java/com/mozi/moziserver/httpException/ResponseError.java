@@ -50,7 +50,9 @@ public interface ResponseError {
         INVALID_DECLARATION("invalid declaration"),
         INVALID_EMAIL_AUTH("email authentication is required"),
         EXPIRED_EMAIL_AUTH("expired email authentication"),
-        INVALID_CONFIRM_STATE_TYPE("invalid confirm update sate type");
+        INVALID_CONFIRM_STATE_TYPE("invalid confirm update sate type"),
+        INVALID_CURRENT_TAG_LIST("invalid current tag list"),
+        INVALID_CURRENT_THEME_LIST("invalid current theme list");
 
         private final String message;
 
