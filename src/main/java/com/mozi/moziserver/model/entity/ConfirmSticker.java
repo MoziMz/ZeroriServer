@@ -17,20 +17,24 @@ public class ConfirmSticker extends AbstractTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long seq;
 
+    @Column(name = "location_x")
     private BigDecimal locationX;
 
+    @Column(name = "location_y")
     private BigDecimal locationY;
 
+    @Column(name = "angle")
     private BigDecimal angle;
 
+    @Column(name = "inch")
     private BigDecimal inch;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "confirm_seq")
+    @JoinColumn(name="confirm_seq")
     private Confirm confirm;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_seq")
+    @JoinColumn(name="user_seq")
     User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
