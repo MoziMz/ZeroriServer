@@ -3,6 +3,7 @@ package com.mozi.moziserver.repository;
 import com.mozi.moziserver.model.entity.*;
 import com.querydsl.core.types.Predicate;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.function.Function;
@@ -36,6 +37,26 @@ public class PostboxMessageAdminRepositoryImpl extends QuerydslRepositorySupport
 
         return postboxMessageAdminList;
     }
+    // -------------------- -------------------- below admin methods -------------------- -------------------- //
+    @Override
+    public List<PostboxMessageAdmin> findAllByKeyword(
+            String keyword,
+            Long numberOfKeyword,
+            Integer pageNumber,
+            Integer pageSize
+    ){
+        return from(qPostboxMessageAdmin)
+                .innerJoin(qPostboxMessageAdmin.user,qUser).fetchJoin()
+                .where(StringUtils.hasLength(keyword) ?
+                        numberOfKeyword != null ?
+                                qPostboxMessageAdmin.content.like('%' + keyword + '%').or(qUser.seq.eq(numberOfKeyword)) :
+                                qPostboxMessageAdmin.content.like('%' + keyword + '%') :
+                        null)
+                .offset(pageNumber * pageSize)
+                .limit(pageSize)
+                .fetch();
+    }
+
 
     private <T> Predicate predicateOptional(final Function<T, Predicate> whereFunc, final T value) {
         return value != null ? whereFunc.apply(value) : null;

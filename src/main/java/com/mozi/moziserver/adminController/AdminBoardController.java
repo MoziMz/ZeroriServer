@@ -1,7 +1,9 @@
 package com.mozi.moziserver.adminController;
 
 import com.mozi.moziserver.adminService.AdminBoardService;
+import com.mozi.moziserver.model.adminReq.ReqAdminPostboxMessageAdminCreate;
 import com.mozi.moziserver.model.adminRes.AdminResBoard;
+import com.mozi.moziserver.model.adminRes.AdminResPostboxMessageAdmin;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -76,3 +78,60 @@ public class AdminBoardController {
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+    @ApiOperation("관리자 편지 리스트 조회")
+    @GetMapping("/admin/postbox-message-admins")
+    public List<AdminResPostboxMessageAdmin> getPostboxMessageAdminList(
+            @RequestParam(value = "keyword", required = false) String keyword, //keyword is userSeq or content
+            @RequestParam(name = "pageNumber", required = false, defaultValue = "0") Integer pageNumber,
+            @RequestParam(name = "pageSize", required = false, defaultValue = "20") @Max(30) Integer pageSize
+    ) {
+        return adminBoardService.getPostBoxMessageAdminList(keyword, pageNumber, pageSize)
+                .stream()
+                .map(postboxMessageAdmin -> AdminResPostboxMessageAdmin.of(postboxMessageAdmin))
+                .collect(Collectors.toList());
+    }
+
+    @ApiOperation("관리자 편지 하나 조회")
+    @GetMapping("/admin/postbox-message-admins/{seq}")
+    public AdminResPostboxMessageAdmin getPostboxMessageAdmin(
+            @PathVariable("seq") Long seq
+    ) {
+        return AdminResPostboxMessageAdmin.of(adminBoardService.getPostboxMessageAdmin(seq));
+    }
+
+    @ApiOperation("관리자 편지 생성")
+    @PostMapping("/admin/postbox-message-admins")
+    public ResponseEntity<Object> createPostboxMessageAdmin(
+            @RequestBody @Valid ReqAdminPostboxMessageAdminCreate req
+    ) {
+        adminBoardService.createPostboxMessageAdmin(req.getUserSeq(), req.getContent(), req.getSender());
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @ApiOperation("관리자 편지 수정")
+    @PutMapping("/admin/postbox-message-admins/{seq}")
+    public ResponseEntity<Object> updatePostboxMessageAdmin(
+            @PathVariable(value = "seq") Long seq,
+            @RequestParam(value = "content", required = false) String content,
+            @RequestParam(value = "sender", required = false) String sender,
+            @RequestParam(value = "checked_state", required = false) Boolean checkedState
+    ) {
+        if (content != null || sender != null || checkedState != null) {
+            adminBoardService.updatePostboxMessageAdmin(seq, content, sender, checkedState);
+        }
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @ApiOperation("관리자 편지 삭제")
+    @DeleteMapping("/admin/postbox-message-admins/{seq}")
+    public ResponseEntity<Object> deletePostboxMessageAdmin(
+            @PathVariable("seq") Long seq
+    ) {
+        adminBoardService.deletePostboxMessageAdmin(seq);
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+}
+
