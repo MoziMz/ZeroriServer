@@ -70,7 +70,7 @@ public class ScheduleService {
         final LocalDate today = LocalDate.now();
 
         LocalDate beforeDay = today.minusDays(7);
-        LocalDateTime startDateTime = LocalDateTime.of(beforeDay.getDayOfYear(), beforeDay.getMonthValue(), beforeDay.getDayOfMonth(), 21, 0, 0);
+        LocalDateTime startDateTime = LocalDateTime.of(beforeDay.getYear(), beforeDay.getMonthValue(), beforeDay.getDayOfMonth(), 21, 0, 0);
         LocalDateTime endDateTime = LocalDateTime.of(today.getYear(), today.getMonthValue(), today.getDayOfMonth(), 21, 0, 0);
         List<User> activeUserList = userRepository.findAllActiveUserByUserReward(startDateTime, endDateTime);
 
