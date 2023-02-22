@@ -1,6 +1,7 @@
 package com.mozi.moziserver.controller;
 
 import com.mozi.moziserver.httpException.ResponseError;
+import com.mozi.moziserver.model.entity.User;
 import com.mozi.moziserver.model.req.ReqChallengeAndDate;
 import com.mozi.moziserver.model.req.ReqList;
 import com.mozi.moziserver.model.req.ReqUserChallengeCreate;
@@ -10,6 +11,7 @@ import com.mozi.moziserver.model.res.ResUserChallengeList;
 import com.mozi.moziserver.model.res.ResUserChallengeOfReward;
 import com.mozi.moziserver.security.SessionUser;
 import com.mozi.moziserver.service.UserChallengeService;
+import com.mozi.moziserver.service.UserService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +29,9 @@ import java.util.stream.Collectors;
 @RequestMapping("/api")
 @RequiredArgsConstructor
 public class UserChallengeController {
+
     private final UserChallengeService userChallengeService;
+    private final UserService userService;
 
     @ApiOperation("유저 챌린지 날짜별 리스트 조회")
     @GetMapping("/v1/period/user-challenges")
@@ -57,15 +61,27 @@ public class UserChallengeController {
                 .collect(Collectors.toList());
     }
 
-    @ApiOperation("유저 챌린지 생성 가능한지 확인")
-    @GetMapping("/v1/user-challenges/creatable")
-    public ResponseEntity<Object> checkCreatableUserChallenge(
-            @ApiParam(hidden = true) @SessionUser Long userSeq,
-            @Valid ReqChallengeAndDate req
+    @ApiOperation("완료한 유저 챌린지 리스트 조회 (유저가 확인 안한 것만)")
+    @GetMapping("/v1/user-challenges/end")
+    public List<ResUserChallengeOfReward> getEndUserChallengeList(
+            @ApiParam(hidden = true) @SessionUser Long userSeq
     ) {
-        userChallengeService.checkCreatableUserChallenge(userSeq, req);
+        return userChallengeService.getEndUserChallengeList(userSeq)
+                .stream()
+                .map(ResUserChallengeOfReward::of)
+                .collect(Collectors.toList());
+    }
 
-        return new ResponseEntity<>(HttpStatus.OK);
+    @ApiOperation("인증한 제로 활동-활동별 (마이페이지)")
+    @GetMapping("/v1/user-challenges/confirmed")
+    public List<ResConfirmedUserChallengeRecord> getUserChallengeRecordList(
+            @ApiParam(hidden = true) @SessionUser Long userSeq,
+            @Valid ReqList req
+    ) {
+        return userChallengeService.getUserChallengeRecordListByUserSeq(userSeq, req)
+                .stream()
+                .map(ResConfirmedUserChallengeRecord::of)
+                .collect(Collectors.toList());
     }
 
     @ApiOperation("유저 챌린지 생성")
@@ -74,7 +90,20 @@ public class UserChallengeController {
             @ApiParam(hidden = true) @SessionUser Long userSeq,
             @RequestBody @Valid ReqUserChallengeCreate req
     ) {
-        userChallengeService.createUserChallenge(userSeq, req);
+
+        User user = userService.getUserBySeq(userSeq);
+        userChallengeService.createUserChallenge(user, req);
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @ApiOperation("완료한 유저 챌린지 확인 완료")
+    @PutMapping("/v1/user-challenges/{seq}/checked")
+    public ResponseEntity<Object> checkedUserChallenge(
+            @ApiParam(hidden = true) @SessionUser Long userSeq,
+            @PathVariable("seq") Long userChallengeSeq
+    ) {
+        userChallengeService.checkUserChallenge(userSeq, userChallengeSeq);
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
@@ -90,37 +119,16 @@ public class UserChallengeController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @ApiOperation("완료한 유저 챌린지 리스트 조회 (유저가 확인 안한 것만)")
-    @GetMapping("/v1/user-challenges/end")
-    public List<ResUserChallengeOfReward> getEndUserChallengeList(
-            @ApiParam(hidden = true) @SessionUser Long userSeq
-    ) {
-        return userChallengeService.getEndUserChallengeList(userSeq)
-                .stream()
-                .map(ResUserChallengeOfReward::of)
-                .collect(Collectors.toList());
-    }
-
-    @ApiOperation("완료한 유저 챌린지 확인 완료")
-    @PutMapping("/v1/user-challenges/{seq}/checked")
-    public ResponseEntity<Object> checkedUserChallenge(
+    @ApiOperation("유저 챌린지 생성 가능한지 확인")
+    @GetMapping("/v1/user-challenges/creatable")
+    public ResponseEntity<Object> checkCreatableUserChallenge(
             @ApiParam(hidden = true) @SessionUser Long userSeq,
-            @PathVariable("seq") Long userChallengeSeq
+            @Valid ReqChallengeAndDate req
     ) {
-        userChallengeService.checkUserChallenge(userSeq, userChallengeSeq);
+
+        User user = userService.getUserBySeq(userSeq);
+        userChallengeService.checkCreatableUserChallenge(user, req);
 
         return new ResponseEntity<>(HttpStatus.OK);
-    }
-
-    @ApiOperation("인증한 제로 활동-활동별 (마이페이지)")
-    @GetMapping("/v1/user-challenges/confirmed")
-    public List<ResConfirmedUserChallengeRecord> getUserChallengeRecordList(
-            @ApiParam(hidden = true) @SessionUser Long userSeq,
-            @Valid ReqList req
-    ) {
-        return userChallengeService.getUserChallengeRecordListByUserSeq(userSeq, req)
-                .stream()
-                .map(ResConfirmedUserChallengeRecord::of)
-                .collect(Collectors.toList());
     }
 }

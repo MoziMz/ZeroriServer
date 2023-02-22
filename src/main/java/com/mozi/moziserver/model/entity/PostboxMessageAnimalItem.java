@@ -9,18 +9,18 @@ import javax.persistence.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity(name = "user_island")
-public class UserIsland extends AbstractTimeEntity {
+@Entity(name = "postbox_message_animal_item")
+public class PostboxMessageAnimalItem {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long seq;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_seq")
-    private User user;
+    @JoinColumn(name = "postbox_message_animal_seq")
+    private PostboxMessageAnimal postboxMessageAnimal;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "detail_island_seq")
-    private DetailIsland detailIsland;
+    @JoinColumn(name = "animal_item_seq")
+    private AnimalItem animalItem;
 }

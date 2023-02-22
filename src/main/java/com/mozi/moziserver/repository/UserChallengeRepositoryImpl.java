@@ -8,7 +8,6 @@ import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.time.Period;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -22,7 +21,9 @@ public class UserChallengeRepositoryImpl extends QuerydslRepositorySupport imple
 
     private final QChallengeRecord qChallengeRecord = QChallengeRecord.challengeRecord;
 
-    public UserChallengeRepositoryImpl() { super(UserChallenge.class); }
+    public UserChallengeRepositoryImpl() {
+        super(UserChallenge.class);
+    }
 
     @Override
     public Optional<UserChallenge> findBySeq(Long seq) {
@@ -35,14 +36,13 @@ public class UserChallengeRepositoryImpl extends QuerydslRepositorySupport imple
     }
 
 
-
     @Override
-    public Optional<UserChallenge> findUserChallengeByUserSeqAndChallengeAndStates(Long userSeq, Challenge challenge, Collection<UserChallengeStateType> states){
+    public Optional<UserChallenge> findUserChallengeByUserSeqAndChallengeAndStates(Long userSeq, Challenge challenge, Collection<UserChallengeStateType> states) {
 
         return Optional.ofNullable(from(qUserChallenge)
                 .where(qUserChallenge.user.seq.eq(userSeq)
-                    .and(qUserChallenge.challenge.eq(challenge))
-                    .and(qUserChallenge.state.in(states)))
+                        .and(qUserChallenge.challenge.eq(challenge))
+                        .and(qUserChallenge.state.in(states)))
                 .orderBy(qUserChallenge.endDate.desc())
                 .fetchFirst());
     }
@@ -52,15 +52,15 @@ public class UserChallengeRepositoryImpl extends QuerydslRepositorySupport imple
             Long userSeq,
             Integer pageSize,
             Long prevLastUserChallengeSeq
-    ){
+    ) {
         final Predicate[] predicates = new Predicate[]{
                 predicateOptional(qUserChallenge.seq::gt, prevLastUserChallengeSeq),
                 predicateOptional(qUserChallenge.user.seq::eq, userSeq)
         };
 
         return from(qUserChallenge)
-                .leftJoin(qUserChallenge.challenge,qChallenge).fetchJoin()
-                .leftJoin(qChallenge.challengeRecord,qChallengeRecord).fetchJoin()
+                .leftJoin(qUserChallenge.challenge, qChallenge).fetchJoin()
+                .leftJoin(qChallenge.challengeRecord, qChallengeRecord).fetchJoin()
                 .orderBy(qUserChallenge.startDate.asc())
                 .where(predicates)
                 .limit(pageSize)
@@ -132,13 +132,6 @@ public class UserChallengeRepositoryImpl extends QuerydslRepositorySupport imple
         return from(qUserChallenge)
                 .where(predicates)
                 .fetch();
-//                .stream()
-//                .filter( item -> item.getUserChallengeResultList().get(Period.between(item.getStartDate(), date).getDays()).getResult() == UserChallengeResultType.PLAN)
-//                .collect(Collectors.toList());
-
-        // TODO
-        // filter 에 걸려서 나오지 않는데도 JSON 내용이 바뀐것으로 인식되고 있음
-        // update 실행됨
     }
 
     @Transactional

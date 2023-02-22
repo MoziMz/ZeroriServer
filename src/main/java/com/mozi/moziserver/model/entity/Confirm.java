@@ -15,11 +15,11 @@ import java.util.List;
 @DynamicUpdate
 @Entity(name = "confirm")
 public class Confirm extends AbstractTimeEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long seq;
 
-    @Column(name = "img_url")
     private String imgUrl;
 
     @Builder.Default
@@ -28,14 +28,14 @@ public class Confirm extends AbstractTimeEntity {
     @Builder.Default
     private Integer reportedCnt = 0;
 
+    @Enumerated(EnumType.STRING)
+    private ConfirmStateType state;
+
     @Transient
     boolean isLiked;
 
     @Transient
     boolean isReported;
-
-    @Enumerated(EnumType.STRING)
-    private ConfirmStateType state;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_seq")

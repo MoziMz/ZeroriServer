@@ -7,7 +7,6 @@ import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport
 
 import java.util.List;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 public class BoardRepositoryImpl extends QuerydslRepositorySupport implements BoardRepositorySupport {
     private final QBoard qBoard = QBoard.board;
@@ -22,7 +21,7 @@ public class BoardRepositoryImpl extends QuerydslRepositorySupport implements Bo
             Long prevLastPostSeq
     ) {
         final Predicate[] predicates = new Predicate[]{
-                predicateOptional(qBoard.seq::lt,prevLastPostSeq),
+                predicateOptional(qBoard.seq::lt, prevLastPostSeq),
         };
 
         return from(qBoard)

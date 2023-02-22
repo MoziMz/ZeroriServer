@@ -2,7 +2,10 @@ package com.mozi.moziserver.model.entity;
 
 import lombok.*;
 
-import javax.persistence.*;
+import javax.persistence.Embeddable;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import java.io.Serializable;
 
 @Getter
@@ -13,8 +16,9 @@ import java.io.Serializable;
 @Builder
 @EqualsAndHashCode(of = {"user"})
 public class UserStickerId implements Serializable {
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="user_seq")
+    @JoinColumn(name = "user_seq")
     User user;
 
     @ManyToOne(fetch = FetchType.LAZY)

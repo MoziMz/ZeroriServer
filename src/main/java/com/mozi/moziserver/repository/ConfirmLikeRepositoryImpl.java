@@ -9,7 +9,9 @@ public class ConfirmLikeRepositoryImpl extends QuerydslRepositorySupport impleme
     QConfirmLike qConfirmLike = QConfirmLike.confirmLike;
     QUser qUser = QUser.user;
 
-    public ConfirmLikeRepositoryImpl() { super(ConfirmLike.class); }
+    public ConfirmLikeRepositoryImpl() {
+        super(ConfirmLike.class);
+    }
 
     public List<ConfirmLike> findAllByUserAndConfirmsIn(User user, List<Confirm> confirmList) {
         return from(qConfirmLike)

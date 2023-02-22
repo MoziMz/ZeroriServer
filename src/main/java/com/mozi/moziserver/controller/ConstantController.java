@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 @RequestMapping("/api")
 @RequiredArgsConstructor
 public class ConstantController {
+
     private final CurrentTagListService currentTagListService;
     private final ChallengeService challengeService;
 
@@ -36,6 +37,7 @@ public class ConstantController {
     @ApiOperation("챌린지 테마 리스트 조회")
     @GetMapping("/v1/challenge-themes")
     public List<ChallengeTheme> getChallengeThemeList() {
+
         return challengeService.getChallengeThemeList();
     }
 }

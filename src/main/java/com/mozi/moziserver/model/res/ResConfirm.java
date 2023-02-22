@@ -1,16 +1,10 @@
 package com.mozi.moziserver.model.res;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.mozi.moziserver.model.entity.Confirm;
 import com.mozi.moziserver.model.entity.ConfirmSticker;
-import com.mozi.moziserver.model.entity.PreparationItem;
-import com.mozi.moziserver.model.mappedenum.ChallengeTagType;
 import lombok.Getter;
 
-import javax.validation.constraints.NotNull;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 

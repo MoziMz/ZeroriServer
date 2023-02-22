@@ -5,7 +5,6 @@ import com.mozi.moziserver.model.entity.Question;
 import com.mozi.moziserver.model.entity.User;
 import com.mozi.moziserver.model.req.ReqQuestionCreate;
 import com.mozi.moziserver.repository.QuestionRepository;
-import com.mozi.moziserver.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -16,19 +15,12 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class QuestionService {
 
-    private final UserRepository userRepository;
-
     private final QuestionRepository questionRepository;
 
     private final S3ImageService s3ImageService;
 
     @Transactional
-    public void createQuestion(Long userSeq, ReqQuestionCreate reqQuestionCreate) {
-
-        User user = userRepository.findById(userSeq)
-                .orElseThrow(ResponseError.NotFound.USER_NOT_EXISTS::getResponseException);
-
-        Long seq = questionRepository.findSeq();
+    public void createQuestion(User user, ReqQuestionCreate reqQuestionCreate) {
 
         String imgUrl = null;
         if (reqQuestionCreate.getImage() != null) {
@@ -47,7 +39,6 @@ public class QuestionService {
                 .content(reqQuestionCreate.getContent())
                 .imgUrl(imgUrl)
                 .build();
-
         try {
             questionRepository.save(question);
         } catch (Exception e) {

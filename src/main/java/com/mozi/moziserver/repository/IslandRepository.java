@@ -7,6 +7,6 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface IslandRepository extends JpaRepository<Island, Integer> {
-    List<Island> findAllByOrderByTypeAsc();
+public interface IslandRepository extends JpaRepository<Island, Long> {
+    List<Island> findAllByOrderBySeqAsc();
 }

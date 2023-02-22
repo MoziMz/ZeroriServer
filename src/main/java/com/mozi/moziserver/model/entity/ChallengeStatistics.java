@@ -11,7 +11,8 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity(name = "challenge_statistics")
-public class ChallengeStatistics extends AbstractTimeEntity{
+public class ChallengeStatistics extends AbstractTimeEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long seq;

@@ -11,7 +11,8 @@ import javax.persistence.Entity;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity(name = "user_sticker")
-public class UserSticker extends AbstractTimeEntity{
+public class UserSticker extends AbstractTimeEntity {
+
     @EmbeddedId
     private UserStickerId id;
 }

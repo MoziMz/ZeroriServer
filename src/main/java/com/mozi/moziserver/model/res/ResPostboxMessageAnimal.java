@@ -1,7 +1,7 @@
 package com.mozi.moziserver.model.res;
 
+import com.mozi.moziserver.model.entity.AnimalItem;
 import com.mozi.moziserver.model.entity.PostboxMessageAnimal;
-import com.mozi.moziserver.model.entity.PreparationItem;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
@@ -14,11 +14,14 @@ public class ResPostboxMessageAnimal {
     private String animalName;
     private String content;
     private String imgUrl;
-    private List<ResPreparationItemList> preparationItemList;
+    private List<ResPreparationItemList> preparationItemList; // TODO ERASE V2
+    private List<ResAnimalItemList> animalItemList;
+    private Integer thisWeekUserRewardPoint;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    private ResPostboxMessageAnimal(PostboxMessageAnimal postboxMessageAnimal, List<PreparationItem> preparationItemList) {
+    // TODO ERASE V2
+    private ResPostboxMessageAnimal(PostboxMessageAnimal postboxMessageAnimal, List<AnimalItem> preparationItemList) {
         this.animalSeq = postboxMessageAnimal.getAnimal().getSeq();
         this.animalName = postboxMessageAnimal.getAnimal().getName();
         this.content = postboxMessageAnimal.getAnimal().getPostboxAnimalContent();
@@ -28,7 +31,26 @@ public class ResPostboxMessageAnimal {
         this.updatedAt = postboxMessageAnimal.getUpdatedAt();
     }
 
-    public static ResPostboxMessageAnimal of(PostboxMessageAnimal postboxMessageAnimal, List<PreparationItem> preparationItemList){
+    // V2
+    private ResPostboxMessageAnimal(PostboxMessageAnimal postboxMessageAnimal, Integer thisWeekUserRewardPoint) {
+        this.animalSeq = postboxMessageAnimal.getAnimal().getSeq();
+        this.animalName = postboxMessageAnimal.getAnimal().getName();
+        this.content = postboxMessageAnimal.getAnimal().getPostboxAnimalContent();
+        this.imgUrl = postboxMessageAnimal.getAnimal().getImgUrl();
+        this.animalItemList = postboxMessageAnimal.getAnimalItemList().stream()
+                .map(itemList -> ResAnimalItemList.of(itemList)).collect(Collectors.toList());
+        this.thisWeekUserRewardPoint = thisWeekUserRewardPoint;
+        this.createdAt = postboxMessageAnimal.getCreatedAt();
+        this.updatedAt = postboxMessageAnimal.getUpdatedAt();
+    }
+
+    // TODO ERASE V2
+    public static ResPostboxMessageAnimal of(PostboxMessageAnimal postboxMessageAnimal, List<AnimalItem> preparationItemList){
         return new ResPostboxMessageAnimal(postboxMessageAnimal, preparationItemList);
+    }
+
+    // V2
+    public static ResPostboxMessageAnimal of(PostboxMessageAnimal postboxMessageAnimal, Integer thisWeekUserRewardPoint) {
+        return new ResPostboxMessageAnimal(postboxMessageAnimal, thisWeekUserRewardPoint);
     }
 }

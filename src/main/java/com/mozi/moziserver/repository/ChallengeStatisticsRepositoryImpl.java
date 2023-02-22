@@ -4,7 +4,6 @@ import com.mozi.moziserver.model.entity.ChallengeStatistics;
 import com.mozi.moziserver.model.entity.QChallenge;
 import com.mozi.moziserver.model.entity.QChallengeStatistics;
 import com.querydsl.core.types.Predicate;
-import io.swagger.models.auth.In;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 
 import java.util.List;
@@ -15,7 +14,9 @@ public class ChallengeStatisticsRepositoryImpl extends QuerydslRepositorySupport
     private final QChallengeStatistics qChallengeStatistics = QChallengeStatistics.challengeStatistics;
     private final QChallenge qChallenge = QChallenge.challenge;
 
-    public ChallengeStatisticsRepositoryImpl() { super(ChallengeStatistics.class); }
+    public ChallengeStatisticsRepositoryImpl() {
+        super(ChallengeStatistics.class);
+    }
 
     @Override
     public List<ChallengeStatistics> findAllByPeriod(

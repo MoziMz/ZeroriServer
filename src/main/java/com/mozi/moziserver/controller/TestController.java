@@ -1,8 +1,6 @@
 package com.mozi.moziserver.controller;
 
-import com.mozi.moziserver.model.req.ReqList;
 import com.mozi.moziserver.model.req.ReqTestUserChallengeStartDateUpdate;
-import com.mozi.moziserver.model.res.ResConfirmList;
 import com.mozi.moziserver.security.SessionUser;
 import com.mozi.moziserver.service.BadWordService;
 import com.mozi.moziserver.service.UserChallengeService;
@@ -16,8 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Profile("!production")
 @Slf4j
@@ -25,8 +21,8 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/test")
 @RequiredArgsConstructor
 public class TestController {
-    private final UserChallengeService userChallengeService;
 
+    private final UserChallengeService userChallengeService;
     private final BadWordService badWordService;
 
     @ApiOperation("유저 챌린지 startDate 변경")
@@ -36,6 +32,7 @@ public class TestController {
             @PathVariable("seq") Long userChallengeSeq,
             @RequestBody @Valid ReqTestUserChallengeStartDateUpdate req
     ) {
+
         userChallengeService.updateUserChallengeStartDate(userSeq, userChallengeSeq, req.getStartDate());
 
         return new ResponseEntity<>(HttpStatus.OK);
@@ -46,8 +43,8 @@ public class TestController {
     public ResponseEntity<Object> createBadWord(
             @ApiParam(hidden = true) @SessionUser Long userSeq,
             @RequestParam String content
-
     ) {
+
         badWordService.createBadword(content);
 
         return new ResponseEntity<>(HttpStatus.OK);

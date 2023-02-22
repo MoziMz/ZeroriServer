@@ -1,12 +1,14 @@
 package com.mozi.moziserver.repository;
 
-import com.mozi.moziserver.model.entity.*;
+import com.mozi.moziserver.model.entity.PostboxMessageAdmin;
+import com.mozi.moziserver.model.entity.QPostboxMessageAdmin;
+import com.mozi.moziserver.model.entity.QUser;
+import com.mozi.moziserver.model.entity.User;
 import com.querydsl.core.types.Predicate;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 
 import java.util.List;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 public class PostboxMessageAdminRepositoryImpl extends QuerydslRepositorySupport implements PostboxMessageAdminRepositorySupport {
     private final QPostboxMessageAdmin qPostboxMessageAdmin = QPostboxMessageAdmin.postboxMessageAdmin;

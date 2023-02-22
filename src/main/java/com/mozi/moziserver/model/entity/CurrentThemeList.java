@@ -12,6 +12,7 @@ import javax.persistence.Id;
 @Setter
 @Entity(name = "current_theme_list")
 public class CurrentThemeList extends AbstractTimeEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private String name;

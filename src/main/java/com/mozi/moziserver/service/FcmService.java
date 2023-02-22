@@ -4,7 +4,6 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingException;
 import com.google.firebase.messaging.Message;
 import com.google.firebase.messaging.MessagingErrorCode;
-import com.mozi.moziserver.httpException.ResponseError;
 import com.mozi.moziserver.model.entity.User;
 import com.mozi.moziserver.model.entity.UserFcm;
 import com.mozi.moziserver.model.mappedenum.FcmMessageType;
@@ -12,8 +11,6 @@ import com.mozi.moziserver.repository.UserFcmRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @Service

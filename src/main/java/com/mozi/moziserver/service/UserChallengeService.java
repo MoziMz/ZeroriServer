@@ -10,18 +10,19 @@ import com.mozi.moziserver.model.req.ReqUserChallengeCreate;
 import com.mozi.moziserver.model.req.ReqUserChallengeList;
 import com.mozi.moziserver.repository.*;
 import lombok.RequiredArgsConstructor;
-import org.apache.tomcat.jni.Local;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.Period;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class UserChallengeService {
-    private final UserRepository userRepository;
+
     private final UserChallengeRepository userChallengeRepository;
     private final ChallengeRepository challengeRepository;
     private final ChallengeStatisticsRepository challengeStatisticsRepository;
@@ -113,9 +114,7 @@ public class UserChallengeService {
         return true;
     }
 
-    public void checkCreatableUserChallenge(Long userSeq, ReqChallengeAndDate req) {
-        User user = userRepository.findById(userSeq)
-                .orElseThrow(ResponseError.NotFound.USER_NOT_EXISTS::getResponseException);
+    public void checkCreatableUserChallenge(User user, ReqChallengeAndDate req) {
 
         Challenge challenge = challengeRepository.findById(req.getChallengeSeq())
                 .orElseThrow(ResponseError.NotFound.CHALLENGE_NOT_EXISTS::getResponseException);
@@ -124,10 +123,7 @@ public class UserChallengeService {
     }
 
     @Transactional
-    public void createUserChallenge(Long userSeq, ReqUserChallengeCreate req) {
-
-        User user = userRepository.findById(userSeq)
-                .orElseThrow(ResponseError.NotFound.USER_NOT_EXISTS::getResponseException);
+    public void createUserChallenge(User user, ReqUserChallengeCreate req) {
 
         Challenge challenge = challengeRepository.findById(req.getChallengeSeq())
                 .orElseThrow(ResponseError.NotFound.CHALLENGE_NOT_EXISTS::getResponseException);
@@ -151,7 +147,7 @@ public class UserChallengeService {
 
         userChallengeRepository.save(userChallenge);
 
-        Optional<UserChallengeRecord> optionalUserChallengeRecord = userChallengeRecordRepository.findByChallengeAndUser(challenge.getSeq(), userSeq);
+        Optional<UserChallengeRecord> optionalUserChallengeRecord = userChallengeRecordRepository.findByChallengeAndUser(challenge.getSeq(), user);
 
         if (!optionalUserChallengeRecord.isPresent()) {
             final UserChallengeRecord userChallengeRecord = UserChallengeRecord.builder()
@@ -256,7 +252,7 @@ public class UserChallengeService {
         LocalDate today = LocalDate.now();
         UserChallenge userChallenge = getUserChallenge(userSeq, userChallengeSeq);
 
-        if (userChallenge.getState().equals(UserChallengeStateType.STOP)){
+        if (userChallenge.getState().equals(UserChallengeStateType.STOP)) {
             throw ResponseError.BadRequest.ALREADY_STOPPED_USER_CHALLENGE.getResponseException();
         }
 
@@ -312,7 +308,8 @@ public class UserChallengeService {
             Integer confirmCount,
             Integer points
     ) {
-        UserChallengeRecord userChallengeRecord = userChallengeRecordRepository.findByChallengeAndUser(challenge.getSeq(), user.getSeq())
+
+        UserChallengeRecord userChallengeRecord = userChallengeRecordRepository.findByChallengeAndUser(challenge.getSeq(), user)
                 .orElseGet(() -> UserChallengeRecord.builder()
                         .challenge(challenge)
                         .user(user)
@@ -325,12 +322,11 @@ public class UserChallengeService {
     }
 
     public UserChallengeRecord getUserChallengeRecord(
-            Long userSeq,
+            User user,
             Challenge challenge
     ) {
-        User user = userRepository.getById(userSeq);
 
-        UserChallengeRecord userChallengeRecord = userChallengeRecordRepository.findByChallengeAndUser(challenge.getSeq(), userSeq)
+        UserChallengeRecord userChallengeRecord = userChallengeRecordRepository.findByChallengeAndUser(challenge.getSeq(), user)
                 .orElseGet(() -> UserChallengeRecord.builder()
                         .challenge(challenge)
                         .user(user)
@@ -344,6 +340,6 @@ public class UserChallengeService {
             ReqList reqList
     ) {
 
-        return userChallengeRecordRepository.findByUserAndConfirmCnt(userSeq,reqList.getPrevLastSeq(),reqList.getPageSize());
+        return userChallengeRecordRepository.findByUserAndConfirmCnt(userSeq, reqList.getPrevLastSeq(), reqList.getPageSize());
     }
 }

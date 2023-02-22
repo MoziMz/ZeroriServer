@@ -17,6 +17,10 @@ public class ConfirmReport extends AbstractTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long seq;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "type")
+    private ConfirmReportType confirmReportType;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "confirm_seq")
     private Confirm confirm;
@@ -24,8 +28,4 @@ public class ConfirmReport extends AbstractTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_seq")
     private User user;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "type")
-    private ConfirmReportType confirmReportType;
 }

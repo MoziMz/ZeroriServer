@@ -13,6 +13,7 @@ import javax.persistence.*;
 @DynamicUpdate
 @Entity(name = "challenge_record")
 public class ChallengeRecord extends AbstractTimeEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long seq;

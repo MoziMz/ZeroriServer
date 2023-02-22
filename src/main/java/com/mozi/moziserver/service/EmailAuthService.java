@@ -2,7 +2,6 @@ package com.mozi.moziserver.service;
 
 import com.mozi.moziserver.common.JpaUtil;
 import com.mozi.moziserver.httpException.ResponseError;
-import com.mozi.moziserver.model.entity.Animal;
 import com.mozi.moziserver.model.entity.EmailAuth;
 import com.mozi.moziserver.model.entity.User;
 import com.mozi.moziserver.model.entity.UserAuth;
@@ -88,6 +87,7 @@ public class EmailAuthService {
 
     /**
      * 패스워드 변경 이메일 전송
+     *
      * @param userAuth
      */
     public void sendResetPwEmail(UserAuth userAuth) {
@@ -141,6 +141,7 @@ public class EmailAuthService {
 
     /**
      * 이메일 변경 이메일 전송
+     *
      * @param userAuth
      * @param newEmail
      */
@@ -241,8 +242,9 @@ public class EmailAuthService {
 
     /**
      * 이메일 전송
-     * @param to 받는 이메일
-     * @param title 제목
+     *
+     * @param to      받는 이메일
+     * @param title   제목
      * @param content 내용
      * @return 메일 전송 요청 성공 여부
      */
@@ -289,14 +291,7 @@ public class EmailAuthService {
                 user.setEmail(userAuth.getId());
                 userRepository.save(user);
 
-                // UserIsland 생성
                 islandService.firstCreateUserIsland(user);
-
-                //동물의 편지 생성
-                Animal firstAnimal = animalRepository.findByIslandTypeAndIslandLevel(1, 2);
-                postboxMessageAnimalService.createPostboxMessageAnimal(user, firstAnimal);
-
-                //UserReword 생성
                 userRewardService.firstCreateUserReward(user);
             });
         } catch (DataIntegrityViolationException e) {

@@ -1,7 +1,8 @@
 package com.mozi.moziserver.controller;
 
+import com.mozi.moziserver.model.entity.AnimalItem;
 import com.mozi.moziserver.model.entity.PostboxMessageAnimal;
-import com.mozi.moziserver.model.entity.PreparationItem;
+import com.mozi.moziserver.model.entity.User;
 import com.mozi.moziserver.model.entity.UserNotice;
 import com.mozi.moziserver.model.mappedenum.UserNoticeType;
 import com.mozi.moziserver.model.req.ReqList;
@@ -10,6 +11,7 @@ import com.mozi.moziserver.security.SessionUser;
 import com.mozi.moziserver.service.AnimalService;
 import com.mozi.moziserver.service.PostboxMessageAdminService;
 import com.mozi.moziserver.service.PostboxMessageAnimalService;
+import com.mozi.moziserver.service.UserService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
@@ -31,17 +33,23 @@ public class PostboxMessageController {
     private final PostboxMessageAdminService postboxMessageAdminService;
     private final PostboxMessageAnimalService postboxMessageAnimalService;
     private final AnimalService animalService;
+    private final UserService userService;
 
-    @ApiOperation("관리자의 편지 리스트 조회")
-    @GetMapping("/v1/postbox-message-admins")
-    public List<ResPostboxMessageAdminList> getPostboxMessageAdminList(
+    // -------------------- -------------------- PostboxMessageAnimal -------------------- -------------------- //
+    // TODO ERASE (NOT USED V2)
+    @ApiOperation("동물의 편지 하나 조회")
+    @GetMapping("/v1/postbox-message-animals/{seq}")
+    public ResPostboxMessageAnimal getPostboxMessageAnimalV1(
             @ApiParam(hidden = true) @SessionUser Long userSeq,
-            @Valid ReqList req
+            @PathVariable("seq") Long seq
+
     ) {
-        return postboxMessageAdminService.getPostboxMessageAdminList(userSeq, req)
-                .stream()
-                .map(ResPostboxMessageAdminList::of)
-                .collect(Collectors.toList());
+
+        PostboxMessageAnimal postboxMessageAnimal = postboxMessageAnimalService.getPostboxMessageAnimal(userSeq, seq);
+        List<AnimalItem> preparationItemList = animalService.getAnimalItemList(postboxMessageAnimal.getAnimal());
+        postboxMessageAnimalService.checkMessage(postboxMessageAnimal.getSeq());
+
+        return ResPostboxMessageAnimal.of(postboxMessageAnimal, preparationItemList);
     }
 
     @ApiOperation("동물의 편지 리스트 조회")
@@ -50,25 +58,26 @@ public class PostboxMessageController {
             @ApiParam(hidden = true) @SessionUser Long userSeq,
             @Valid ReqList req
     ) {
+
         return postboxMessageAnimalService.getPostboxMessageAnimalList(userSeq, req)
                 .stream()
                 .map(ResPostboxMessageAnimalList::of)
                 .collect(Collectors.toList());
     }
 
-    @ApiOperation("동물의 편지 하나 조회")
-    @GetMapping("/v1/postbox-message-animals/{seq}")
-    public ResPostboxMessageAnimal getPostboxMessageAnimal(
+    // -------------------- -------------------- PostboxMessageAdmin -------------------- -------------------- //
+    @ApiOperation("관리자의 편지 리스트 조회")
+    @GetMapping("/v1/postbox-message-admins")
+    public List<ResPostboxMessageAdminList> getPostboxMessageAdminList(
             @ApiParam(hidden = true) @SessionUser Long userSeq,
-            @PathVariable("seq") Long seq
-
+            @Valid ReqList req
     ) {
-        PostboxMessageAnimal postboxMessageAnimal = postboxMessageAnimalService.getPostboxMessageAnimal(userSeq, seq);
-        List<PreparationItem> preparationItemList = postboxMessageAnimalService.getItemList(userSeq, postboxMessageAnimal.getAnimal().getSeq());
 
-        postboxMessageAnimalService.checkMessage(userSeq, postboxMessageAnimal.getSeq());
-
-        return ResPostboxMessageAnimal.of(postboxMessageAnimal, preparationItemList);
+        User user = userService.getUserBySeq(userSeq);
+        return postboxMessageAdminService.getPostboxMessageAdminList(user, req)
+                .stream()
+                .map(ResPostboxMessageAdminList::of)
+                .collect(Collectors.toList());
     }
 
     @ApiOperation("관리자 편지 확인 완료")
@@ -77,28 +86,32 @@ public class PostboxMessageController {
             @ApiParam(hidden = true) @SessionUser Long userSeq,
             @PathVariable("seq") Long seq
     ) {
+
         postboxMessageAdminService.checkMessage(userSeq, seq);
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    // -------------------- -------------------- Animal -------------------- -------------------- //
     @ApiOperation("동물 하나 조회")
-    @GetMapping("v1/animals/{seq}")
+    @GetMapping("/v1/animals/{seq}")
     public ResAnimal getAnimal(
             @ApiParam(hidden = true) @SessionUser Long userSeq,
             @PathVariable("seq") Long seq
     ) {
+
         return ResAnimal.of(animalService.getAnimal(seq));
     }
 
+    // -------------------- -------------------- UserNotice -------------------- -------------------- //
     @ApiOperation("유저 알림 조회")
     @GetMapping("/v1/user-notices/{type}")
     public ResUserNotice getUserNotice(
             @ApiParam(hidden = true) @SessionUser Long userSeq,
             @PathVariable UserNoticeType type
     ) {
-        //UserNotice에서 type: PostboxMessageAnimal이고 checked_state: false인 User 조회한다.
-        UserNotice userNotice = postboxMessageAnimalService.getUserNoticeByUserAndType(userSeq,type);
+
+        UserNotice userNotice = postboxMessageAnimalService.getUserNoticeByUserAndType(userSeq, type);
 
         return ResUserNotice.of(userNotice);
     }
@@ -109,9 +122,25 @@ public class PostboxMessageController {
             @ApiParam(hidden = true) @SessionUser Long userSeq,
             @PathVariable UserNoticeType type
     ) {
+
         postboxMessageAnimalService.checkUserNotice(userSeq, type);
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    // -------------------- v2 -------------------- //
+    @ApiOperation("동물의 편지 하나 조회")
+    @GetMapping("/v2/postbox-message-animals/{seq}")
+    public ResPostboxMessageAnimal getPostboxMessageAnimal(
+            @ApiParam(hidden = true) @SessionUser Long userSeq,
+            @PathVariable("seq") Long seq
+
+    ) {
+
+        PostboxMessageAnimal postboxMessageAnimal = postboxMessageAnimalService.getPostboxMessageAnimal(userSeq, seq);
+        postboxMessageAnimalService.checkMessage(postboxMessageAnimal.getSeq());
+        Integer thisWeekUserRewardPoint = 10; // TODO V2 userRewardService에서 유저의 이번주 획득포인트 가져오기 (저번주 9시 오늘 현재까지)
+
+        return ResPostboxMessageAnimal.of(postboxMessageAnimal, thisWeekUserRewardPoint);
+    }
 }
