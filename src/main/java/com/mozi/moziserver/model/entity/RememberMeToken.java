@@ -14,6 +14,7 @@ import java.util.Date;
 @Builder
 @Entity(name = "remember_me_token")
 public class RememberMeToken extends AbstractTimeEntity {
+
     @Id
     private String series;
 

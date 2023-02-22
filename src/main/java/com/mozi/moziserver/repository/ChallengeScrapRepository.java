@@ -1,7 +1,6 @@
 package com.mozi.moziserver.repository;
 
 import com.mozi.moziserver.model.entity.ChallengeScrap;
-import com.mozi.moziserver.model.entity.ChallengeUserSeq;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -14,5 +13,5 @@ public interface ChallengeScrapRepository extends JpaRepository<ChallengeScrap, 
     @Transactional
     @Modifying
     @Query(value = "DELETE FROM challenge_scrap WHERE user_seq = :userSeq AND challenge_seq = :challengeSeq", nativeQuery = true)
-    int deleteChallengeScrapByUserSeqAndChallengeSeq(@Param("userSeq") Long userSeq,@Param("challengeSeq") Long challengeSeq);
+    int deleteChallengeScrapByUserSeqAndChallengeSeq(@Param("userSeq") Long userSeq, @Param("challengeSeq") Long challengeSeq);
 }

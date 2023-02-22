@@ -6,7 +6,12 @@ import com.mozi.moziserver.model.entity.UserIsland;
 import java.util.List;
 
 public interface UserIslandRepositorySupport {
-    List<UserIsland> findAllByUserOrderByType(User user);
+    UserIsland findTopByUser(User user);
+
+    List<UserIsland> findAllByUserOrderByIsland(User user);
+
+    UserIsland findTopByUserOrderByIsland(User user);
+
     // -------------------- -------------------- below admin methods -------------------- -------------------- //
     List<UserIsland> findAllByUserIn(List<User> userList);
 }

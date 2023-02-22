@@ -6,13 +6,10 @@ import com.querydsl.jpa.JPAExpressions;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 public class PostboxMessageAnimalRepositoryImpl extends QuerydslRepositorySupport implements PostboxMessageAnimalRepositorySupport {
     private final QPostboxMessageAnimal qPostboxMessageAnimal = QPostboxMessageAnimal.postboxMessageAnimal;
-    private final QPreparationItem qPreparationItem = QPreparationItem.preparationItem;
     private final QAnimal qAnimal = QAnimal.animal;
     private final QUser qUser = QUser.user;
 
@@ -35,31 +32,19 @@ public class PostboxMessageAnimalRepositoryImpl extends QuerydslRepositorySuppor
     }
 
     @Override
-    public List<PreparationItem> findItemByUser(User user, Long animalSeq) {
-        List<PreparationItem> preparationItemList = from(qPreparationItem)
-                .where(qPreparationItem.animal.seq.eq(animalSeq))
-                .orderBy(qPreparationItem.turn.asc())
-                .fetchAll()
-                .fetch();
-
-        return preparationItemList;
-
-    }
-
-    @Override
     public List<PostboxMessageAnimal> findAllByUser(User user, Integer pageSize, Long prevLastSeq) {
         final Predicate[] predicates = new Predicate[]{
                 predicateOptional(qPostboxMessageAnimal.seq::lt, prevLastSeq),
                 predicateOptional(qPostboxMessageAnimal.user::eq, user)
         };
 
-         return from(qPostboxMessageAnimal)
-                 .innerJoin(qPostboxMessageAnimal.user, qUser).fetchJoin()
-                 .innerJoin(qPostboxMessageAnimal.animal, qAnimal).fetchJoin()
-                 .where(predicates)
-                 .orderBy(qPostboxMessageAnimal.updatedAt.desc())
-                 .limit(pageSize)
-                 .fetch();
+        return from(qPostboxMessageAnimal)
+                .innerJoin(qPostboxMessageAnimal.user, qUser).fetchJoin()
+                .innerJoin(qPostboxMessageAnimal.animal, qAnimal).fetchJoin()
+                .where(predicates)
+                .orderBy(qPostboxMessageAnimal.updatedAt.desc())
+                .limit(pageSize)
+                .fetch();
     }
 
     @Override
@@ -68,7 +53,7 @@ public class PostboxMessageAnimalRepositoryImpl extends QuerydslRepositorySuppor
                 .innerJoin(qPostboxMessageAnimal.user, qUser).fetchJoin()
                 .innerJoin(qPostboxMessageAnimal.animal, qAnimal).fetchJoin()
                 .where(qPostboxMessageAnimal.user.eq(user))
-                .orderBy(qPostboxMessageAnimal.animal.islandType.desc(), qPostboxMessageAnimal.animal.islandLevel.desc())
+                .orderBy(qPostboxMessageAnimal.animal.island.seq.desc(), qPostboxMessageAnimal.animal.turn.desc())
                 .fetchFirst();
     }
 

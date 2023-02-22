@@ -10,18 +10,22 @@ import java.io.Serializable;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity(name = "island_img")
-public class IslandImg extends AbstractTimeEntity implements Serializable {
+@Entity(name = "detail_island")
+public class DetailIsland extends AbstractTimeEntity implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long seq;
 
-    private Integer type;
+    private Integer animalTurn;
 
-    private Integer level;
+    private Integer itemTurn;
 
     private String imgUrl;
 
     private String thumbnailImgUrl;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "island_seq")
+    Island island;
 }

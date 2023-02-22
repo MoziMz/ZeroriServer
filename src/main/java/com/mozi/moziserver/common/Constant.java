@@ -11,7 +11,7 @@ public interface Constant {
 //    String PROFILE_LOCAL = "local";
 
     String MDC_KEY_THREAD_ID = "THREAD_ID";
-    String MDC_KEY_USER_SEQ = "USER_SEQ"; // TODO check user_seq
+    String MDC_KEY_USER_SEQ = "USER_SEQ";
 
     String ROLE_USER = "USER";
     Collection<SimpleGrantedAuthority> USER_AUTHORITIES = Collections.singleton(new SimpleGrantedAuthority("ROLE_" + ROLE_USER));
@@ -73,8 +73,8 @@ public interface Constant {
     String EMAIL_REGEX = "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@"
             + "[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
 
-    String PW_REGEX="^(?=.*[A-Za-z])(?=.*[0-9])(?=.*[!%^&*.])[A-Za-z[0-9]!%^&*.]{8,16}$";
-    String NICKNAME_REGEX="^[ㄱ-ㅎ가-힣A-Za-z0-9!@#$%^&*(),.?\":{}|<>]{1,8}$";
+    String PW_REGEX = "^(?=.*[A-Za-z])(?=.*[0-9])(?=.*[!%^&*.])[A-Za-z[0-9]!%^&*.]{8,16}$";
+    String NICKNAME_REGEX = "^[ㄱ-ㅎ가-힣A-Za-z0-9!@#$%^&*(),.?\":{}|<>]{1,8}$";
 
     List<List<String>> EMAIL_DOMAIN_GROUPS = Arrays.asList(
             Arrays.asList("gmail.com"),
@@ -93,7 +93,5 @@ public interface Constant {
 
     int islandMaxLevel = 6;
 
-    int lastIslandType = 6;
-
-    int postboxAnimalMaxLevel = 3;
+    int lastIslandSeq = 1;
 }

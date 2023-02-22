@@ -2,11 +2,12 @@ package com.mozi.moziserver.service;
 
 import com.mozi.moziserver.common.JpaUtil;
 import com.mozi.moziserver.httpException.ResponseError;
-import com.mozi.moziserver.model.entity.*;
+import com.mozi.moziserver.model.entity.Board;
+import com.mozi.moziserver.model.entity.User;
+import com.mozi.moziserver.model.entity.UserBoardChecked;
 import com.mozi.moziserver.model.req.ReqList;
 import com.mozi.moziserver.repository.BoardRepository;
 import com.mozi.moziserver.repository.UserBoardCheckedRepository;
-import com.mozi.moziserver.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -23,22 +24,19 @@ import java.util.stream.Collectors;
 public class BoardService {
     private final BoardRepository boardRepository;
     private final UserBoardCheckedRepository userBoardCheckedRepository;
-    private final UserRepository userRepository;
 
-    public List<Board> getAllBoardListByCreatedAt(Long userSeq, ReqList req) {
-        List<Board> boardList =  boardRepository.findAllByOrderByCreatedAt(
+    public List<Board> getAllBoardListByCreatedAt(User user, ReqList req) {
+        List<Board> boardList = boardRepository.findAllByOrderByCreatedAt(
                 req.getPageSize(),
                 req.getPrevLastSeq()
         );
 
-        return setBoardChecked(userSeq, boardList);
+        return setBoardChecked(user, boardList);
     }
 
-    private List<Board> setBoardChecked(Long userSeq, List<Board> boardList) {
-        User user = userRepository.findById(userSeq)
-                .orElseThrow(ResponseError.InternalServerError.UNEXPECTED_ERROR::getResponseException);
+    private List<Board> setBoardChecked(User user, List<Board> boardList) {
 
-        List<UserBoardChecked> userBoardCheckedList = userBoardCheckedRepository.findAllByUserSeqAndBoardSeqIn(userSeq, boardList.stream().map(board -> board.getSeq()).collect(Collectors.toList()));
+        List<UserBoardChecked> userBoardCheckedList = userBoardCheckedRepository.findAllByUserSeqAndBoardSeqIn(user.getSeq(), boardList.stream().map(board -> board.getSeq()).collect(Collectors.toList()));
         HashSet<Long> checkedBoardSeqSet = new HashSet<>(userBoardCheckedList.stream().map(userBoardChecked -> userBoardChecked.getBoard().getSeq()).collect(Collectors.toList()));
         for (Board board : boardList) {
             boolean isChecked = checkedBoardSeqSet.contains(board.getSeq());
@@ -47,10 +45,9 @@ public class BoardService {
 
         return boardList;
     }
+
     @Transactional
-    public void checkBoard(Long userSeq, Long seq) {
-        User user = userRepository.findById(userSeq)
-                .orElseThrow(ResponseError.NotFound.USER_NOT_EXISTS::getResponseException);
+    public void checkBoard(User user, Long seq) {
 
         Board board = boardRepository.findById(seq)
                 .orElseThrow(ResponseError.NotFound.BOARD_NOT_EXISTS::getResponseException);
@@ -59,7 +56,6 @@ public class BoardService {
                 .user(user)
                 .board(board)
                 .build();
-
 
         try {
             userBoardCheckedRepository.save(userBoardChecked);

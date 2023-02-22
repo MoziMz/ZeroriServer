@@ -1,7 +1,6 @@
 package com.mozi.moziserver.service;
 
 import com.mozi.moziserver.httpException.ResponseError;
-import com.mozi.moziserver.model.entity.Animal;
 import com.mozi.moziserver.model.entity.Sticker;
 import com.mozi.moziserver.repository.StickerRepository;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class StickerService {
     private final StickerRepository stickerRepository;
     private final S3ImageService s3ImageService;
+
     private Sticker getSticker(Long seq) {
         Sticker sticker = stickerRepository.findById(seq)
                 .orElseThrow(ResponseError.NotFound.STICKER_NOT_EXISTS::getResponseException);

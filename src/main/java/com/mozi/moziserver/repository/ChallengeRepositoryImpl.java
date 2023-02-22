@@ -30,7 +30,6 @@ public class ChallengeRepositoryImpl extends QuerydslRepositorySupport implement
 
     @Override
     public List<Challenge> findAll(
-            Long userSeq,
             List<Long> tagSeqList,
             List<Long> themeSeqList,
             String keyword,
@@ -88,7 +87,7 @@ public class ChallengeRepositoryImpl extends QuerydslRepositorySupport implement
         };
 
         return from(qChallenge)
-                .innerJoin(qChallenge.challengeRecord,qChallengeRecord).fetchJoin()
+                .innerJoin(qChallenge.challengeRecord, qChallengeRecord).fetchJoin()
                 .innerJoin(qChallengeTag).on(qChallenge.seq.eq(qChallengeTag.challenge.seq)).fetchJoin()
                 .where(predicates)
                 .offset(pageNumber * pageSize)

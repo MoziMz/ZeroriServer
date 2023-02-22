@@ -36,6 +36,7 @@ import static org.springframework.security.web.context.HttpSessionSecurityContex
 @RequestMapping("/api")
 @RequiredArgsConstructor
 public class UserController {
+
     private final UserService userService;
     private final RememberMeService rememberMeService;
     private final EmailAuthService emailAuthService;
@@ -46,6 +47,7 @@ public class UserController {
     public ResponseEntity<Object> signUpUser(
             @RequestBody @Valid ReqUserSignUp reqUserSignUp
     ) {
+
         userService.signUp(reqUserSignUp);
 
         return new ResponseEntity<>(HttpStatus.OK);
@@ -59,6 +61,7 @@ public class UserController {
             HttpServletResponse response,
             HttpSession session
     ) {
+
         if (req.getType() == UserAuthType.EMAIL && !StringUtils.hasLength(req.getPw())) {
             throw ResponseError.BadRequest.INVALID_EMAIL_OR_PASSWORD.getResponseException();
         }
@@ -77,6 +80,7 @@ public class UserController {
     @ApiOperation("로그아웃")
     @PostMapping("/v1/users/signout")
     public ResponseEntity<Object> signOut() {
+
         throw new IllegalStateException("This Method not working");
     }
 
@@ -85,6 +89,7 @@ public class UserController {
     public ResponseEntity<Object> checkNickNameDuplicate(
             @PathVariable String nickName
     ) {
+
         return new ResponseEntity<>(
                 userService.checkNickNameDuplicate(nickName) ? HttpStatus.OK : HttpStatus.NOT_FOUND
         );
@@ -95,6 +100,7 @@ public class UserController {
     public ResEmail findUserAuthEmail(
             @Valid ReqUserNickNameAndPw req
     ) {
+
         UserAuth userAuth = userService.findUserAuthByNicknameAndPw(req.getNickName(), req.getPw());
 
         if (userAuth.getType() != UserAuthType.EMAIL) {
@@ -109,6 +115,7 @@ public class UserController {
     public ResponseEntity<Object> checkEmailDuplicate(
             @PathVariable String email
     ) {
+
         return new ResponseEntity<>(
                 userService.checkEmailDuplicate(email) ? HttpStatus.OK : HttpStatus.NOT_FOUND
         );
@@ -119,6 +126,7 @@ public class UserController {
     public ResponseEntity<Object> sendPwEmail(
             @RequestBody @Valid ReqAuthEmail req
     ) {
+
         UserAuth userAuth = userService.findUserAuthByTypeAndId(UserAuthType.EMAIL, req.getEmail())
                 .orElseThrow(ResponseError.NotFound.EMAIL_NOT_EXISTS::getResponseException);
 
@@ -133,8 +141,8 @@ public class UserController {
             @ApiParam(hidden = true) @SessionUser Long userSeq,
             @RequestBody @Valid ReqFcmToken reqFcmToken
     ) {
-        User user = userService.getUserBySeq(userSeq)
-                .orElseThrow(ResponseError.InternalServerError.UNEXPECTED_ERROR::getResponseException);
+
+        User user = userService.getUserBySeq(userSeq);
 
         userService.upsertUserFcm(user, reqFcmToken.getDeviceId(), reqFcmToken.getToken());
 
@@ -146,7 +154,10 @@ public class UserController {
     public ResUserPoint getUserPoint(
             @ApiParam(hidden = true) @SessionUser Long userSeq
     ) {
-        UserReward userReward = userRewardService.getUserReward(userSeq);
+
+        User user = userService.getUserBySeq(userSeq);
+        UserReward userReward = userRewardService.getUserReward(user);
+
         return ResUserPoint.of(userReward);
     }
 }

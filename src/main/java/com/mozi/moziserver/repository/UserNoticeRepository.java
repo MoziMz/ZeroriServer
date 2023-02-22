@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface UserNoticeRepository extends JpaRepository<UserNotice, Long>, UserNoticeRepositorySupport{
+public interface UserNoticeRepository extends JpaRepository<UserNotice, Long>, UserNoticeRepositorySupport {
 
     Optional<UserNotice> findByUserAndType(User user, UserNoticeType type);
 }

@@ -1,11 +1,14 @@
 package com.mozi.moziserver.controller;
 
+import com.mozi.moziserver.model.entity.DetailIsland;
 import com.mozi.moziserver.model.entity.Island;
+import com.mozi.moziserver.model.entity.User;
 import com.mozi.moziserver.model.entity.UserIsland;
 import com.mozi.moziserver.model.res.ResUserIslandList;
 import com.mozi.moziserver.security.SessionUser;
 import com.mozi.moziserver.service.IslandService;
 import com.mozi.moziserver.service.UserRewardService;
+import com.mozi.moziserver.service.UserService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -28,15 +32,19 @@ public class UserIslandController {
 
     private final IslandService islandService;
     private final UserRewardService userRewardService;
+    private final UserService userService;
 
+    // TODO ERASE (NOT USED V2)
     @ApiOperation("섬리스트 조회")
     @GetMapping("/v1/users/me/user-islands")
-    public List<ResUserIslandList> getUserIslandList(
+    public List<ResUserIslandList> getUserIslandListV1(
             @ApiParam(hidden = true) @SessionUser Long userSeq
     ) {
-        List<UserIsland> userIslandList = islandService.getUserIslandList(userSeq);
-        List<Island> islandList = islandService.getIslandList();
-        int currentUserPoint = userRewardService.getUserPoint(userSeq);
+
+        User user = userService.getUserBySeq(userSeq);
+        List<UserIsland> userIslandList = islandService.getUserIslandListOrderByIslandSeq(user);
+        List<Island> islandList = islandService.getIslandListOrderBySeq();
+        int currentUserPoint = userRewardService.getUserPoint(user);
         UserIsland lastUserIsland = userIslandList.get(userIslandList.size() - 1);
 
         List<ResUserIslandList> resUserIslandLists = new LinkedList<ResUserIslandList>();
@@ -51,11 +59,36 @@ public class UserIslandController {
 
     @ApiOperation("섬 오픈하기")
     @PostMapping("/v1/users/me/user-islands/open")
-    public ResponseEntity<Object> openUserIsland(
+    public ResponseEntity<Object> openUserIslandV1(
             @ApiParam(hidden = true) @SessionUser Long userSeq
     ) {
-        islandService.openUserIsland(userSeq);
+
+        User user = userService.getUserBySeq(userSeq);
+        islandService.openUserIsland(user);
 
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    // -------------------- v2 -------------------- //
+    @ApiOperation("섬 리스트 조회")
+    @GetMapping("/v2/users/me/user-islands")
+    public List<ResUserIslandList> getUserIslandList(
+            @ApiParam(hidden = true) @SessionUser Long userSeq
+    ) {
+
+        User user = userService.getUserBySeq(userSeq);
+        List<UserIsland> userIslandList = islandService.getUserIslandListOrderByIslandSeq(user);
+        List<Island> islandList = islandService.getIslandListOrderBySeq();
+        int currentUserPoint = userRewardService.getUserPoint(user);
+        Long lastUserIslandSeq = userIslandList.get(userIslandList.size() - 1).getDetailIsland().getIsland().getSeq();
+
+        List<ResUserIslandList> resUserIslandLists = new LinkedList<ResUserIslandList>();
+        for (int i = 0; i < islandList.size(); i++) {
+            Island island = islandList.get(i);
+            DetailIsland detailIsland = i < userIslandList.size() ? userIslandList.get(i).getDetailIsland() : null;
+            resUserIslandLists.add(ResUserIslandList.of(island, detailIsland, lastUserIslandSeq, currentUserPoint));
+        }
+
+        return resUserIslandLists;
     }
 }

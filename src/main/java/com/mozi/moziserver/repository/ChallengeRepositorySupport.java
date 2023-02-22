@@ -10,7 +10,6 @@ public interface ChallengeRepositorySupport {
     Optional<Challenge> findBySeq(Long seq);
 
     List<Challenge> findAll(
-            Long userSeq,
             List<Long> tagSeqList,
             List<Long> themeSeqList,
             String keyword,

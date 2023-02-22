@@ -1,19 +1,23 @@
 package com.mozi.moziserver.repository;
 
-import com.mozi.moziserver.model.entity.*;
+import com.mozi.moziserver.model.entity.QUser;
+import com.mozi.moziserver.model.entity.QUserNotice;
+import com.mozi.moziserver.model.entity.User;
+import com.mozi.moziserver.model.entity.UserNotice;
 import com.mozi.moziserver.model.mappedenum.UserNoticeType;
 import com.querydsl.core.types.Predicate;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 
-import java.util.List;
 import java.util.Optional;
 
-public class UserNoticeRepositoryImpl extends QuerydslRepositorySupport implements UserNoticeRepositorySupport{
+public class UserNoticeRepositoryImpl extends QuerydslRepositorySupport implements UserNoticeRepositorySupport {
     private final QUserNotice qUserNotice = QUserNotice.userNotice;
 
     private final QUser qUser = QUser.user;
 
-    public UserNoticeRepositoryImpl(){super(UserNotice.class);}
+    public UserNoticeRepositoryImpl() {
+        super(UserNotice.class);
+    }
 
     @Override
     public Optional<UserNotice> findOneByUserAndTypeAndCheckedState(User user, UserNoticeType type) {
@@ -25,7 +29,7 @@ public class UserNoticeRepositoryImpl extends QuerydslRepositorySupport implemen
         };
 
         return Optional.ofNullable(from(qUserNotice)
-                .innerJoin(qUserNotice.user,qUser).fetchJoin()
+                .innerJoin(qUserNotice.user, qUser).fetchJoin()
                 .where(predicates)
                 .fetchFirst());
     }

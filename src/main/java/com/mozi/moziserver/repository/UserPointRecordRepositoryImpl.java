@@ -8,21 +8,22 @@ import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
-public class UserPointRecordRepositoryImpl extends QuerydslRepositorySupport implements UserPointRecordRepositorySupport{
-    private final QUserPointRecord qUserPointRecord=QUserPointRecord.userPointRecord;
+public class UserPointRecordRepositoryImpl extends QuerydslRepositorySupport implements UserPointRecordRepositorySupport {
+    private final QUserPointRecord qUserPointRecord = QUserPointRecord.userPointRecord;
 
-    private final QUser qUser=QUser.user;
+    private final QUser qUser = QUser.user;
 
-    public UserPointRecordRepositoryImpl(){super(UserPointRecord.class);}
+    public UserPointRecordRepositoryImpl() {
+        super(UserPointRecord.class);
+    }
 
     @Override
-    public List<UserPointRecord> findByUserAndPeriod(User user, LocalDateTime startDateTime, LocalDateTime endDateTime){
+    public List<UserPointRecord> findByUserAndPeriod(User user, LocalDateTime startDateTime, LocalDateTime endDateTime) {
 
         return from(qUserPointRecord)
                 .where(qUser.eq(user)
-                        .and(qUserPointRecord.createdAt.between(startDateTime,endDateTime)))
+                        .and(qUserPointRecord.createdAt.between(startDateTime, endDateTime)))
                 .fetch();
     }
 

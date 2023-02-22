@@ -6,5 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface ConfirmStickerRepository  extends JpaRepository<ConfirmSticker, Sticker>, ConfirmStickerRepositorySupport{
+public interface ConfirmStickerRepository extends JpaRepository<ConfirmSticker, Sticker>, ConfirmStickerRepositorySupport {
 }

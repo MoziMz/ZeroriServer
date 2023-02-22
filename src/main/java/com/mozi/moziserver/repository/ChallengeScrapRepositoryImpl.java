@@ -1,27 +1,27 @@
 package com.mozi.moziserver.repository;
 
-import com.mozi.moziserver.model.entity.*;
-import com.mozi.moziserver.model.res.ResChallengeTagList;
+import com.mozi.moziserver.model.entity.Challenge;
+import com.mozi.moziserver.model.entity.ChallengeScrap;
+import com.mozi.moziserver.model.entity.QChallengeScrap;
+import com.mozi.moziserver.model.entity.User;
 import com.querydsl.core.types.Predicate;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
-public class ChallengeScrapRepositoryImpl extends QuerydslRepositorySupport implements ChallengeScrapRepositorySupport{
-    private final QChallengeScrap qChallengeScrap=QChallengeScrap.challengeScrap;
+public class ChallengeScrapRepositoryImpl extends QuerydslRepositorySupport implements ChallengeScrapRepositorySupport {
+    private final QChallengeScrap qChallengeScrap = QChallengeScrap.challengeScrap;
 
     public ChallengeScrapRepositoryImpl() {
         super(ChallengeScrap.class);
     }
 
     @Override
-    public ChallengeScrap findByChallengeAndUser (Challenge challenge,User user ) {
+    public ChallengeScrap findByChallengeAndUser(Challenge challenge, User user) {
         return from(qChallengeScrap)
                 .where(qChallengeScrap.challenge.eq(challenge)
-                .and(qChallengeScrap.user.eq(user)))
+                        .and(qChallengeScrap.user.eq(user)))
                 .fetchOne();
     }
 

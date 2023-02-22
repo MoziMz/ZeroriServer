@@ -1,6 +1,5 @@
 package com.mozi.moziserver.model.entity;
 
-import com.mozi.moziserver.model.mappedenum.AnimalType;
 import lombok.*;
 
 import javax.persistence.*;
@@ -12,9 +11,12 @@ import javax.persistence.*;
 @AllArgsConstructor
 @Entity(name = "animal")
 public class Animal extends AbstractTimeEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long seq;
+
+    private Integer turn;
 
     private String name;
 
@@ -22,9 +24,9 @@ public class Animal extends AbstractTimeEntity {
 
     private String fullBodyImgUrl;
 
-    private Integer islandType;
-
-    private Integer islandLevel;
-
     private String postboxAnimalContent;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "island_seq")
+    Island island;
 }

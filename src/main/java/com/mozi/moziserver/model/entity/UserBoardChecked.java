@@ -11,12 +11,13 @@ import javax.persistence.*;
 @Builder
 @Entity(name = "user_board_checked")
 public class UserBoardChecked extends AbstractTimeEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long seq;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="user_seq")
+    @JoinColumn(name = "user_seq")
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)

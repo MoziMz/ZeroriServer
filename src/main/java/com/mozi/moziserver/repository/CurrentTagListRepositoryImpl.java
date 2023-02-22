@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 public class CurrentTagListRepositoryImpl extends QuerydslRepositorySupport implements CurrentTagListRepositorySupport {
+
     private final QCurrentTagList qCurrentTagList = QCurrentTagList.currentTagList;
 
     private final QTag qTag = QTag.tag;

@@ -6,5 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface UserStickerRepository extends JpaRepository<UserSticker, UserStickerId>, UserStickerRepositorySupport{
+public interface UserStickerRepository extends JpaRepository<UserSticker, UserStickerId>, UserStickerRepositorySupport {
 }

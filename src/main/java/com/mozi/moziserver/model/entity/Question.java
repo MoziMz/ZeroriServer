@@ -14,11 +14,10 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Question extends AbstractTimeEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long seq;
-
-    private QuestionCategoryType category;
 
     private String title;
 
@@ -27,6 +26,8 @@ public class Question extends AbstractTimeEntity {
     private String imgUrl;
 
     private String email;
+
+    private QuestionCategoryType category;
 
     @Builder.Default
     @Enumerated(EnumType.STRING)

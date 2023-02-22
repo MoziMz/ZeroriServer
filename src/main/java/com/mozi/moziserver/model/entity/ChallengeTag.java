@@ -11,6 +11,7 @@ import javax.persistence.*;
 @Builder
 @Entity(name = "challenge_tag")
 public class ChallengeTag extends AbstractTimeEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long seq;

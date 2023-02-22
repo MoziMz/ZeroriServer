@@ -7,7 +7,7 @@ import java.util.List;
 
 public class UserIslandRepositoryImpl extends QuerydslRepositorySupport implements UserIslandRepositorySupport {
     private final QUserIsland qUserIsland = QUserIsland.userIsland;
-    private final QIslandImg qIslandImg = QIslandImg.islandImg;
+    private final QDetailIsland qDetailIsland = QDetailIsland.detailIsland;
     private final QIsland qIsland = QIsland.island;
     private final QUser qUser = QUser.user;
 
@@ -16,14 +16,36 @@ public class UserIslandRepositoryImpl extends QuerydslRepositorySupport implemen
     }
 
     @Override
-    public List<UserIsland> findAllByUserOrderByType(User user) {
+    public UserIsland findTopByUser(User user) {
+
+        return from(qUserIsland)
+                .innerJoin(qUserIsland.detailIsland, qDetailIsland).fetchJoin()
+                .orderBy(qDetailIsland.island.seq.desc())
+                .fetchFirst();
+    }
+
+    @Override
+    public List<UserIsland> findAllByUserOrderByIsland(User user) {
+
         return from(qUserIsland)
                 .innerJoin(qUserIsland.user, qUser).fetchJoin()
-                .innerJoin(qUserIsland.island, qIsland).fetchJoin()
-                .innerJoin(qUserIsland.islandImg, qIslandImg).fetchJoin()
+                .innerJoin(qUserIsland.detailIsland, qDetailIsland).fetchJoin()
+                .innerJoin(qDetailIsland.island, qIsland).fetchJoin()
                 .where(qUserIsland.user.eq(user))
-                .orderBy(qIsland.type.asc())
+                .orderBy(qDetailIsland.island.seq.asc())
                 .fetch();
+    }
+
+    @Override
+    public UserIsland findTopByUserOrderByIsland(User user) {
+
+        return from(qUserIsland)
+                .innerJoin(qUserIsland.user, qUser).fetchJoin()
+                .innerJoin(qUserIsland.detailIsland, qDetailIsland).fetchJoin()
+                .innerJoin(qDetailIsland.island, qIsland).fetchJoin()
+                .where(qUserIsland.user.eq(user))
+                .orderBy(qDetailIsland.island.seq.asc())
+                .fetchOne();
     }
 
     // -------------------- -------------------- below admin methods -------------------- -------------------- //

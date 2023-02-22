@@ -1,9 +1,11 @@
 package com.mozi.moziserver.model.entity;
 
-import com.mozi.moziserver.model.mappedenum.ChallengeTagType;
 import lombok.*;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 
 @Getter
 @Setter
@@ -12,6 +14,7 @@ import javax.persistence.*;
 @Builder
 @Entity(name = "tag")
 public class Tag extends AbstractTimeEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long seq;

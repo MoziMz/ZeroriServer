@@ -11,6 +11,7 @@ import javax.persistence.*;
 @Builder
 @Entity(name = "current_tag_list")
 public class CurrentTagList extends AbstractTimeEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long seq;

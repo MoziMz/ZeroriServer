@@ -11,6 +11,7 @@ import javax.persistence.*;
 @Builder
 @Entity(name = "current_theme_list")
 public class CurrentThemeList extends AbstractTimeEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long seq;

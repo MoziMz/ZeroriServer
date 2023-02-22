@@ -1,6 +1,9 @@
 package com.mozi.moziserver.repository;
 
-import com.mozi.moziserver.model.entity.*;
+import com.mozi.moziserver.model.entity.EmailCheckAuth;
+import com.mozi.moziserver.model.entity.QEmailCheckAuth;
+import com.mozi.moziserver.model.entity.QUser;
+import com.mozi.moziserver.model.entity.User;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 
 public class EmailCheckAuthRepositoryImpl extends QuerydslRepositorySupport implements EmailCheckAuthRepositorySupport {
