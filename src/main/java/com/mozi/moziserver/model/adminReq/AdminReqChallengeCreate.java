@@ -10,7 +10,7 @@ import javax.validation.constraints.NotNull;
 
 @Getter
 @Setter
-public class ReqAdminChallengeCreate {
+public class AdminReqChallengeCreate {
     @NotBlank
     private String name;
     @NotBlank
