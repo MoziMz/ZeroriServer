@@ -3,6 +3,7 @@ package com.mozi.moziserver.service;
 import com.mozi.moziserver.common.Constant;
 import com.mozi.moziserver.model.entity.*;
 import com.mozi.moziserver.model.mappedenum.FcmMessageType;
+import com.mozi.moziserver.model.mappedenum.PointReasonType;
 import com.mozi.moziserver.model.mappedenum.UserChallengeStateType;
 import com.mozi.moziserver.model.mappedenum.UserNoticeType;
 import com.mozi.moziserver.repository.*;
@@ -55,6 +56,7 @@ public class ScheduleService {
             withTransaction(() -> {
                 if (userChallenge.getTotalConfirmCnt() >= userChallenge.getChallenge().getRecommendedCnt()) {
                     userRewardRepository.incrementPoint(userChallenge.getUser().getSeq(), Constant.challengeExtraPoints);
+                    userRewardService.createUserPointRecord(userChallenge.getUser(), PointReasonType.CHALLENGE_EXTRA_POINT, Constant.challengeExtraPoints);
                 }
 
                 userChallengeRepository.updateUserChallengeState(userChallenge.getSeq(), UserChallengeStateType.DOING, UserChallengeStateType.END);
