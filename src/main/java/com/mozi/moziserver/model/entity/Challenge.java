@@ -1,6 +1,7 @@
 package com.mozi.moziserver.model.entity;
 
 import com.mozi.moziserver.model.ChallengeExplanation;
+import com.mozi.moziserver.model.mappedenum.ChallengeStateType;
 import com.mozi.moziserver.model.mappedenum.ChallengeTagType;
 import com.mozi.moziserver.model.mappedenum.ExplanationConverter;
 import lombok.*;
@@ -32,6 +33,9 @@ public class Challenge extends AbstractTimeEntity {
 
     @Enumerated(EnumType.STRING)
     private ChallengeTagType mainTag; // 현재는 챌린지당 하나의 태그만 있다.
+
+    @Enumerated(EnumType.STRING)
+    private ChallengeStateType state;
 
     @Convert(converter = ExplanationConverter.class)
     private ChallengeExplanation explanation;

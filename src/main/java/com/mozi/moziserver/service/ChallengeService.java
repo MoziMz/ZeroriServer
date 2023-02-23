@@ -5,6 +5,7 @@ import com.mozi.moziserver.model.entity.Challenge;
 import com.mozi.moziserver.model.entity.ChallengeScrap;
 import com.mozi.moziserver.model.entity.ChallengeTheme;
 import com.mozi.moziserver.model.entity.User;
+import com.mozi.moziserver.model.mappedenum.ChallengeStateType;
 import com.mozi.moziserver.model.req.ReqChallengeList;
 import com.mozi.moziserver.model.req.ReqList;
 import com.mozi.moziserver.repository.ChallengeRepository;
@@ -29,8 +30,13 @@ public class ChallengeService {
     private final ChallengeThemeRepository challengeThemeRepository;
 
     public Challenge getChallenge(Long seq) {
-        return challengeRepository.findBySeq(seq)
+
+        Challenge challenge = challengeRepository.findBySeq(seq)
                 .orElseThrow(ResponseError.NotFound.CHALLENGE_NOT_EXISTS::getResponseException);
+
+        checkChallengeState(challenge);
+
+        return challenge;
     }
 
     public List<Challenge> getChallengeList(ReqChallengeList req) {
@@ -81,6 +87,8 @@ public class ChallengeService {
         Challenge challenge = challengeRepository.findById(seq)
                 .orElseThrow(ResponseError.BadRequest.INVALID_SEQ::getResponseException);
 
+        checkChallengeState(challenge);
+
         ChallengeScrap challengeScrap = ChallengeScrap.builder()
                 .challenge(challenge)
                 .user(user)
@@ -98,6 +106,9 @@ public class ChallengeService {
 
         Challenge challenge = challengeRepository.findById(seq)
                 .orElseThrow(ResponseError.BadRequest.INVALID_SEQ::getResponseException);
+
+        checkChallengeState(challenge);
+
         try {
             int deleteCount = challengeScrapRepository.deleteChallengeScrapByUserSeqAndChallengeSeq(user.getSeq(), challenge.getSeq());
             if (deleteCount == 0) {
@@ -112,5 +123,12 @@ public class ChallengeService {
     public List<ChallengeTheme> getChallengeThemeList() {
 
         return challengeThemeRepository.findAll();
+    }
+
+    public void checkChallengeState(Challenge challenge){
+
+        if(challenge.getState() == ChallengeStateType.DELETED){
+            throw ResponseError.BadRequest.CHALLENGE_STATE_TYPE_IS_DELETED.getResponseException();
+        }
     }
 }
