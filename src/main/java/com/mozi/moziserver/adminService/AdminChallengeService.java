@@ -8,6 +8,7 @@ import com.mozi.moziserver.model.adminReq.AdminReqChallengeUpdate;
 import com.mozi.moziserver.model.adminReq.AdminReqCurrentTagList;
 import com.mozi.moziserver.model.adminReq.AdminReqCurrentThemeList;
 import com.mozi.moziserver.model.entity.*;
+import com.mozi.moziserver.model.mappedenum.ChallengeStateType;
 import com.mozi.moziserver.model.mappedenum.ChallengeTagType;
 import com.mozi.moziserver.repository.*;
 import lombok.RequiredArgsConstructor;
@@ -36,8 +37,33 @@ public class AdminChallengeService {
     private final CurrentThemeListRepository currentThemeListRepository;
     private final PlatformTransactionManager transactionManager;
 
+    // -------------------- -------------------- Challenge -------------------- -------------------- //
+    public Challenge getChallenge(Long seq) {
+
+        Challenge challenge = challengeRepository.findById(seq)
+                .orElseThrow(ResponseError.NotFound.CHALLENGE_NOT_EXISTS::getResponseException);
+
+        return challenge;
+    }
+
+    public List<Challenge> getChallengeListByThemeAndTagAndName(Long themeSeq, ChallengeTagType challengeTagType, String keyword, Integer pageNumber, Integer pageSize) {
+
+        if (themeSeq != null) {
+            getChallengeTheme(themeSeq.intValue());
+        }
+
+        Long tagSeq = null;
+        if (challengeTagType != null) {
+            tagSeq = getTagByName(challengeTagType.getName()).getSeq();
+        }
+
+
+        return challengeRepository.findAllByThemeAndTagAndName(themeSeq, tagSeq, keyword, pageNumber, pageSize);
+    }
+
     @Transactional
     public void createChallenge(AdminReqChallengeCreate req) {
+
         final Challenge challenge = Challenge.builder()
                 .name(req.getName())
                 .description(req.getDescription())
@@ -45,6 +71,7 @@ public class AdminChallengeService {
                 .mainTag(req.getMainTag())
                 .themeSeq(req.getThemeSeq())
                 .point(req.getPoint())
+                .state(ChallengeStateType.ACTIVE)
                 .build();
 
         try {
@@ -62,6 +89,7 @@ public class AdminChallengeService {
     }
 
     public void createChallengeExplanation(Long challengeSeq, String title, List<String> contentList) {
+
         Challenge challenge = challengeRepository.getById(challengeSeq);
 
         createChallengeTag(challenge);
@@ -85,128 +113,9 @@ public class AdminChallengeService {
         challengeRepository.save(challenge);
     }
 
-    public Challenge getChallenge(Long seq) {
-        Challenge challenge = challengeRepository.findById(seq)
-                .orElseThrow(ResponseError.NotFound.CHALLENGE_NOT_EXISTS::getResponseException);
-
-        return challenge;
-    }
-
-    public ChallengeTheme getChallengeTheme(Integer seq) {
-        ChallengeTheme challengeTheme = challengeThemeRepository.findById(seq)
-                .orElseThrow(ResponseError.NotFound.CHALLENGE_THEME_NOT_EXISTS::getResponseException);
-
-        return challengeTheme;
-    }
-
-    public Tag getTagByName(String name) {
-        Tag tag = tagRepository.findByName(name)
-                .orElseThrow(ResponseError.NotFound.TAG_NOT_EXISTS::getResponseException);
-
-        return tag;
-    }
-
-    public Tag getTagBySeq(Long seq) {
-        Tag tag = tagRepository.findById(seq).
-                orElseThrow(ResponseError.NotFound.TAG_NOT_EXISTS::getResponseException);
-
-        return tag;
-    }
-
-    public List<ChallengeStatistics> getChallengeStatisticsListByPeriod(
-            Challenge challenge,
-            Integer startYear,
-            Integer startMonth
-    ) {
-
-        LocalDate today = LocalDate.now();
-
-        List<ChallengeStatistics> curChallengeStatisticsList = challengeStatisticsRepository.findAllByPeriod(
-                challenge.getSeq(),
-                startYear,
-                startMonth,
-                today.getYear(),
-                today.getMonthValue()
-        );
-
-        if (curChallengeStatisticsList == null) {
-            curChallengeStatisticsList = new ArrayList<>();
-        }
-
-        int size = curChallengeStatisticsList.size();
-        //월이 없는 달은 통계를 0으로 채운다
-        for (int i = 1; i <= today.getMonthValue(); i++) {
-            boolean exists = false;
-            for (int j = 0; j < size; j++) {
-                if (curChallengeStatisticsList.get(j).getMonth() == i) {
-                    exists = true;
-                    break;
-                }
-            }
-            if (!exists) {
-                curChallengeStatisticsList.add(ChallengeStatistics.builder()
-                        .challenge(challenge)
-                        .year(startYear)
-                        .month(i)
-                        .playerFirstTryingCnt(0)
-                        .playerConfirmCnt(0)
-                        .build());
-            }
-        }
-        curChallengeStatisticsList = curChallengeStatisticsList.stream()
-                .sorted(Comparator.comparing(ChallengeStatistics::getYear)
-                        .thenComparing(ChallengeStatistics::getMonth))
-                .collect(Collectors.toList());
-
-        return curChallengeStatisticsList;
-    }
-
-
-    public List<Challenge> getChallengeListByThemeAndTagAndName(Long themeSeq, ChallengeTagType challengeTagType, String keyword, Integer pageNumber, Integer pageSize) {
-
-        if (themeSeq != null) {
-            getChallengeTheme(themeSeq.intValue());
-        }
-
-        Long tagSeq = null;
-        if (challengeTagType != null) {
-            tagSeq = getTagByName(challengeTagType.getName()).getSeq();
-        }
-
-
-        return challengeRepository.findAllByThemeAndTagAndName(themeSeq, tagSeq, keyword, pageNumber, pageSize);
-    }
-
-    public void createChallengeTag(Challenge challenge) {
-
-        Tag tag = getTagByName(challenge.getMainTag().getName());
-
-        ChallengeTag challengeTag = ChallengeTag.builder()
-                .tag(tag)
-                .challenge(challenge)
-                .turn(1)
-                .build();
-
-        challengeTagRepository.save(challengeTag);
-    }
-
-    public void updateChallengeTag(Challenge challenge, ChallengeTagType challengeTagType) {
-
-
-        Tag beforeTag = getTagByName(challenge.getMainTag().getName());
-
-        Tag newTag = getTagByName(challengeTagType.getName());
-
-        ChallengeTag challengeTag = challengeTagRepository.findByChallengeAndTag(challenge, beforeTag)
-                .orElseThrow(ResponseError.NotFound.CHALLENGE_TAG_NOT_EXISTS::getResponseException);
-
-        challengeTag.setTag(newTag);
-
-        challengeTagRepository.save(challengeTag);
-    }
-
     @Transactional
     public void updateChallenge(Long seq, AdminReqChallengeUpdate req, String title, List<String> contentList) {
+
         final Challenge challenge = getChallenge(seq);
 
         if (req.getName() != null) {
@@ -278,7 +187,34 @@ public class AdminChallengeService {
         return challengeExplanation;
     }
 
+    public void deleteChallenge(Long seq){
+
+        Challenge challenge=getChallenge(seq);
+
+        challenge.setState(ChallengeStateType.DELETED);
+
+        challengeRepository.save(challenge);
+    }
+
+    // -------------------- -------------------- Tag -------------------- -------------------- //
+    public Tag getTagBySeq(Long seq) {
+
+        Tag tag = tagRepository.findById(seq).
+                orElseThrow(ResponseError.NotFound.TAG_NOT_EXISTS::getResponseException);
+
+        return tag;
+    }
+
+    public Tag getTagByName(String name) {
+
+        Tag tag = tagRepository.findByName(name)
+                .orElseThrow(ResponseError.NotFound.TAG_NOT_EXISTS::getResponseException);
+
+        return tag;
+    }
+
     public List<Tag> getTagList(String name) {
+
         if (name == null) {
             return tagRepository.findAll();
         }
@@ -304,6 +240,7 @@ public class AdminChallengeService {
     }
 
     public void updateTag(Long seq, String name) {
+
         final Tag tag = getTagBySeq(seq);
 
         tag.setName(name);
@@ -312,6 +249,7 @@ public class AdminChallengeService {
     }
 
     public void deleteTag(Long seq) {
+
         Tag tag = getTagBySeq(seq);
 
         Optional<CurrentTagList> currentTagList = currentTagListRepository.findByTag(tag);
@@ -333,7 +271,17 @@ public class AdminChallengeService {
 
     }
 
+    // -------------------- -------------------- ChallengeTheme -------------------- -------------------- //
+    public List<ChallengeTheme> getChallengeThemeList(String name) {
+
+        if (name == null) {
+            return challengeThemeRepository.findAll();
+        }
+        return challengeThemeRepository.findAllByNameContaining(name);
+    }
+
     public void createChallengeTheme(String name, String color, String inactiveColor) {
+
         Optional<ChallengeTheme> optionalChallengeTheme = challengeThemeRepository.findByName(name);
 
         if (optionalChallengeTheme.isPresent()) {
@@ -353,13 +301,6 @@ public class AdminChallengeService {
                 throw ResponseError.BadRequest.ALREADY_CREATED.getResponseException(); // for duplicate exception
             }
         });
-    }
-
-    public List<ChallengeTheme> getChallengeThemeList(String name) {
-        if (name == null) {
-            return challengeThemeRepository.findAll();
-        }
-        return challengeThemeRepository.findAllByNameContaining(name);
     }
 
     public void updateChallengeTheme(Integer seq, String name, String color, String inactiveColor) {
@@ -392,6 +333,7 @@ public class AdminChallengeService {
     }
 
     public void deleteChallengeTheme(Integer seq) {
+
         ChallengeTheme challengeTheme = getChallengeTheme(seq);
 
         Optional<CurrentThemeList> currentThemeList = currentThemeListRepository.findByChallengeTheme(challengeTheme);
@@ -414,7 +356,14 @@ public class AdminChallengeService {
         challengeThemeRepository.delete(challengeTheme);
     }
 
+    // -------------------- -------------------- CurrentTagList -------------------- -------------------- //
+    public List<CurrentTagList> getAllCurrentTagList() {
+
+        return currentTagListRepository.findAll();
+    }
+
     public void createCurrentTagList(Integer turn, Long tagSeq) {
+
         final Tag tag = tagRepository.findById(tagSeq).
                 orElseThrow(ResponseError.NotFound.TAG_NOT_EXISTS::getResponseException);
 
@@ -442,36 +391,8 @@ public class AdminChallengeService {
         });
     }
 
-    public List<CurrentTagList> getAllCurrentTagList() {
-        return currentTagListRepository.findAll();
-    }
-
-    public void deleteCurrentTagList(Long seq) {
-        final CurrentTagList currentTagList = currentTagListRepository.findById(seq)
-                .orElseThrow(ResponseError.NotFound.NOT_EXISTS::getResponseException);
-
-        List<CurrentTagList> currentTagLists = getAllCurrentTagList();
-
-        withTransaction(() -> {
-            try {
-                currentTagLists.removeIf(c -> c.equals(currentTagList));
-
-                currentTagListRepository.delete(currentTagList);
-
-                currentTagLists.forEach(c -> {
-                    if (c.getTurn() > currentTagList.getTurn()) {
-                        c.setTurn(c.getTurn() - 1);
-                    }
-                });
-
-                currentTagListRepository.saveAll(currentTagLists);
-            } catch (Exception e) {
-                throw ResponseError.BadRequest.ALREADY_DELETED.getResponseException(); // for duplicate exception
-            }
-        });
-    }
-
     public void updateAllCurrentTagList(List<AdminReqCurrentTagList> reqList) {
+
         List<CurrentTagList> currentTagLists = new ArrayList<>();
 
         for (AdminReqCurrentTagList req : reqList) {
@@ -521,7 +442,40 @@ public class AdminChallengeService {
         });
     }
 
+    public void deleteCurrentTagList(Long seq) {
+
+        final CurrentTagList currentTagList = currentTagListRepository.findById(seq)
+                .orElseThrow(ResponseError.NotFound.NOT_EXISTS::getResponseException);
+
+        List<CurrentTagList> currentTagLists = getAllCurrentTagList();
+
+        withTransaction(() -> {
+            try {
+                currentTagLists.removeIf(c -> c.equals(currentTagList));
+
+                currentTagListRepository.delete(currentTagList);
+
+                currentTagLists.forEach(c -> {
+                    if (c.getTurn() > currentTagList.getTurn()) {
+                        c.setTurn(c.getTurn() - 1);
+                    }
+                });
+
+                currentTagListRepository.saveAll(currentTagLists);
+            } catch (Exception e) {
+                throw ResponseError.BadRequest.ALREADY_DELETED.getResponseException(); // for duplicate exception
+            }
+        });
+    }
+
+    // -------------------- -------------------- CurrentThemeList -------------------- -------------------- //
+    public List<CurrentThemeList> getAllCurrentThemeList() {
+
+        return currentThemeListRepository.findAll();
+    }
+
     public void createCurrentThemeList(Integer turn, Integer challengeThemeSeq) {
+
         final ChallengeTheme challengeTheme = challengeThemeRepository.findById(challengeThemeSeq).
                 orElseThrow(ResponseError.NotFound.CHALLENGE_THEME_NOT_EXISTS::getResponseException);
 
@@ -547,37 +501,6 @@ public class AdminChallengeService {
                 throw ResponseError.BadRequest.ALREADY_CREATED.getResponseException(); // for duplicate exception
             }
         });
-    }
-
-    public List<CurrentThemeList> getAllCurrentThemeList() {
-        return currentThemeListRepository.findAll();
-    }
-
-    public void deleteCurrentThemeList(Long seq) {
-        final CurrentThemeList currentThemeList = currentThemeListRepository.findById(seq)
-                .orElseThrow(ResponseError.NotFound.NOT_EXISTS::getResponseException);
-
-        List<CurrentThemeList> currentThemeLists = getAllCurrentThemeList();
-
-        withTransaction(() -> {
-            try {
-                currentThemeLists.removeIf(c -> c.equals(currentThemeList));
-
-                currentThemeListRepository.delete(currentThemeList);
-
-                currentThemeLists.forEach(c -> {
-                    if (c.getTurn() > currentThemeList.getTurn()) {
-                        c.setTurn(c.getTurn() - 1);
-                    }
-                });
-
-                currentThemeListRepository.saveAll(currentThemeLists);
-
-            } catch (Exception e) {
-                throw ResponseError.BadRequest.ALREADY_DELETED.getResponseException(); // for duplicate exception
-            }
-        });
-
     }
 
     public void updateAllCurrentThemeList(List<AdminReqCurrentThemeList> reqList) {
@@ -630,7 +553,122 @@ public class AdminChallengeService {
         });
     }
 
+    public void deleteCurrentThemeList(Long seq) {
+
+        final CurrentThemeList currentThemeList = currentThemeListRepository.findById(seq)
+                .orElseThrow(ResponseError.NotFound.NOT_EXISTS::getResponseException);
+
+        List<CurrentThemeList> currentThemeLists = getAllCurrentThemeList();
+
+        withTransaction(() -> {
+            try {
+                currentThemeLists.removeIf(c -> c.equals(currentThemeList));
+
+                currentThemeListRepository.delete(currentThemeList);
+
+                currentThemeLists.forEach(c -> {
+                    if (c.getTurn() > currentThemeList.getTurn()) {
+                        c.setTurn(c.getTurn() - 1);
+                    }
+                });
+
+                currentThemeListRepository.saveAll(currentThemeLists);
+
+            } catch (Exception e) {
+                throw ResponseError.BadRequest.ALREADY_DELETED.getResponseException(); // for duplicate exception
+            }
+        });
+
+    }
+
+    // -------------------- -------------------- ChallengeTag -------------------- -------------------- //
+    public void createChallengeTag(Challenge challenge) {
+
+        Tag tag = getTagByName(challenge.getMainTag().getName());
+
+        ChallengeTag challengeTag = ChallengeTag.builder()
+                .tag(tag)
+                .challenge(challenge)
+                .turn(1)
+                .build();
+
+        challengeTagRepository.save(challengeTag);
+    }
+
+    public void updateChallengeTag(Challenge challenge, ChallengeTagType challengeTagType) {
+
+        Tag beforeTag = getTagByName(challenge.getMainTag().getName());
+
+        Tag newTag = getTagByName(challengeTagType.getName());
+
+        ChallengeTag challengeTag = challengeTagRepository.findByChallengeAndTag(challenge, beforeTag)
+                .orElseThrow(ResponseError.NotFound.CHALLENGE_TAG_NOT_EXISTS::getResponseException);
+
+        challengeTag.setTag(newTag);
+
+        challengeTagRepository.save(challengeTag);
+    }
+
+    // -------------------- -------------------- ChallengeTheme -------------------- -------------------- //
+    public ChallengeTheme getChallengeTheme(Integer seq) {
+
+        ChallengeTheme challengeTheme = challengeThemeRepository.findById(seq)
+                .orElseThrow(ResponseError.NotFound.CHALLENGE_THEME_NOT_EXISTS::getResponseException);
+
+        return challengeTheme;
+    }
+
+    // -------------------- -------------------- ChallengeStatistics -------------------- -------------------- //
+    public List<ChallengeStatistics> getChallengeStatisticsListByPeriod(
+            Challenge challenge,
+            Integer startYear,
+            Integer startMonth
+    ) {
+
+        LocalDate today = LocalDate.now();
+
+        List<ChallengeStatistics> curChallengeStatisticsList = challengeStatisticsRepository.findAllByPeriod(
+                challenge.getSeq(),
+                startYear,
+                startMonth,
+                today.getYear(),
+                today.getMonthValue()
+        );
+
+        if (curChallengeStatisticsList == null) {
+            curChallengeStatisticsList = new ArrayList<>();
+        }
+
+        int size = curChallengeStatisticsList.size();
+        //월이 없는 달은 통계를 0으로 채운다
+        for (int i = 1; i <= today.getMonthValue(); i++) {
+            boolean exists = false;
+            for (int j = 0; j < size; j++) {
+                if (curChallengeStatisticsList.get(j).getMonth() == i) {
+                    exists = true;
+                    break;
+                }
+            }
+            if (!exists) {
+                curChallengeStatisticsList.add(ChallengeStatistics.builder()
+                        .challenge(challenge)
+                        .year(startYear)
+                        .month(i)
+                        .playerFirstTryingCnt(0)
+                        .playerConfirmCnt(0)
+                        .build());
+            }
+        }
+        curChallengeStatisticsList = curChallengeStatisticsList.stream()
+                .sorted(Comparator.comparing(ChallengeStatistics::getYear)
+                        .thenComparing(ChallengeStatistics::getMonth))
+                .collect(Collectors.toList());
+
+        return curChallengeStatisticsList;
+    }
+
     private void withTransaction(Runnable runnable) {
+
         DefaultTransactionDefinition definition = new DefaultTransactionDefinition();
 
         TransactionStatus status = transactionManager.getTransaction(definition);
