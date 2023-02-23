@@ -52,7 +52,8 @@ public interface ResponseError {
         EXPIRED_EMAIL_AUTH("expired email authentication"),
         INVALID_CONFIRM_STATE_TYPE("invalid confirm update sate type"),
         INVALID_CURRENT_TAG_LIST("invalid current tag list"),
-        INVALID_CURRENT_THEME_LIST("invalid current theme list");
+        INVALID_CURRENT_THEME_LIST("invalid current theme list"),
+        CHALLENGE_STATE_TYPE_IS_DELETED("challenge state type is deleted");
 
         private final String message;
 
