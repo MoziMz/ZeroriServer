@@ -2,8 +2,8 @@ package com.mozi.moziserver.model.entity;
 
 import lombok.*;
 
-import javax.persistence.*;
-import java.util.*;
+import javax.persistence.Entity;
+import javax.persistence.Id;
 
 @Getter
 @Setter
@@ -12,14 +12,13 @@ import java.util.*;
 @AllArgsConstructor
 @Entity(name = "island")
 public class Island extends AbstractTimeEntity {
+
     @Id
-    private Integer type;
+    private Long seq;
 
     private String name;
 
-    private Integer maxPoint;
-
-    private Integer maxRewardLevel;
-
     private String description;
+
+    private Integer openRequiredPoint;
 }

@@ -35,16 +35,15 @@ public class ConfirmRepositoryImpl extends QuerydslRepositorySupport implements 
                 qConfirm.state.notIn(ConfirmStateType.DELETED, ConfirmStateType.BLOCKED)
         };
 
-        List<Confirm> confirmList = from(qConfirm)
-                .innerJoin(qConfirm.challenge, qChallenge).fetchJoin()
-                .innerJoin(qConfirm.user, qUser).fetchJoin()
-                .leftJoin(qConfirm.confirmStickerList, qConfirmSticker).fetchJoin()
-                .orderBy(qConfirm.seq.desc())
-                .where(predicates)
-                .limit(pageSize)
-                .fetch();
-
-        return confirmList;
+        return
+                from(qConfirm)
+                        .innerJoin(qConfirm.challenge, qChallenge).fetchJoin()
+                        .innerJoin(qConfirm.user, qUser).fetchJoin()
+                        .leftJoin(qConfirm.confirmStickerList, qConfirmSticker).fetchJoin()
+                        .orderBy(qConfirm.seq.desc())
+                        .where(predicates)
+                        .limit(pageSize)
+                        .fetch();
     }
 
     @Override
@@ -55,7 +54,7 @@ public class ConfirmRepositoryImpl extends QuerydslRepositorySupport implements 
                 qConfirm.state.notIn(ConfirmStateType.DELETED, ConfirmStateType.BLOCKED)
         };
 
-        List<Confirm> confirmList = from(qConfirm)
+        return from(qConfirm)
                 .innerJoin(qConfirm.challenge, qChallenge).fetchJoin()
                 .innerJoin(qConfirm.user, qUser).fetchJoin()
                 .leftJoin(qConfirm.confirmStickerList, qConfirmSticker).fetchJoin()
@@ -63,61 +62,47 @@ public class ConfirmRepositoryImpl extends QuerydslRepositorySupport implements 
                 .where(predicates)
                 .limit(pageSize)
                 .fetch();
-
-        return confirmList;
     }
 
     @Override
-    public List<Confirm> findByUserByOrderDesc(Long userSeq, Long prevLastConfirmSeq, Integer pageSize) {
-        List<User> user = from(qUser)
-                .where(qUser.seq.eq(userSeq))
-                .fetch();
-
-        List<Challenge> challengeList = from(qChallenge)
-                .fetch();
-
+    public List<Confirm> findByUserByOrderDesc(User user, Long prevLastConfirmSeq, Integer pageSize) {
         Predicate[] predicates = new Predicate[]{
                 predicateOptional(qConfirm.seq::lt, prevLastConfirmSeq),
+                qUser.eq(user),
                 qConfirm.state.notIn(ConfirmStateType.DELETED, ConfirmStateType.BLOCKED)
         };
 
-        List<Confirm> confirmList = from(qConfirm)
-                .innerJoin(qConfirm.challenge, qChallenge)
-                .innerJoin(qConfirm.user, qUser)
-                .where(qConfirm.user.in(user), qConfirm.challenge.in(challengeList))
+        return from(qConfirm)
+                .innerJoin(qConfirm.challenge, qChallenge).fetchJoin()
+                .innerJoin(qConfirm.user, qUser).fetchJoin()
                 .where(predicates)
                 .orderBy(qConfirm.createdAt.desc())
                 .limit(pageSize)
                 .fetch();
-
-        return confirmList;
-
     }
 
     @Override
     public Confirm findBySeq(Long seq) {
 
-        Confirm confirm = from(qConfirm)
+        return from(qConfirm)
                 .where(qConfirm.seq.in(seq))
                 .fetchOne();
-
-        return confirm;
     }
 
     @Transactional
     @Override
     public void updateStateSupportedCnt(Confirm confirm, ConfirmStateType state, Integer cnt) {
+
         update(qConfirm)
                 .set(qConfirm.state, state)
                 .set(qConfirm.reportedCnt, cnt)
                 .where(qConfirm.eq(confirm))
                 .execute();
-
-        return;
     }
 
     @Override
     public Optional<Confirm> findByChallenge(Challenge challenge) {
+
         return from(qConfirm)
                 .select(qConfirm)
                 .where(qConfirm.challenge.eq(challenge))

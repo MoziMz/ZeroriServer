@@ -6,7 +6,6 @@ import com.querydsl.core.BooleanBuilder;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class StickerRepositoryImpl extends QuerydslRepositorySupport implements StickerRepositorySupport {
     private final QSticker qSticker = QSticker.sticker;
@@ -16,15 +15,14 @@ public class StickerRepositoryImpl extends QuerydslRepositorySupport implements 
     }
 
     @Override
-    public List<Sticker> findAllBySeq(List<Long> stickerSeqList){
+    public List<Sticker> findAllBySeq(List<Long> stickerSeqList) {
         BooleanBuilder builder = new BooleanBuilder();
-        for(Long seq:stickerSeqList){
+        for (Long seq : stickerSeqList) {
             builder.or(qSticker.seq.eq(seq));
         }
 
 
-
-        List<Sticker> stickerList=from(qSticker)
+        List<Sticker> stickerList = from(qSticker)
                 .where(builder)
                 .fetch();
 

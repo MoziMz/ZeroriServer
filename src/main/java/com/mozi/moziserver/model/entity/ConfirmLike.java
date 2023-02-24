@@ -11,15 +11,16 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Entity(name = "confirm_like")
 public class ConfirmLike extends AbstractTimeEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long seq;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="confirm_seq")
+    @JoinColumn(name = "confirm_seq")
     private Confirm confirm;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="user_seq")
+    @JoinColumn(name = "user_seq")
     User user;
 }

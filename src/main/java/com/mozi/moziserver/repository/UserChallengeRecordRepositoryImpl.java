@@ -3,29 +3,29 @@ package com.mozi.moziserver.repository;
 import com.mozi.moziserver.model.entity.*;
 import com.querydsl.core.types.Predicate;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
-
 import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 public class UserChallengeRecordRepositoryImpl extends QuerydslRepositorySupport implements UserChallengeRecordRepositorySupport {
     private final QUserChallengeRecord qUserChallengeRecord = QUserChallengeRecord.userChallengeRecord;
     private final QChallenge qChallenge = QChallenge.challenge;
     private final QUser qUser = QUser.user;
 
-    public UserChallengeRecordRepositoryImpl() { super(UserChallengeRecord.class); }
+    public UserChallengeRecordRepositoryImpl() {
+        super(UserChallengeRecord.class);
+    }
 
-    public Optional<UserChallengeRecord> findByChallengeAndUser(Long challengeSeq, Long userSeq) {
+    public Optional<UserChallengeRecord> findByChallengeAndUser(Long challengeSeq, User user) {
         final Predicate[] predicates = new Predicate[]{
-                predicateOptional(qUserChallengeRecord.challenge.seq::eq, challengeSeq),
-                predicateOptional(qUserChallengeRecord.user.seq::eq, userSeq)
+                qUserChallengeRecord.challenge.seq.eq(challengeSeq),
+                qUserChallengeRecord.user.eq(user)
         };
 
         return from(qUserChallengeRecord)
-                .innerJoin(qChallenge)
-                .on(qUserChallengeRecord.challenge.seq.eq(qChallenge.seq))
+                .innerJoin(qUserChallengeRecord.challenge, qChallenge).fetchJoin()
                 .where(predicates)
                 .fetch()
                 .stream()
@@ -54,12 +54,12 @@ public class UserChallengeRecordRepositoryImpl extends QuerydslRepositorySupport
     }
 
     @Override
-    public List<UserChallengeRecord> findByUserAndConfirmCnt(Long userSeq,Long prevLastChallengeSeq, Integer pageSize){
+    public List<UserChallengeRecord> findByUserAndConfirmCnt(Long userSeq, Long prevLastChallengeSeq, Integer pageSize) {
         final Predicate[] predicates = new Predicate[]{
-                predicateOptional(qUserChallengeRecord.challenge.seq::lt,prevLastChallengeSeq),
+                predicateOptional(qUserChallengeRecord.challenge.seq::lt, prevLastChallengeSeq),
         };
 
-        Integer zeroConfirmCnt=0;
+        Integer zeroConfirmCnt = 0;
 
         return from(qUserChallengeRecord)
                 .where(qUser.seq.eq(userSeq)

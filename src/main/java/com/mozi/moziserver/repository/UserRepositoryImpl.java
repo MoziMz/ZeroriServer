@@ -3,6 +3,7 @@ package com.mozi.moziserver.repository;
 import com.mozi.moziserver.model.entity.QUser;
 import com.mozi.moziserver.model.entity.QUserReward;
 import com.mozi.moziserver.model.entity.User;
+import com.mozi.moziserver.model.entity.UserReward;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 
 import java.time.LocalDateTime;
@@ -12,7 +13,9 @@ public class UserRepositoryImpl extends QuerydslRepositorySupport implements Use
     private final QUser qUser = QUser.user;
     private final QUserReward qUserReward = QUserReward.userReward;
 
-    public UserRepositoryImpl() { super(User.class); }
+    public UserRepositoryImpl() {
+        super(User.class);
+    }
 
     @Override
     public List<User> findAllActiveUserByUserReward(
@@ -20,7 +23,7 @@ public class UserRepositoryImpl extends QuerydslRepositorySupport implements Use
             LocalDateTime endDateTime
     ) {
         return from(qUser)
-                .innerJoin(qUser.userReward, qUserReward).fetchJoin()
+                .innerJoin(qUserReward).on(qUserReward.user.seq.eq(qUser.seq))
                 .where(qUserReward.updatedAt.goe(startDateTime).and(qUserReward.updatedAt.lt(endDateTime)))
                 .fetch();
     }

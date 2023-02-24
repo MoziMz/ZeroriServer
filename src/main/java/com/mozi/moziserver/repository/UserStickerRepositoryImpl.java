@@ -1,13 +1,15 @@
 package com.mozi.moziserver.repository;
 
-import com.mozi.moziserver.model.entity.*;
+import com.mozi.moziserver.model.entity.QUser;
+import com.mozi.moziserver.model.entity.QUserSticker;
+import com.mozi.moziserver.model.entity.User;
+import com.mozi.moziserver.model.entity.UserSticker;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
-public class UserStickerRepositoryImpl extends QuerydslRepositorySupport implements UserStickerRepositorySupport{
-    private final QUser qUser= QUser.user;
+public class UserStickerRepositoryImpl extends QuerydslRepositorySupport implements UserStickerRepositorySupport {
+    private final QUser qUser = QUser.user;
     private final QUserSticker qUserSticker = QUserSticker.userSticker;
 
     public UserStickerRepositoryImpl() {
@@ -15,8 +17,8 @@ public class UserStickerRepositoryImpl extends QuerydslRepositorySupport impleme
     }
 
     @Override
-    public List<UserSticker> findByUserSeq(Long userSeq){
-        User user=from(qUser)
+    public List<UserSticker> findByUserSeq(Long userSeq) {
+        User user = from(qUser)
                 .where(qUser.seq.eq(userSeq))
                 .fetchOne();
 
@@ -28,8 +30,8 @@ public class UserStickerRepositoryImpl extends QuerydslRepositorySupport impleme
     }
 
     @Override
-    public List<Long> stickerSeqfindByUserSeq(Long userSeq){
-        User user=from(qUser)
+    public List<Long> stickerSeqfindByUserSeq(Long userSeq) {
+        User user = from(qUser)
                 .where(qUser.seq.eq(userSeq))
                 .fetchOne();
 

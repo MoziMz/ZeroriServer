@@ -16,9 +16,9 @@ public interface UserChallengeRepositorySupport {
     Optional<UserChallenge> findUserChallengeByUserSeqAndChallengeAndStates(Long userSeq, Challenge challenge, Collection<UserChallengeStateType> states);
 
     List<UserChallenge> findAllByUserSeq(
-        Long userSeq,
-        Integer pageSize,
-        Long prevLastUserChallengeSeq
+            Long userSeq,
+            Integer pageSize,
+            Long prevLastUserChallengeSeq
     );
 
     List<UserChallenge> findAllByPeriod(

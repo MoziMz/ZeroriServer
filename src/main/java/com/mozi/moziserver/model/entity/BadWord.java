@@ -14,10 +14,10 @@ import javax.persistence.Id;
 @AllArgsConstructor
 @Entity(name = "bad_word")
 public class BadWord extends AbstractTimeEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long seq;
 
     private String content;
-
 }

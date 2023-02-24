@@ -16,12 +16,12 @@ public class UserNotice {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long seq;
 
-    @Enumerated(EnumType.STRING)
-    private UserNoticeType type;
-
     private Long relatedSeq; // 관련 컨텐츠의 seq
 
     private boolean checkedState;
+
+    @Enumerated(EnumType.STRING)
+    private UserNoticeType type;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_seq")

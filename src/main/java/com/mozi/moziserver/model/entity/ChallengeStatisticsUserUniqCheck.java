@@ -10,7 +10,8 @@ import javax.persistence.*;
 @AllArgsConstructor
 @Builder
 @Entity(name = "challenge_statistics_user_uniq_check")
-public class ChallengeStatisticsUserUniqCheck extends AbstractDateTimeEntity{
+public class ChallengeStatisticsUserUniqCheck extends AbstractDateTimeEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long seq;

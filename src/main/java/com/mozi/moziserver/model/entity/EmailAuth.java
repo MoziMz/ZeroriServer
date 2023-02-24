@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 @Setter
 @Entity(name = "email_auth")
 public class EmailAuth extends AbstractTimeEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long seq;

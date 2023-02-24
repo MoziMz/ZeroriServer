@@ -5,6 +5,7 @@ import lombok.Getter;
 
 @Getter
 public class ResAnimal {
+
     private final Long seq;
     private final String name;
     private final String fullBodyImgUrl;

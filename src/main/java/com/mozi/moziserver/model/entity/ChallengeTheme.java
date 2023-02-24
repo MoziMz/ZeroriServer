@@ -13,7 +13,7 @@ import javax.persistence.Id;
 @AllArgsConstructor
 @Builder
 @Entity(name = "challenge_theme")
-public class ChallengeTheme{
+public class ChallengeTheme {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

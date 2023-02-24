@@ -1,34 +1,43 @@
 package com.mozi.moziserver.repository;
 
 import com.mozi.moziserver.model.entity.*;
-import com.mozi.moziserver.model.res.ResChallengeTagList;
+import com.mozi.moziserver.model.mappedenum.ChallengeStateType;
 import com.querydsl.core.types.Predicate;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
-public class ChallengeScrapRepositoryImpl extends QuerydslRepositorySupport implements ChallengeScrapRepositorySupport{
-    private final QChallengeScrap qChallengeScrap=QChallengeScrap.challengeScrap;
+public class ChallengeScrapRepositoryImpl extends QuerydslRepositorySupport implements ChallengeScrapRepositorySupport {
+    private final QChallengeScrap qChallengeScrap = QChallengeScrap.challengeScrap;
+    private final QChallenge qChallenge= QChallenge.challenge;
 
     public ChallengeScrapRepositoryImpl() {
         super(ChallengeScrap.class);
     }
 
     @Override
-    public ChallengeScrap findByChallengeAndUser (Challenge challenge,User user ) {
+    public ChallengeScrap findByChallengeAndUser(Challenge challenge, User user) {
+        final Predicate[] predicates = new Predicate[]{
+                qChallengeScrap.challenge.eq(challenge),
+                qChallengeScrap.user.eq(user),
+                qChallenge.state.ne(ChallengeStateType.DELETED)
+        };
+
         return from(qChallengeScrap)
-                .where(qChallengeScrap.challenge.eq(challenge)
-                .and(qChallengeScrap.user.eq(user)))
+                .where(predicates)
                 .fetchOne();
     }
 
     @Override
     public List<ChallengeScrap> findByUser(User user) {
+        final Predicate[] predicates = new Predicate[]{
+                qChallengeScrap.user.eq(user),
+                qChallenge.state.ne(ChallengeStateType.DELETED)
+        };
+
         return from(qChallengeScrap)
-                .where(qChallengeScrap.user.eq(user))
+                .where(predicates)
                 .orderBy(qChallengeScrap.createdAt.desc())
                 .fetch();
     }
@@ -37,7 +46,8 @@ public class ChallengeScrapRepositoryImpl extends QuerydslRepositorySupport impl
     public List<ChallengeScrap> findByUser(User user, Long prevChallengeScrapSeq, int pageSize) {
         final Predicate[] predicates = new Predicate[]{
                 predicateOptional(qChallengeScrap.seq::lt, prevChallengeScrapSeq),
-                qChallengeScrap.user.eq(user)
+                qChallengeScrap.user.eq(user),
+                qChallenge.state.ne(ChallengeStateType.DELETED)
         };
 
         return from(qChallengeScrap)

@@ -11,23 +11,11 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity(name = "confirm_sticker")
-public class ConfirmSticker extends AbstractTimeEntity{
+public class ConfirmSticker extends AbstractTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long seq;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="confirm_seq")
-    private Confirm confirm;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="user_seq")
-    User user;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "sticker_seq")
-    Sticker sticker;
 
     @Column(name = "location_x")
     private BigDecimal locationX;
@@ -40,4 +28,16 @@ public class ConfirmSticker extends AbstractTimeEntity{
 
     @Column(name = "inch")
     private BigDecimal inch;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="confirm_seq")
+    private Confirm confirm;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="user_seq")
+    User user;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "sticker_seq")
+    Sticker sticker;
 }

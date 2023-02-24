@@ -1,18 +1,21 @@
 package com.mozi.moziserver.service;
 
 import com.mozi.moziserver.httpException.ResponseError;
-import com.mozi.moziserver.model.ChallengeExplanation;
-import com.mozi.moziserver.model.ChallengeExplanationContent;
-import com.mozi.moziserver.model.entity.*;
+import com.mozi.moziserver.model.entity.Challenge;
+import com.mozi.moziserver.model.entity.ChallengeScrap;
+import com.mozi.moziserver.model.entity.ChallengeTheme;
+import com.mozi.moziserver.model.entity.User;
+import com.mozi.moziserver.model.mappedenum.ChallengeStateType;
 import com.mozi.moziserver.model.req.ReqChallengeList;
 import com.mozi.moziserver.model.req.ReqList;
-import com.mozi.moziserver.repository.*;
+import com.mozi.moziserver.repository.ChallengeRepository;
+import com.mozi.moziserver.repository.ChallengeScrapRepository;
+import com.mozi.moziserver.repository.ChallengeThemeRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,22 +26,22 @@ import java.util.stream.Collectors;
 public class ChallengeService {
 
     private final ChallengeRepository challengeRepository;
-    private final UserRepository userRepository;
     private final ChallengeScrapRepository challengeScrapRepository;
     private final ChallengeThemeRepository challengeThemeRepository;
-    private final UserService userService;
 
-    // 챌린지 하나 조회
     public Challenge getChallenge(Long seq) {
-        return challengeRepository.findBySeq(seq)
+
+        Challenge challenge = challengeRepository.findBySeq(seq)
                 .orElseThrow(ResponseError.NotFound.CHALLENGE_NOT_EXISTS::getResponseException);
+
+        checkChallengeState(challenge);
+
+        return challenge;
     }
 
-    // 챌린지 모두 조회
-    public List<Challenge> getChallengeList(Long userSeq, ReqChallengeList req) {
+    public List<Challenge> getChallengeList(ReqChallengeList req) {
 
         return challengeRepository.findAll(
-                userSeq,
                 req.getTagSeqList(),
                 req.getThemeSeqList(),
                 req.getKeyword(),
@@ -47,8 +50,8 @@ public class ChallengeService {
         );
     }
 
-    public long getChallengeCnt(ReqChallengeList req)
-    {
+    public long getChallengeCnt(ReqChallengeList req) {
+
         return challengeRepository.countChallengeList(
                 req.getTagSeqList(),
                 req.getThemeSeqList(),
@@ -56,12 +59,10 @@ public class ChallengeService {
         );
     }
 
-    public List<Challenge> getScrappedChallengeList(Long userSeq, ReqList req) {
-        User user = userService.getUserBySeq(userSeq)
-                .orElseThrow(ResponseError.InternalServerError.UNEXPECTED_ERROR::getResponseException);
+    public List<Challenge> getScrappedChallengeList(User user, ReqList req) {
 
         ChallengeScrap prevChallengeScrap = null;
-        if ( req.getPrevLastSeq() != null ) {
+        if (req.getPrevLastSeq() != null) {
             Challenge prevChallenge = challengeRepository.findBySeq(req.getPrevLastSeq())
                     .orElseThrow(ResponseError.BadRequest.INVALID_SEQ::getResponseException);
 
@@ -69,25 +70,24 @@ public class ChallengeService {
         }
         Long prevChallengeScrapSeq = prevChallengeScrap != null ? prevChallengeScrap.getSeq() : null;
 
-        return challengeScrapRepository.findByUser(user, prevChallengeScrapSeq,req.getPageSize()).stream()
+        return challengeScrapRepository.findByUser(user, prevChallengeScrapSeq, req.getPageSize()).stream()
                 .map(ChallengeScrap::getChallenge)
                 .collect(Collectors.toList());
     }
 
     public ChallengeScrap getChallengeScrap(Challenge challenge, User user) {
-        return challengeScrapRepository.findByChallengeAndUser(challenge, user);
 
+        return challengeScrapRepository.findByChallengeAndUser(challenge, user);
     }
 
     //챌린지 스크랩 생성
     @Transactional
-    public void createChallengeScrap(Long userSeq, Long seq) {
-
-        User user = userRepository.findById(userSeq)
-                .orElseThrow(ResponseError.NotFound.USER_NOT_EXISTS::getResponseException);
+    public void createChallengeScrap(User user, Long seq) {
 
         Challenge challenge = challengeRepository.findById(seq)
                 .orElseThrow(ResponseError.BadRequest.INVALID_SEQ::getResponseException);
+
+        checkChallengeState(challenge);
 
         ChallengeScrap challengeScrap = ChallengeScrap.builder()
                 .challenge(challenge)
@@ -97,18 +97,18 @@ public class ChallengeService {
         try {
             challengeScrapRepository.save(challengeScrap);
         } catch (Exception e) {
-            throw ResponseError.BadRequest.ALREADY_CREATED.getResponseException(); // for duplicate exception
+            throw ResponseError.BadRequest.ALREADY_CREATED.getResponseException();
         } // FIXME DuplicateKeyException
-
     }
 
     @Transactional
-    public void deleteChallengeScrap(Long userSeq, Long seq) {
-        User user = userRepository.findById(userSeq)
-                .orElseThrow(ResponseError.NotFound.USER_NOT_EXISTS::getResponseException);
+    public void deleteChallengeScrap(User user, Long seq) {
 
         Challenge challenge = challengeRepository.findById(seq)
                 .orElseThrow(ResponseError.BadRequest.INVALID_SEQ::getResponseException);
+
+        checkChallengeState(challenge);
+
         try {
             int deleteCount = challengeScrapRepository.deleteChallengeScrapByUserSeqAndChallengeSeq(user.getSeq(), challenge.getSeq());
             if (deleteCount == 0) {
@@ -118,33 +118,17 @@ public class ChallengeService {
         } catch (Exception e) {
             throw ResponseError.BadRequest.ALREADY_DELETED.getResponseException(); // for duplicate exception
         } // FIXME DuplicateKeyException
-
-
-    }
-
-    public void createChallengeExplanation(Long challengeSeq, String title, List<String> contentList) {
-        Challenge challenge = challengeRepository.getById(challengeSeq);
-
-        List<ChallengeExplanationContent> challengeExplanationContentList = new ArrayList<>();
-        for (int i = 0; i < contentList.size(); i++) {
-            challengeExplanationContentList.add(
-                    ChallengeExplanationContent.builder()
-                            .turn(i + 1)
-                            .content(contentList.get(i))
-                            .build()
-            );
-        }
-
-        ChallengeExplanation challengeExplanation = ChallengeExplanation.builder()
-                .title(title)
-                .contents(challengeExplanationContentList)
-                .build();
-
-        challenge.setExplanation(challengeExplanation);
-        challengeRepository.save(challenge);
     }
 
     public List<ChallengeTheme> getChallengeThemeList() {
+
         return challengeThemeRepository.findAll();
+    }
+
+    public void checkChallengeState(Challenge challenge){
+
+        if(challenge.getState() == ChallengeStateType.DELETED){
+            throw ResponseError.BadRequest.CHALLENGE_STATE_TYPE_IS_DELETED.getResponseException();
+        }
     }
 }

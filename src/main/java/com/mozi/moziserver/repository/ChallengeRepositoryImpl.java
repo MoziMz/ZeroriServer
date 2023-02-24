@@ -1,6 +1,7 @@
 package com.mozi.moziserver.repository;
 
 import com.mozi.moziserver.model.entity.*;
+import com.mozi.moziserver.model.mappedenum.ChallengeStateType;
 import com.querydsl.core.types.Predicate;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 
@@ -11,7 +12,6 @@ import java.util.function.Function;
 public class ChallengeRepositoryImpl extends QuerydslRepositorySupport implements ChallengeRepositorySupport {
     private final QChallenge qChallenge = QChallenge.challenge;
     private final QChallengeTag qChallengeTag = QChallengeTag.challengeTag;
-    private final QChallengeTheme qChallengeTheme = QChallengeTheme.challengeTheme;
     private final QChallengeRecord qChallengeRecord = QChallengeRecord.challengeRecord;
 
     public ChallengeRepositoryImpl() {
@@ -30,7 +30,6 @@ public class ChallengeRepositoryImpl extends QuerydslRepositorySupport implement
 
     @Override
     public List<Challenge> findAll(
-            Long userSeq,
             List<Long> tagSeqList,
             List<Long> themeSeqList,
             String keyword,
@@ -41,7 +40,8 @@ public class ChallengeRepositoryImpl extends QuerydslRepositorySupport implement
                 predicateOptional(qChallenge.seq::lt, prevLastPostSeq),
                 predicateOptional(qChallenge.themeSeq::in, themeSeqList),
                 predicateOptional(qChallengeTag.tag.seq::in, tagSeqList),
-                keyword != null ? predicateOptional(qChallenge.name::like, '%' + keyword + '%') : null
+                keyword != null ? predicateOptional(qChallenge.name::like, '%' + keyword + '%') : null,
+                qChallenge.state.ne(ChallengeStateType.DELETED)
         };
 
         return from(qChallenge)
@@ -61,7 +61,8 @@ public class ChallengeRepositoryImpl extends QuerydslRepositorySupport implement
         final Predicate[] predicates = new Predicate[]{
                 predicateOptional(qChallenge.themeSeq::in, themeSeqList),
                 predicateOptional(qChallengeTag.tag.seq::in, tagSeqList),
-                keyword != null ? predicateOptional(qChallenge.name::like, '%' + keyword + '%') : null
+                keyword != null ? predicateOptional(qChallenge.name::like, '%' + keyword + '%') : null,
+                qChallenge.state.ne(ChallengeStateType.DELETED)
         };
 
         return from(qChallenge)
@@ -88,15 +89,13 @@ public class ChallengeRepositoryImpl extends QuerydslRepositorySupport implement
         };
 
         return from(qChallenge)
-                .innerJoin(qChallenge.challengeRecord,qChallengeRecord).fetchJoin()
+                .innerJoin(qChallenge.challengeRecord, qChallengeRecord).fetchJoin()
                 .innerJoin(qChallengeTag).on(qChallenge.seq.eq(qChallengeTag.challenge.seq)).fetchJoin()
                 .where(predicates)
                 .offset(pageNumber * pageSize)
                 .limit(pageSize)
                 .orderBy(qChallenge.seq.asc())
                 .fetch();
-
-
     }
 
     private <T> Predicate predicateOptional(final Function<T, Predicate> whereFunc, final T value) {

@@ -8,6 +8,7 @@ import com.mozi.moziserver.model.res.ResChallenge;
 import com.mozi.moziserver.model.res.ResChallengeList;
 import com.mozi.moziserver.model.res.ResChallengeTagList;
 import com.mozi.moziserver.model.res.ResSearchOfChallengeList;
+import com.mozi.moziserver.repository.UserRepository;
 import com.mozi.moziserver.security.SessionUser;
 import com.mozi.moziserver.service.*;
 import io.swagger.annotations.ApiOperation;
@@ -35,7 +36,6 @@ public class ChallengeController {
     private final ChallengeStatisticsService challengeStatisticsService;
     private final ChallengeTagService challengeTagService;
     private final ChallengeScrapService challengeScrapService;
-
     private final ConfirmService confirmService;
     private final UserService userService;
 
@@ -45,15 +45,15 @@ public class ChallengeController {
             @ApiParam(hidden = true) @SessionUser Long userSeq,
             @PathVariable Long seq
     ) {
+
         Challenge challenge = challengeService.getChallenge(seq);
 
-        User user = userService.getUserBySeq(userSeq)
-                .orElseThrow(ResponseError.InternalServerError.UNEXPECTED_ERROR::getResponseException);
+        User user = userService.getUserBySeq(userSeq);
 
         Optional<UserChallenge> optionalUserChallenge = userChallengeService.getActiveUserChallenge(userSeq, challenge);
 
         Optional<UserChallengeRecord> optionalUserChallengeRecord = optionalUserChallenge.isPresent() ?
-                Optional.of(userChallengeService.getUserChallengeRecord(userSeq, challenge)) :
+                Optional.of(userChallengeService.getUserChallengeRecord(user, challenge)) :
                 Optional.empty();
 
         List<ChallengeStatistics> challengeStatisticsList = challengeStatisticsService.getChallengeStatisticsList(challenge);
@@ -73,30 +73,34 @@ public class ChallengeController {
             @ApiParam(hidden = true) @SessionUser Long userSeq,
             @Valid ReqChallengeList req
     ) {
-        List<ChallengeScrap> challengeScrapList=challengeScrapService.getChallengeScrapList(userSeq);
+
+        User user = userService.getUserBySeq(userSeq);
+
+        List<ChallengeScrap> challengeScrapList = challengeScrapService.getChallengeScrapList(user);
 
         long challengeCnt=challengeService.getChallengeCnt(req);
 
-        List<Challenge> challengeListPaging=challengeService.getChallengeList(userSeq, req);
+        List<Challenge> challengeListPaging = challengeService.getChallengeList(req);
 
-        List<ResChallengeList> challengeLists=new ArrayList<ResChallengeList>();
+        List<ResChallengeList> challengeLists = new ArrayList<ResChallengeList>();
 
-        for(Challenge challenge: challengeListPaging){
-            Boolean flag=false;
-            for(ChallengeScrap cs: challengeScrapList){
-                if(cs.getChallenge().equals(challenge)){
-                    challengeLists.add(ResChallengeList.of(challenge,true));
-                    flag=true;
+        for (Challenge challenge: challengeListPaging) {
+            Boolean flag = false;
+            for (ChallengeScrap cs : challengeScrapList) {
+                if (cs.getChallenge().equals(challenge)) {
+                    challengeLists.add(ResChallengeList.of(challenge, true));
+                    flag = true;
                 }
             }
-            if(!flag) challengeLists.add(ResChallengeList.of(challenge,false));
+            if (!flag) {
+                challengeLists.add(ResChallengeList.of(challenge,false));
+            }
         }
 
-        if ( req.getIsRandom() )
-        {
-            ResChallengeList lastResChallenge = challengeLists.get(challengeLists.size()-1);
+        if (req.getIsRandom()) {
+            ResChallengeList lastResChallenge = challengeLists.get(challengeLists.size() - 1);
 
-            challengeLists.remove(challengeLists.size()-1);
+            challengeLists.remove(challengeLists.size() - 1);
 
             Collections.shuffle(challengeLists);
 
@@ -112,7 +116,9 @@ public class ChallengeController {
             @ApiParam(hidden = true) @SessionUser Long userSeq,
             @Valid ReqList req
     ) {
-        List<Challenge> challengeList = challengeService.getScrappedChallengeList(userSeq, req);
+
+        User user = userService.getUserBySeq(userSeq);
+        List<Challenge> challengeList = challengeService.getScrappedChallengeList(user, req);
 
         boolean isScrapped = true;
         return challengeList.stream()
@@ -120,24 +126,28 @@ public class ChallengeController {
                 .collect(Collectors.toList());
     }
 
-    @ApiOperation("챌린지 스크랩")
+    @ApiOperation("챌린지 스크랩 생성")
     @PostMapping("/v1/challenges/{seq}/scraps")
     public ResponseEntity<Object> createChallengeScrap(
             @ApiParam(hidden = true) @SessionUser Long userSeq,
             @PathVariable Long seq
     ) {
-        challengeService.createChallengeScrap(userSeq, seq);
+
+        User user = userService.getUserBySeq(userSeq);
+        challengeService.createChallengeScrap(user, seq);
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @ApiOperation("챌린지 스크랩")
+    @ApiOperation("챌린지 스크랩 취소")
     @DeleteMapping("/v1/challenges/{seq}/scraps")
     public ResponseEntity<Object> deleteChallengeScrap(
             @ApiParam(hidden = true) @SessionUser Long userSeq,
             @PathVariable Long seq
     ) {
-        challengeService.deleteChallengeScrap(userSeq, seq);
+
+        User user = userService.getUserBySeq(userSeq);
+        challengeService.deleteChallengeScrap(user, seq);
 
         return new ResponseEntity<>(HttpStatus.OK);
     }

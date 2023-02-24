@@ -11,16 +11,16 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity(name = "sticker")
-public class Sticker extends AbstractTimeEntity{
+public class Sticker extends AbstractTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long seq;
 
-    @Column(name="img_url")
+    @Column(name = "img_url")
     private String imgUrl;
 
     @OneToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name="seq")
+    @JoinColumn(name = "seq")
     private List<ConfirmSticker> confirmStickerList;
 }

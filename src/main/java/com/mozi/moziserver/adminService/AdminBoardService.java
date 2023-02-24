@@ -81,8 +81,7 @@ public class AdminBoardService {
     }
 
     public void createPostboxMessageAdmin(Long userSeq, String content, String sender) {
-        User user = userService.getUserBySeq(userSeq)
-                .orElseThrow(ResponseError.NotFound.USER_NOT_EXISTS::getResponseException);
+        User user = userService.getUserBySeq(userSeq);
 
         PostboxMessageAdmin postboxMessageAdmin = PostboxMessageAdmin.builder()
                 .user(user)

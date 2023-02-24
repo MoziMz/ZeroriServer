@@ -35,6 +35,7 @@ public class ConfigurationController {
     private final SuggestionService suggestionService;
     private final UserService userService;
 
+    // -------------------- -------------------- Question -------------------- -------------------- //
     @ApiOperation("문의 등록")
     @PostMapping("/v1/questions")
     public ResponseEntity<Object> createQuestion(
@@ -45,26 +46,31 @@ public class ConfigurationController {
             @RequestParam(name = "questionCategory", required = true) QuestionCategoryType category,
             @RequestPart(name = "image", required = false) MultipartFile image
     ) {
-        // TODO @RequestPart 사용 request 객체로 받는 방향으로 전환?
+
+        User user = userService.getUserBySeq(userSeq);
+
+        // TODO FIX ME
         ReqQuestionCreate reqQuestionCreate = new ReqQuestionCreate();
         reqQuestionCreate.setEmail(email);
         reqQuestionCreate.setTitle(title);
         reqQuestionCreate.setContent(content);
         reqQuestionCreate.setQuestionCategory(category);
         reqQuestionCreate.setImage(image);
-
-        questionService.createQuestion(userSeq, reqQuestionCreate);
+        questionService.createQuestion(user, reqQuestionCreate);
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    // -------------------- -------------------- Board -------------------- -------------------- //
     @ApiOperation("공지사항 보기")
     @GetMapping("/v1/boards")
     public List<Board> getBoardListByCreatedAt(
             @ApiParam(hidden = true) @SessionUser Long userSeq,
             @Valid ReqList req
     ) {
-        return boardService.getAllBoardListByCreatedAt(userSeq, req);
+
+        User user = userService.getUserBySeq(userSeq);
+        return boardService.getAllBoardListByCreatedAt(user, req);
     }
 
     @ApiOperation("공지사항 확인 완료")
@@ -73,8 +79,49 @@ public class ConfigurationController {
             @ApiParam(hidden = true) @SessionUser Long userSeq,
             @PathVariable("seq") Long seq
     ) {
-        boardService.checkBoard(userSeq, seq);
 
+        User user = userService.getUserBySeq(userSeq);
+        boardService.checkBoard(user, seq);
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    // -------------------- -------------------- Suggestion -------------------- -------------------- //
+    @ApiOperation("챌린지 제안하기")
+    @PostMapping("/v1/suggestions")
+    public ResponseEntity<Object> createSuggestion(
+            @ApiParam(hidden = true) @SessionUser Long userSeq,
+            @RequestBody @Valid ReqSuggestionCreate req
+    ) {
+
+        User user = userService.getUserBySeq(userSeq);
+        suggestionService.createSuggestion(user, req);
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    // -------------------- -------------------- User -------------------- -------------------- //
+    @ApiOperation("내 정보 조회")
+    @GetMapping("/v1/users/me")
+    public ResUserInfo getUserInfo(
+            @ApiParam(hidden = true) @SessionUser Long userSeq
+    ) {
+
+        User user = userService.getUserBySeq(userSeq);
+
+        return ResUserInfo.of(user);
+    }
+
+    @ApiOperation("닉네임 등록 및 수정")
+    @PostMapping("/v1/users/me/nickname/{nickName}")
+    public ResponseEntity<Object> updateUserNickName(
+            @ApiParam(hidden = true) @SessionUser Long userSeq,
+            @PathVariable String nickName
+    ) {
+
+        User user = userService.getUserBySeq(userSeq);
+
+        userService.updateNickname(user, nickName);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
@@ -88,49 +135,16 @@ public class ConfigurationController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @ApiOperation("챌린지 제안하기")
-    @PostMapping("/v1/suggestions")
-    public ResponseEntity<Object> createSuggestion(
-            @ApiParam(hidden = true) @SessionUser Long userSeq,
-            @RequestBody @Valid ReqSuggestionCreate req
-    ) {
-        suggestionService.createSuggestion(userSeq, req);
-        return new ResponseEntity<>(HttpStatus.OK);
-    }
-
-    @ApiOperation("내 정보 조회")
-    @GetMapping("/v1/users/me")
-    public ResUserInfo getUserInfo(
-            @ApiParam(hidden = true) @SessionUser Long userSeq
-    ) {
-        User user = userService.getUserBySeq(userSeq)
-                .orElseThrow(ResponseError.InternalServerError.UNEXPECTED_ERROR::getResponseException);
-
-        return ResUserInfo.of(user);
-    }
-
-    @ApiOperation("닉네임 등록 및 수정")
-    @PostMapping("/v1/users/me/nickname/{nickName}")
-    public ResponseEntity<Object> updateUserNickName(
-            @ApiParam(hidden = true) @SessionUser Long userSeq,
-            @PathVariable String nickName
-    ) {
-        User user = userService.getUserBySeq(userSeq)
-                .orElseThrow(ResponseError.InternalServerError.UNEXPECTED_ERROR::getResponseException);
-
-        userService.updateNickname(user, nickName);
-        return new ResponseEntity<>(HttpStatus.OK);
-    }
-
     @ApiOperation("비밀번호 확인")
     @PostMapping("/v1/users/me/password/check")
     public ResponseEntity<Object> checkPassword(
             @ApiParam(hidden = true) @SessionUser Long userSeq,
             @RequestBody @Valid ReqUserPw req
     ) {
-        Optional<User> user=userService.getUserBySeq(userSeq);
 
-        if(!userService.checkPassword(user.get(),req.getCurrentPw())){
+        User user = userService.getUserBySeq(userSeq);
+
+        if (!userService.checkPassword(user, req.getCurrentPw())) {
             throw ResponseError.BadRequest.NOT_MATCH_AN_EXISTING_PASSWORD.getResponseException();
         }
 
@@ -143,8 +157,7 @@ public class ConfigurationController {
             @ApiParam(hidden = true) @SessionUser Long userSeq,
             @RequestBody @Valid ReqUserPw req
             ) {
-        User user = userService.getUserBySeq(userSeq)
-                .orElseThrow(ResponseError.InternalServerError.UNEXPECTED_ERROR::getResponseException);
+        User user = userService.getUserBySeq(userSeq);
 
         userService.updatePw(user, req.getNewPw(), req.getCurrentPw());
         return new ResponseEntity<>(HttpStatus.OK);
@@ -156,8 +169,7 @@ public class ConfigurationController {
             @ApiParam(hidden = true) @SessionUser Long userSeq,
             @PathVariable @Valid String email
     ) {
-        User user = userService.getUserBySeq(userSeq)
-                .orElseThrow(ResponseError.InternalServerError.UNEXPECTED_ERROR::getResponseException);
+        User user = userService.getUserBySeq(userSeq);
 
         userService.updateEmail(user, email);
 
@@ -171,14 +183,11 @@ public class ConfigurationController {
             @RequestBody @Valid ReqResign reqResign,
             HttpSession session
     ) {
-        User user = userService.getUserBySeq(userSeq)
-                .orElseThrow(ResponseError.InternalServerError.UNEXPECTED_ERROR::getResponseException);
-
+        User user = userService.getUserBySeq(userSeq);
         // 세션에서 정보 지우기 -> 로그아웃 참고
         userService.resignUser(user, reqResign);
         session.invalidate();
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
-
 }

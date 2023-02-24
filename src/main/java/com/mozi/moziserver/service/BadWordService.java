@@ -18,31 +18,30 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class BadWordService {
-    private static LinkedHashSet<String> badwords = new LinkedHashSet<>();
-    private static Trie badwordsTrie;
+
     private final BadWordRepository badWordRepository;
 
-    @PostConstruct
-    public void addBadWord(){
-        List<BadWord> badWordList=badWordRepository.findAll();
+    private static final LinkedHashSet<String> badwords = new LinkedHashSet<>();
+    private static Trie badwordsTrie;
 
-        for (BadWord badword: badWordList){
+    @PostConstruct
+    public void addBadWord() {
+        List<BadWord> badWordList = badWordRepository.findAll();
+
+        for (BadWord badword : badWordList) {
             badwords.add(badword.getContent());
         }
 
-        badwordsTrie=Trie.builder().ignoreCase().addKeywords(badwords).build();
+        badwordsTrie = Trie.builder().ignoreCase().addKeywords(badwords).build();
     }
 
     public Boolean isBadWord(String word) {
         Collection<Emit> emits = badwordsTrie.parseText(word);
-        if (emits.size() != 0){
-            return true;
-        }
-        return false;
+        return emits.size() != 0;
     }
 
-    public void createBadword(String content){
-        final BadWord badWord=BadWord.builder()
+    public void createBadword(String content) {
+        final BadWord badWord = BadWord.builder()
                 .content(content)
                 .build();
 
@@ -53,5 +52,4 @@ public class BadWordService {
             throw ResponseError.BadRequest.ALREADY_CREATED.getResponseException();
         }
     }
-
 }
