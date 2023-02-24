@@ -1,38 +1,64 @@
 package com.mozi.moziserver.adminService;
 
-import com.mozi.moziserver.common.Constant;
 import com.mozi.moziserver.httpException.ResponseError;
+import com.mozi.moziserver.model.entity.DetailIsland;
 import com.mozi.moziserver.model.entity.Island;
+import com.mozi.moziserver.repository.DetailIslandRepository;
 import com.mozi.moziserver.repository.IslandRepository;
 import com.mozi.moziserver.service.S3ImageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.DefaultTransactionDefinition;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class AdminIslandService {
-//
-//    private final IslandRepository islandRepository;
-//    private final IslandImgRepository islandImgRepository;
-//    private final S3ImageService s3ImageService;
+
+    private final S3ImageService s3ImageService;
+
+    private final IslandRepository islandRepository;
+    private final DetailIslandRepository detailIslandRepository;
+
 //    private final PlatformTransactionManager transactionManager;
-//
-//    public Island getIsland(Long seq) {
-//        Island island = islandRepository.findById(seq)
-//                .orElseThrow(ResponseError.NotFound.ISLAND_NOT_EXISTS::getResponseException);
-//
-//        return island;
-//    }
+
+    public Island getIsland(Long seq) {
+
+        Island island = islandRepository.findById(seq)
+                .orElseThrow(ResponseError.NotFound.ISLAND_NOT_EXISTS::getResponseException);
+
+        return island;
+    }
+
+    public void updateImgOfDetailIsland(Long seq, MultipartFile img, MultipartFile islandThumbnailImg) {
+
+        DetailIsland detailIsland = detailIslandRepository.findById(seq)
+                .orElseThrow(ResponseError.NotFound.NOT_EXISTS::getResponseException);
+
+        String imgUrl = null;
+        if (img != null) {
+            try {
+                imgUrl = s3ImageService.uploadFile(img, "detailIsland");
+            } catch (Exception e) {
+                throw new RuntimeException(e.getCause());
+            }
+            detailIsland.setImgUrl(imgUrl);
+        }
+
+        String islandThumbnailImgUrl = null;
+        if (islandThumbnailImg != null) {
+            try {
+                islandThumbnailImgUrl = s3ImageService.uploadFile(islandThumbnailImg, "detailIsland");
+            } catch (Exception e) {
+                throw new RuntimeException(e.getCause());
+            }
+            detailIsland.setThumbnailImgUrl(islandThumbnailImgUrl);
+        }
+
+        detailIslandRepository.save(detailIsland);
+
+    }
 //
 //    public List<Island> getIslandList() {
 //        return islandRepository.findAll();
