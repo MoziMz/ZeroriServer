@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 import java.util.Optional;
 
-public interface AnimalItemRepository extends JpaRepository<AnimalItem, Long> {
+public interface AnimalItemRepository extends JpaRepository<AnimalItem, Long>, AnimalItemRepositorySupport {
     List<AnimalItem> findAllByAnimal(Animal animal);
 
     Optional<AnimalItem> findByAnimalAndTurn(Animal animal, Integer turn);

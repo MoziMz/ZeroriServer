@@ -1,5 +1,6 @@
 package com.mozi.moziserver.adminService;
 
+import com.mozi.moziserver.common.Constant;
 import com.mozi.moziserver.httpException.ResponseError;
 import com.mozi.moziserver.model.entity.DetailIsland;
 import com.mozi.moziserver.model.entity.Island;
@@ -58,6 +59,12 @@ public class AdminIslandService {
 
         detailIslandRepository.save(detailIsland);
 
+    }
+
+    public void checkLastIsland(Island island){
+        if(island.getSeq() == Constant.lastIslandSeq){
+            throw ResponseError.BadRequest.INVALID_SEQ.getResponseException("Creation/Deletion is not possible because the island seq is 1.");
+        }
     }
 //
 //    public List<Island> getIslandList() {
