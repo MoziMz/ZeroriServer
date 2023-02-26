@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface AnimalRepository extends JpaRepository<Animal, Long> {
+public interface AnimalRepository extends JpaRepository<Animal, Long>, AnimalRepositorySupprot {
     Optional<Animal> findByIslandSeqAndTurn(Long islandSeq, Integer turn);
 
     int countByIslandSeq(Long islandSeq);

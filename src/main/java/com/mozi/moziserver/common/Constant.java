@@ -94,4 +94,6 @@ public interface Constant {
     int islandMaxLevel = 6;
 
     int lastIslandSeq = 1;
+
+    int lastTurnOfAnimalItem = 2;
 }

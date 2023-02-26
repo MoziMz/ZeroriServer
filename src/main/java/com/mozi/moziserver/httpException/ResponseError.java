@@ -53,8 +53,8 @@ public interface ResponseError {
         INVALID_CONFIRM_STATE_TYPE("invalid confirm update sate type"),
         INVALID_CURRENT_TAG_LIST("invalid current tag list"),
         INVALID_CURRENT_THEME_LIST("invalid current theme list"),
-        CHALLENGE_STATE_TYPE_IS_DELETED("challenge state type is deleted");
-
+        CHALLENGE_STATE_TYPE_IS_DELETED("challenge state type is deleted"),
+        INVALID_ANIMAL_SEQ("invalid animal seq");
         private final String message;
 
         public ResponseException getResponseException() {
@@ -131,7 +131,9 @@ public interface ResponseError {
         TAG_NOT_EXISTS("tag not exists"),
         CHALLENGE_TAG_NOT_EXISTS("challenge tag not exists"),
         DETAIL_ISLAND_NOT_EXISTS("detail island not exists"),
-        NOT_EXISTS("not exists");
+        NOT_EXISTS("not exists"),
+
+        ANIMAL_ITEM_NOT_EXISTS("animal item not exists");
 
         private final String message;
 
