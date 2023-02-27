@@ -30,11 +30,14 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class AdminChallengeController {
     private final AdminChallengeService adminChallengeService;
+
+    // -------------------- -------------------- Challenge -------------------- -------------------- //
     @ApiOperation("챌린지 하나 조회")
     @GetMapping("/admin/challenges/{seq}")
     public AdminResChallenge getChallenge(
             @PathVariable Long seq
     ) {
+
         Challenge challenge = adminChallengeService.getChallenge(seq);
 
         ChallengeTheme challengeTheme = adminChallengeService.getChallengeTheme(challenge.getThemeSeq().intValue());
@@ -108,11 +111,13 @@ public class AdminChallengeController {
     @DeleteMapping("/admin/challenges/{seq}")
     public ResponseEntity<Object> deleteChallenge(
             @PathVariable Long seq
-    ){
+    ) {
         adminChallengeService.deleteChallenge(seq);
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+    // -------------------- -------------------- Tag -------------------- -------------------- //
 
     @ApiOperation("태그 리스트 조회")
     @GetMapping("/admin/tags")
@@ -157,6 +162,7 @@ public class AdminChallengeController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    // -------------------- -------------------- ChallengeTheme -------------------- -------------------- //
     @ApiOperation("테마 리스트 조회")
     @GetMapping("/admin/challege-themes")
     public List<ChallengeTheme> getChallengeThemeList(
@@ -202,6 +208,7 @@ public class AdminChallengeController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    // -------------------- -------------------- CurrentTagList -------------------- -------------------- //
     @ApiOperation("현재 태그 리스트 조회")
     @GetMapping("/admin/current-tag-lists")
     public List<AdminResCurrentTagList> getCurrentTagList(
@@ -249,6 +256,7 @@ public class AdminChallengeController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    // -------------------- -------------------- CurrentThemeList -------------------- -------------------- //
     @ApiOperation("현재 테마 리스트 조회")
     @GetMapping("/admin/current-theme-lists")
     public List<AdminResCurrentThemeList> getCurrentThemeList(
