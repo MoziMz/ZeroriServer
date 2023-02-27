@@ -18,6 +18,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
+import org.springframework.util.StringUtils;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -35,6 +36,7 @@ public class AdminChallengeService {
     private final ChallengeTagRepository challengeTagRepository;
     private final CurrentTagListRepository currentTagListRepository;
     private final CurrentThemeListRepository currentThemeListRepository;
+
     private final PlatformTransactionManager transactionManager;
 
     // -------------------- -------------------- Challenge -------------------- -------------------- //
@@ -118,11 +120,11 @@ public class AdminChallengeService {
 
         final Challenge challenge = getChallenge(seq);
 
-        if (req.getName() != null) {
+        if (StringUtils.hasText(req.getName())) {
             challenge.setName(req.getName());
         }
 
-        if (req.getDescription() != null) {
+        if (StringUtils.hasText(req.getDescription())) {
             challenge.setDescription(req.getDescription());
         }
 
@@ -130,9 +132,7 @@ public class AdminChallengeService {
             challenge.setRecommendedCnt(req.getRecommendedCnt());
         }
 
-
         if (req.getMainTag() != null) {
-
             updateChallengeTag(challenge, req.getMainTag());
 
             challenge.setMainTag(req.getMainTag());
@@ -146,25 +146,23 @@ public class AdminChallengeService {
             challenge.setPoint(req.getPoint());
         }
 
-        if (title != null || contentList != null) {
+        if (StringUtils.hasText(title) || (contentList != null && !contentList.isEmpty())) {
             ChallengeExplanation challengeExplanation = updateChallengeExplanation(challenge, title, contentList);
             challenge.setExplanation(challengeExplanation);
 
         }
 
-        withTransaction(() -> {
-            try {
-                challengeRepository.save(challenge);
-            } catch (Exception e) {
-                throw ResponseError.BadRequest.ALREADY_CREATED.getResponseException(); // for duplicate exception
-            }
-        });
+        try {
+            challengeRepository.save(challenge);
+        } catch (Exception e) {
+            throw ResponseError.BadRequest.ALREADY_CREATED.getResponseException(); // for duplicate exception
+        }
     }
 
     public ChallengeExplanation updateChallengeExplanation(Challenge challenge, String title, List<String> contentList) {
 
         List<ChallengeExplanationContent> challengeExplanationContentList = new ArrayList<>();
-        if (contentList != null) {
+        if (contentList != null && !contentList.isEmpty()) {
             for (int i = 0; i < contentList.size(); i++) {
                 challengeExplanationContentList.add(
                         ChallengeExplanationContent.builder()
@@ -176,20 +174,20 @@ public class AdminChallengeService {
         }
 
         ChallengeExplanation challengeExplanation = challenge.getExplanation();
-        if (title != null) {
+        if (StringUtils.hasText(title)) {
             challengeExplanation.setTitle(title);
         }
 
-        if (contentList != null) {
+        if (contentList != null && !contentList.isEmpty()) {
             challengeExplanation.setContents(challengeExplanationContentList);
         }
 
         return challengeExplanation;
     }
 
-    public void deleteChallenge(Long seq){
+    public void deleteChallenge(Long seq) {
 
-        Challenge challenge=getChallenge(seq);
+        Challenge challenge = getChallenge(seq);
 
         challenge.setState(ChallengeStateType.DELETED);
 
@@ -215,7 +213,7 @@ public class AdminChallengeService {
 
     public List<Tag> getTagList(String name) {
 
-        if (name == null) {
+        if (StringUtils.hasText(name)) {
             return tagRepository.findAll();
         }
         return tagRepository.findAllByNameContaining(name);
@@ -230,13 +228,11 @@ public class AdminChallengeService {
 
         Tag tag = Tag.builder().name(name).build();
 
-        withTransaction(() -> {
-            try {
-                tagRepository.save(tag);
-            } catch (Exception e) {
-                throw ResponseError.BadRequest.ALREADY_CREATED.getResponseException(); // for duplicate exception
-            }
-        });
+        try {
+            tagRepository.save(tag);
+        } catch (Exception e) {
+            throw ResponseError.BadRequest.ALREADY_CREATED.getResponseException(); // for duplicate exception
+        }
     }
 
     public void updateTag(Long seq, String name) {
@@ -274,7 +270,7 @@ public class AdminChallengeService {
     // -------------------- -------------------- ChallengeTheme -------------------- -------------------- //
     public List<ChallengeTheme> getChallengeThemeList(String name) {
 
-        if (name == null) {
+        if (StringUtils.hasText(name)) {
             return challengeThemeRepository.findAll();
         }
         return challengeThemeRepository.findAllByNameContaining(name);
@@ -305,31 +301,29 @@ public class AdminChallengeService {
 
     public void updateChallengeTheme(Integer seq, String name, String color, String inactiveColor) {
 
-        if (name != null && challengeThemeRepository.findByName(name).isPresent()) {
+        if (StringUtils.hasText(name) && challengeThemeRepository.findByName(name).isPresent()) {
             throw ResponseError.BadRequest.ALREADY_CREATED.getResponseException("already created challengeTheme");
         }
 
         final ChallengeTheme challengeTheme = getChallengeTheme(seq);
 
-        if (name != null) {
+        if (StringUtils.hasText(name)) {
             challengeTheme.setName(name);
         }
 
-        if (color != null) {
+        if (StringUtils.hasText(color)) {
             challengeTheme.setColor(color);
         }
 
-        if (inactiveColor != null) {
+        if (StringUtils.hasText(inactiveColor)) {
             challengeTheme.setInactiveColor(inactiveColor);
         }
 
-        withTransaction(() -> {
-            try {
-                challengeThemeRepository.save(challengeTheme);
-            } catch (Exception e) {
-                throw ResponseError.BadRequest.ALREADY_CREATED.getResponseException(); // for duplicate exception
-            }
-        });
+        try {
+            challengeThemeRepository.save(challengeTheme);
+        } catch (Exception e) {
+            throw ResponseError.BadRequest.ALREADY_CREATED.getResponseException(); // for duplicate exception
+        }
     }
 
     public void deleteChallengeTheme(Integer seq) {
@@ -382,13 +376,11 @@ public class AdminChallengeService {
                 .tag(tag)
                 .build();
 
-        withTransaction(() -> {
-            try {
-                currentTagListRepository.save(currentTagList);
-            } catch (Exception e) {
-                throw ResponseError.BadRequest.ALREADY_CREATED.getResponseException(); // for duplicate exception
-            }
-        });
+        try {
+            currentTagListRepository.save(currentTagList);
+        } catch (Exception e) {
+            throw ResponseError.BadRequest.ALREADY_CREATED.getResponseException(); // for duplicate exception
+        }
     }
 
     public void updateAllCurrentTagList(List<AdminReqCurrentTagList> reqList) {
@@ -433,13 +425,11 @@ public class AdminChallengeService {
             throw ResponseError.BadRequest.INVALID_CURRENT_TAG_LIST.getResponseException();
         }
 
-        withTransaction(() -> {
-            try {
-                currentTagListRepository.saveAll(currentTagLists);
-            } catch (Exception e) {
-                throw ResponseError.BadRequest.ALREADY_CREATED.getResponseException(); // for duplicate exception
-            }
-        });
+        try {
+            currentTagListRepository.saveAll(currentTagLists);
+        } catch (Exception e) {
+            throw ResponseError.BadRequest.ALREADY_CREATED.getResponseException(); // for duplicate exception
+        }
     }
 
     public void deleteCurrentTagList(Long seq) {
@@ -494,13 +484,11 @@ public class AdminChallengeService {
                 .challengeTheme(challengeTheme)
                 .build();
 
-        withTransaction(() -> {
-            try {
-                currentThemeListRepository.save(currentThemeList);
-            } catch (Exception e) {
-                throw ResponseError.BadRequest.ALREADY_CREATED.getResponseException(); // for duplicate exception
-            }
-        });
+        try {
+            currentThemeListRepository.save(currentThemeList);
+        } catch (Exception e) {
+            throw ResponseError.BadRequest.ALREADY_CREATED.getResponseException(); // for duplicate exception
+        }
     }
 
     public void updateAllCurrentThemeList(List<AdminReqCurrentThemeList> reqList) {
@@ -544,13 +532,11 @@ public class AdminChallengeService {
             throw ResponseError.BadRequest.INVALID_CURRENT_THEME_LIST.getResponseException();
         }
 
-        withTransaction(() -> {
-            try {
-                currentThemeListRepository.saveAll(currentThemeLists);
-            } catch (Exception e) {
-                throw ResponseError.BadRequest.ALREADY_CREATED.getResponseException(); // for duplicate exception
-            }
-        });
+        try {
+            currentThemeListRepository.saveAll(currentThemeLists);
+        } catch (Exception e) {
+            throw ResponseError.BadRequest.ALREADY_CREATED.getResponseException(); // for duplicate exception
+        }
     }
 
     public void deleteCurrentThemeList(Long seq) {

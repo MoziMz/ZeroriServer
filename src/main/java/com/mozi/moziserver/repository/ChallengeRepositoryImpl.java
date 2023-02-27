@@ -4,6 +4,7 @@ import com.mozi.moziserver.model.entity.*;
 import com.mozi.moziserver.model.mappedenum.ChallengeStateType;
 import com.querydsl.core.types.Predicate;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.Optional;
@@ -85,7 +86,7 @@ public class ChallengeRepositoryImpl extends QuerydslRepositorySupport implement
         final Predicate[] predicates = new Predicate[]{
                 predicateOptional(qChallenge.themeSeq::eq, themeSeq),
                 predicateOptional(qChallengeTag.tag.seq::eq, tagSeq),
-                keyword != null ? predicateOptional(qChallenge.name::like, '%' + keyword + '%') : null
+                StringUtils.hasText(keyword) ? predicateOptional(qChallenge.name::like, '%' + keyword + '%') : null
         };
 
         return from(qChallenge)

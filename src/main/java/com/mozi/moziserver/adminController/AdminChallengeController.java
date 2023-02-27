@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Max;
-import javax.validation.constraints.NotBlank;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -99,10 +98,9 @@ public class AdminChallengeController {
         if (req.getDescription() != null || req.getName() != null
                 || req.getPoint() != null || req.getMainTag() != null
                 || req.getRecommendedCnt() != null || req.getThemeSeq() != null
-                || title != null || !contentList.isEmpty()) {
+                || title != null || (contentList != null && !contentList.isEmpty())) {
 
             adminChallengeService.updateChallenge(seq, req, title, contentList);
-
         }
         return new ResponseEntity<>(HttpStatus.OK);
     }
@@ -131,9 +129,9 @@ public class AdminChallengeController {
     }
 
     @ApiOperation("태그 등록")
-    @PostMapping("/admin/tags/{name}")
+    @PostMapping("/admin/tags")
     public ResponseEntity<Object> createTag(
-            @PathVariable(name = "name") @NotBlank String name
+            @RequestParam(name = "name") String name
     ) {
         adminChallengeService.createTag(name);
 
