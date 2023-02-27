@@ -6,11 +6,18 @@ import com.mozi.moziserver.model.entity.DetailIsland;
 import com.mozi.moziserver.model.entity.Island;
 import com.mozi.moziserver.repository.DetailIslandRepository;
 import com.mozi.moziserver.repository.IslandRepository;
+import com.mozi.moziserver.repository.UserIslandRepository;
 import com.mozi.moziserver.service.S3ImageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -21,15 +28,131 @@ public class AdminIslandService {
 
     private final IslandRepository islandRepository;
     private final DetailIslandRepository detailIslandRepository;
+    private final UserIslandRepository userIslandRepository;
 
-//    private final PlatformTransactionManager transactionManager;
+    private final PlatformTransactionManager transactionManager;
 
+    // -------------------- -------------------- island -------------------- -------------------- //
     public Island getIsland(Long seq) {
 
         Island island = islandRepository.findById(seq)
                 .orElseThrow(ResponseError.NotFound.ISLAND_NOT_EXISTS::getResponseException);
 
         return island;
+    }
+
+    public List<Island> getIslandList() {
+
+        return islandRepository.findAll();
+    }
+
+    public void createIsland(
+            String name,
+            String description,
+            Integer openRequiredPoint
+    ) {
+
+        final Island island = Island.builder()
+                .name(name)
+                .description(description)
+                .openRequiredPoint(openRequiredPoint)
+                .build();
+
+        islandRepository.save(island);
+    }
+
+    public void updateIsland(
+            Long seq,
+            String name,
+            String description,
+            Integer openRequiredPoint
+    ) {
+
+        final Island island = getIsland(seq);
+
+        if (name != null && name.length() != 0) {
+            island.setName(name);
+        }
+
+        if (description != null && description.length() != 0) {
+            island.setDescription(description);
+        }
+
+        if (openRequiredPoint != null && openRequiredPoint != 0) {
+            island.setOpenRequiredPoint(openRequiredPoint);
+        }
+
+        try {
+            islandRepository.save(island);
+        } catch (Exception e) {
+            throw ResponseError.InternalServerError.UNEXPECTED_ERROR.getResponseException();
+        }
+    }
+
+    public void deleteIsland(Long seq) {
+
+        Island island = getIsland(seq);
+
+        checkLastIsland(island);
+
+        if (!detailIslandRepository.findAllByIsland(island).isEmpty()) {
+            throw ResponseError.BadRequest.INVALID_SEQ.getResponseException("detail island remain. Please delete the detail island first.");
+        }
+
+        islandRepository.delete(island);
+    }
+
+    // -------------------- -------------------- detailIsland -------------------- -------------------- //
+    public DetailIsland getDetailIsland(Long seq) {
+
+        DetailIsland detailIsland = detailIslandRepository.findById(seq)
+                .orElseThrow(ResponseError.NotFound.NOT_EXISTS::getResponseException);
+
+        return detailIsland;
+    }
+
+    public List<DetailIsland> getDetailIslandListByIsland(Island island) {
+
+        return detailIslandRepository.findAllByIsland(island);
+    }
+
+    public void createDetailIsland(
+            Long islandSeq,
+            List<MultipartFile> islandImgUrlList,
+            List<MultipartFile> islandThumbnailImgUrlList
+    ) {
+        Island island = getIsland(islandSeq);
+
+        List<DetailIsland> detailIslandList = new ArrayList<>();
+
+        for (Integer animalTurn = 0; animalTurn < Constant.islandMaxLevel; animalTurn++) {
+
+            for (Integer itemTurn = 1; itemTurn <= Constant.lastTurnOfAnimalItem; itemTurn++) {
+
+                String imgUrl = islandUploadFile(islandImgUrlList.get(animalTurn), animalTurn, itemTurn);
+                String thumbnailImgUrl = islandUploadFile(islandThumbnailImgUrlList.get(animalTurn), animalTurn, itemTurn);
+
+                if (animalTurn == 0) {
+                    itemTurn = 0;
+                }
+
+                final DetailIsland detailIsland = DetailIsland.builder()
+                        .animalTurn(animalTurn)
+                        .itemTurn(itemTurn)
+                        .imgUrl(imgUrl)
+                        .thumbnailImgUrl(thumbnailImgUrl)
+                        .island(island)
+                        .build();
+
+                detailIslandList.add(detailIsland);
+
+                if (animalTurn == 0) {
+                    break;
+                }
+            }
+        }
+
+        detailIslandRepository.saveAll(detailIslandList);
     }
 
     public void updateImgOfDetailIsland(Long seq, MultipartFile img, MultipartFile islandThumbnailImg) {
@@ -40,7 +163,7 @@ public class AdminIslandService {
         String imgUrl = null;
         if (img != null) {
             try {
-                imgUrl = s3ImageService.uploadFile(img, "detailIsland");
+                imgUrl = islandUploadFile(img, detailIsland.getAnimalTurn(), detailIsland.getItemTurn());
             } catch (Exception e) {
                 throw new RuntimeException(e.getCause());
             }
@@ -50,7 +173,7 @@ public class AdminIslandService {
         String islandThumbnailImgUrl = null;
         if (islandThumbnailImg != null) {
             try {
-                islandThumbnailImgUrl = s3ImageService.uploadFile(islandThumbnailImg, "detailIsland");
+                islandThumbnailImgUrl = islandUploadFile(islandThumbnailImg, detailIsland.getAnimalTurn(), detailIsland.getItemTurn());
             } catch (Exception e) {
                 throw new RuntimeException(e.getCause());
             }
@@ -58,185 +181,45 @@ public class AdminIslandService {
         }
 
         detailIslandRepository.save(detailIsland);
-
     }
 
-    public void checkLastIsland(Island island){
-        if(island.getSeq() == Constant.lastIslandSeq){
+    public void deleteDetailIsland(Long seq) {
+
+        DetailIsland detailIsland = getDetailIsland(seq);
+
+        checkLastIsland(detailIsland.getIsland());
+
+        if (userIslandRepository.existsByDetailIsland(detailIsland)) {
+            throw ResponseError.BadRequest.INVALID_SEQ.getResponseException();
+        }
+
+        detailIslandRepository.delete(detailIsland);
+    }
+
+    public void checkLastIsland(Island island) {
+
+        if (island.getSeq() == Constant.lastIslandSeq) {
             throw ResponseError.BadRequest.INVALID_SEQ.getResponseException("Creation/Deletion is not possible because the island seq is 1.");
         }
     }
-//
-//    public List<Island> getIslandList() {
-//        return islandRepository.findAll();
-//    }
-//
-//    private IslandImg getIslandImg(Integer type, Integer level) {
-//        IslandImg islandImg = islandImgRepository.findByTypeAndLevel(type, level);
-//
-//        if (islandImg == null) {
-//            throw ResponseError.NotFound.ISLAND_IMG_NOT_EXISTS.getResponseException();
-//        }
-//
-//        return islandImg;
-//    }
-//
-//    public List<IslandImg> getIslandImgListByType(Integer islandType) {
-//        return islandImgRepository.findAllByType(islandType);
-//    }
-//
-//    public void createIsland(
-//            Integer type,
-//            String name,
-//            String description,
-//            Integer maxPoint,
-//            Integer maxRewardLevel,
-//            List<MultipartFile> islandImgUrlList,
-//            List<MultipartFile> islandThumbnailImgUrlList
-//    ) {
-//        final Optional<Island> optionalIsland = islandRepository.findById(type);
-//
-//        if (optionalIsland.isPresent()) {
-//            throw ResponseError.BadRequest.ALREADY_CREATED.getResponseException("already created island");
-//        }
-//
-//        for (int i = 0; i < Constant.islandMaxLevel; i++) {
-//            String imgUrl = islandUploadFile(islandImgUrlList.get(i), i + 1);
-//            String thumbnailImgUrl = islandUploadFile(islandThumbnailImgUrlList.get(i), i + 1);
-//
-//            final IslandImg islandImg = IslandImg.builder()
-//                    .type(type)
-//                    .level(i + 1)
-//                    .imgUrl(imgUrl)
-//                    .thumbnailImgUrl(thumbnailImgUrl)
-//                    .build();
-//
-//            withTransaction(() -> {
-//                try {
-//                    islandImgRepository.save(islandImg);
-//                } catch (Exception e) {
-//                    throw ResponseError.BadRequest.ALREADY_CREATED.getResponseException(); // for duplicate exception
-//                }
-//            });
-//        }
-//
-//        final Island island = Island.builder()
-//                .type(type)
-//                .name(name)
-//                .description(description)
-//                .maxPoint(maxPoint)
-//                .maxRewardLevel(maxRewardLevel)
-//                .build();
-//
-//        withTransaction(() -> {
-//            try {
-//                islandRepository.save(island);
-//            } catch (Exception e) {
-//                throw ResponseError.BadRequest.ALREADY_CREATED.getResponseException(); // for duplicate exception
-//            }
-//        });
-//    }
-//
-//    public void updateIsland(
-//            Integer type,
-//            String name,
-//            String description,
-//            Integer maxPoint,
-//            Integer maxRewardLevel
-//    ) {
-//        final Island island = getIsland(type);
-//
-//        if (name != null && name.length() != 0) {
-//            island.setName(name);
-//        }
-//
-//        if (description != null && description.length() != 0) {
-//            island.setDescription(description);
-//        }
-//
-//        if (maxPoint != 0) {
-//            island.setMaxPoint(maxPoint);
-//        }
-//
-//        if (maxRewardLevel != 0) {
-//            island.setMaxRewardLevel(maxRewardLevel);
-//        }
-//
-//        try {
-//            islandRepository.save(island);
-//        } catch (Exception e) {
-//            throw ResponseError.InternalServerError.UNEXPECTED_ERROR.getResponseException();
-//        }
-//    }
-//
-//    public void updateIslandImg(
-//            Integer type,
-//            Integer level,
-//            MultipartFile islandImgFile,
-//            MultipartFile islandThumbnailImgFile
-//    ) {
-//        final IslandImg islandImg = getIslandImg(type, level);
-//
-//        String islandImgUrl = null;
-//        if (islandImgFile != null) {
-//            try {
-//                islandImgUrl = islandUploadFile(islandImgFile, level);
-//            } catch (Exception e) {
-//                throw new RuntimeException(e.getCause());
-//            }
-//            islandImg.setImgUrl(islandImgUrl);
-//        }
-//
-//        String islandThumbnailImgUrl = null;
-//        if (islandThumbnailImgFile != null) {
-//            try {
-//                islandThumbnailImgUrl = islandUploadFile(islandThumbnailImgFile, level);
-//            } catch (Exception e) {
-//                throw new RuntimeException(e.getCause());
-//            }
-//            islandImg.setImgUrl(islandThumbnailImgUrl);
-//        }
-//
-//        if (islandImgUrl != null) {
-//            islandImg.setImgUrl(islandImgUrl);
-//        }
-//        if (islandThumbnailImgUrl != null) {
-//            islandImg.setThumbnailImgUrl(islandThumbnailImgUrl);
-//        }
-//
-//        withTransaction(() -> {
-//            try {
-//                islandImgRepository.save(islandImg);
-//            } catch (Exception e) {
-//                throw ResponseError.BadRequest.ALREADY_CREATED.getResponseException(); // for duplicate exception
-//            }
-//        });
-//    }
-//
-//    public String islandUploadFile(MultipartFile multipartFile, Integer level) {
-//        try {
-//            return s3ImageService.uploadFile(multipartFile, "islandImgUrlLevel" + level.toString());
-//        } catch (Exception e) {
-//            throw new RuntimeException(e.getCause());
-//        }
-//    }
-//
-//    public void deleteIsland(Integer type) {
-//        final Island island = getIsland(type);
-//
-//        islandRepository.delete(island);
-//        islandImgRepository.deleteByType(island.getType());
-//    }
-//
-//    private void withTransaction(Runnable runnable) {
-//        DefaultTransactionDefinition definition = new DefaultTransactionDefinition();
-//
-//        TransactionStatus status = transactionManager.getTransaction(definition);
-//        try {
-//            runnable.run();
-//            transactionManager.commit(status);
-//        } catch (Exception e) {
-//            transactionManager.rollback(status);
-//        }
-//    }
+
+    public String islandUploadFile(MultipartFile multipartFile, Integer animalTurn, Integer itemTurn) {
+        try {
+            return s3ImageService.uploadFile(multipartFile, "DetailIsland_animal" + animalTurn + "_item" + itemTurn);
+        } catch (Exception e) {
+            throw new RuntimeException(e.getCause());
+        }
+    }
+
+    private void withTransaction(Runnable runnable) {
+        DefaultTransactionDefinition definition = new DefaultTransactionDefinition();
+
+        TransactionStatus status = transactionManager.getTransaction(definition);
+        try {
+            runnable.run();
+            transactionManager.commit(status);
+        } catch (Exception e) {
+            transactionManager.rollback(status);
+        }
+    }
 }
