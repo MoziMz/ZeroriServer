@@ -14,7 +14,7 @@ public class AdminResIsland {
     private final String name;
     private final String description;
     private final Integer openRequiredPoint;
-    private final List<AdminResDetailIsland> islandImgList;
+    private final List<AdminResDetailIslandList> islandImgList;
 
     private AdminResIsland(Island island, List<DetailIsland> detailIslandList) {
         this.islandSeq = island.getSeq();
@@ -23,7 +23,7 @@ public class AdminResIsland {
         this.openRequiredPoint = island.getOpenRequiredPoint();
         this.islandImgList = detailIslandList.stream()
                 .sorted(Comparator.comparing(DetailIsland::getAnimalTurn))
-                .map(AdminResDetailIsland::of)
+                .map(AdminResDetailIslandList::of)
                 .collect(Collectors.toList());
     }
 
@@ -32,24 +32,3 @@ public class AdminResIsland {
     }
 }
 
-@Getter
-class AdminResDetailIsland {
-
-    private final Long detailIslandSeq;
-    private final Integer animalTurn;
-    private final Integer itemTurn;
-    private final String imgUrl;
-    private final String thumbnailImgUrl;
-
-    private AdminResDetailIsland(DetailIsland detailIsland) {
-        this.detailIslandSeq = detailIsland.getSeq();
-        this.animalTurn = detailIsland.getAnimalTurn();
-        this.itemTurn = detailIsland.getItemTurn();
-        this.imgUrl = detailIsland.getImgUrl();
-        this.thumbnailImgUrl = detailIsland.getThumbnailImgUrl();
-    }
-
-    public static AdminResDetailIsland of(DetailIsland detailIsland) {
-        return new AdminResDetailIsland(detailIsland);
-    }
-}

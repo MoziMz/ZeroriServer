@@ -6,11 +6,11 @@ import lombok.Getter;
 @Getter
 public class AdminResUser {
 
-    private final Long seq;
+    private final Long userSeq;
     private final String nickName;
 
     private AdminResUser(User user) {
-        this.seq = user.getSeq();
+        this.userSeq = user.getSeq();
         this.nickName = user.getNickName();
     }
 

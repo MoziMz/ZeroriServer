@@ -27,11 +27,26 @@ public class AdminUserService {
     private final UserAuthRepository userAuthRepository;
     private final AuthenticationManager authenticationManager;
 
+    // -------------------- -------------------- User -------------------- -------------------- //
     public User getById(Long seq) {
+
         return userRepository.findById(seq)
                 .orElseThrow(ResponseError.NotFound.USER_NOT_EXISTS::getResponseException);
     }
 
+    // -------------------- -------------------- UserAuth -------------------- -------------------- //
+    public List<UserAuth> getUserAuthList(
+            String keyword,
+            UserAuthType userAuthType,
+            UserState userState,
+            Integer pageNumber,
+            Integer pageSize
+    ) {
+
+        return userAuthRepository.findAllByKeywordAndTypeAndState(keyword, userAuthType, userState, pageNumber, pageSize);
+    }
+
+    // -------------------- -------------------- ETC -------------------- -------------------- //
     public Authentication signIn(ReqAdminSignIn req) {
 
         Authentication auth = null;
@@ -58,15 +73,5 @@ public class AdminUserService {
         }
 
         return auth;
-    }
-
-    public List<UserAuth> getUserAuthList(
-            String keyword,
-            UserAuthType userAuthType,
-            UserState userState,
-            Integer pageNumber,
-            Integer pageSize
-    ) {
-        return userAuthRepository.findAllByKeywordAndTypeAndState(keyword, userAuthType, userState, pageNumber, pageSize);
     }
 }
