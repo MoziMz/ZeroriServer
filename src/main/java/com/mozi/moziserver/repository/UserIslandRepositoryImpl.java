@@ -56,4 +56,12 @@ public class UserIslandRepositoryImpl extends QuerydslRepositorySupport implemen
                 .where(qUser.in(userList))
                 .fetch();
     }
+
+    @Override
+    public boolean existsByDetailIsland(DetailIsland detailIsland) {
+        return from(qUserIsland)
+                .where(qUserIsland.detailIsland.eq(detailIsland))
+                .select(qUserIsland.seq)
+                .fetchFirst() != null;
+    }
 }

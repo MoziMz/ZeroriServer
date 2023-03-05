@@ -1,5 +1,6 @@
 package com.mozi.moziserver.repository;
 
+import com.mozi.moziserver.model.entity.DetailIsland;
 import com.mozi.moziserver.model.entity.User;
 import com.mozi.moziserver.model.entity.UserIsland;
 
@@ -14,4 +15,6 @@ public interface UserIslandRepositorySupport {
 
     // -------------------- -------------------- below admin methods -------------------- -------------------- //
     List<UserIsland> findAllByUserIn(List<User> userList);
+
+    boolean existsByDetailIsland(DetailIsland detailIsland);
 }
