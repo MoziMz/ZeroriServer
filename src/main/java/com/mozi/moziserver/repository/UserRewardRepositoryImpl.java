@@ -2,6 +2,7 @@ package com.mozi.moziserver.repository;
 
 import com.mozi.moziserver.model.entity.QUser;
 import com.mozi.moziserver.model.entity.QUserReward;
+import com.mozi.moziserver.model.entity.User;
 import com.mozi.moziserver.model.entity.UserReward;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 import org.springframework.util.StringUtils;
@@ -30,6 +31,13 @@ public class UserRewardRepositoryImpl extends QuerydslRepositorySupport implemen
                         null)
                 .offset(pageNumber * pageSize)
                 .limit(pageSize)
+                .fetch();
+    }
+
+    @Override
+    public List<UserReward> findAllByUserIn(List<User> userList) {
+        return from(qUserReward)
+                .where(qUser.in(userList))
                 .fetch();
     }
 }

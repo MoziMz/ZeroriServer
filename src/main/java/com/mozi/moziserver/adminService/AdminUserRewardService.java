@@ -24,56 +24,64 @@ import java.util.stream.Collectors;
 @Service
 public class AdminUserRewardService {
     // 유저 포인트, 유저 섬 관련된 로직 관리
-//
-//    private final AdminUserService adminUserService;
-//
-//    private final UserRewardRepository userRewardRepository;
-//    private final UserIslandRepository userIslandRepository;
-//    private final UserPointRecordRepository userPointRecordRepository;
-//
-//    public List<UserReward> getUserRewardList(String keyword, Integer pageNumber, Integer pageSize) {
-//
-//        Long numberOfKeyword = null;
-//        if (StringUtils.hasLength(keyword)) {
-//            try {
-//                numberOfKeyword = Long.valueOf(keyword);
-//            } catch (NumberFormatException e) {
-//            }
-//        }
-//
-//        return userRewardRepository.findAllByKeyword(keyword, numberOfKeyword, pageNumber, pageSize);
-//    }
-//
-//    public List<UserIsland> getLastUserIslandList(List<User> userList) {
-//
-//        List<UserIsland> userIslandList = userIslandRepository.findAllByUserIn(userList);
-//
-//        Map<Long, UserIsland> userIslandMap = new HashMap<>(); // key is User's seq
-//        for (UserIsland userIsland : userIslandList) {
-//            Long userSeq = userIsland.getUser().getSeq();
-//            if (userIslandMap.containsKey(userSeq)) {
-//                UserIsland befUserIsland = userIslandMap.get(userSeq);
-//                if (befUserIsland.getType() < userIsland.getType()) {
-//                    userIslandMap.put(userSeq, userIsland);
-//                }
-//            } else {
-//                userIslandMap.put(userSeq, userIsland);
-//            }
-//        }
-//
-//        return userList.stream()
-//                .map(user -> userIslandMap.get(user.getSeq()))
-//                .collect(Collectors.toList());
-//    }
-//
-//    public List<UserPointRecord> getUserPointRecordByUserAndType(Long userSeq, List<PointReasonType> reasonTypeList, Integer pageNumber, Integer pageSize) {
-//
-//        User user = adminUserService.getById(userSeq);
-//
-//        if (reasonTypeList != null && reasonTypeList.size() > 0) {
-//            return userPointRecordRepository.findAllByUserAndReasonInOrderByCreatedAtDesc(user, reasonTypeList, PageRequest.of(pageNumber, pageSize));
-//        } else {
-//            return userPointRecordRepository.findAllByUserOrderByCreatedAtDesc(user, PageRequest.of(pageNumber, pageSize));
-//        }
-//    }
+
+    private final AdminUserService adminUserService;
+
+    private final UserRewardRepository userRewardRepository;
+    private final UserIslandRepository userIslandRepository;
+    private final UserPointRecordRepository userPointRecordRepository;
+
+    // -------------------- -------------------- UserReward -------------------- -------------------- //
+    public List<UserReward> getAllByUser(List<User> userList){
+
+        return userRewardRepository.findAllByUserIn(userList);
+    }
+
+    public List<UserReward> getUserRewardList(String keyword, Integer pageNumber, Integer pageSize) {
+
+        Long numberOfKeyword = null;
+        if (StringUtils.hasLength(keyword)) {
+            try {
+                numberOfKeyword = Long.valueOf(keyword);
+            } catch (NumberFormatException e) {
+            }
+        }
+
+        return userRewardRepository.findAllByKeyword(keyword, numberOfKeyword, pageNumber, pageSize);
+    }
+
+    // -------------------- -------------------- UserIsland -------------------- -------------------- //
+    public List<UserIsland> getLastUserIslandList(List<User> userList) {
+
+        List<UserIsland> userIslandList = userIslandRepository.findAllByUserIn(userList);
+
+        Map<Long, UserIsland> userIslandMap = new HashMap<>(); // key is User's seq
+        for (UserIsland userIsland : userIslandList) {
+            Long userSeq = userIsland.getUser().getSeq();
+            if (userIslandMap.containsKey(userSeq)) {
+                UserIsland befUserIsland = userIslandMap.get(userSeq);
+                if (befUserIsland.getDetailIsland().getIsland().getSeq() < userIsland.getDetailIsland().getIsland().getSeq()) {
+                    userIslandMap.put(userSeq, userIsland);
+                }
+            } else {
+                userIslandMap.put(userSeq, userIsland);
+            }
+        }
+
+        return userList.stream()
+                .map(user -> userIslandMap.get(user.getSeq()))
+                .collect(Collectors.toList());
+    }
+
+    // -------------------- -------------------- UserPointRecord -------------------- -------------------- //
+    public List<UserPointRecord> getUserPointRecordByUserAndType(Long userSeq, List<PointReasonType> reasonTypeList, Integer pageNumber, Integer pageSize) {
+
+        User user = adminUserService.getById(userSeq);
+
+        if (reasonTypeList != null && reasonTypeList.size() > 0) {
+            return userPointRecordRepository.findAllByUserAndReasonInOrderByCreatedAtDesc(user, reasonTypeList, PageRequest.of(pageNumber, pageSize));
+        } else {
+            return userPointRecordRepository.findAllByUserOrderByCreatedAtDesc(user, PageRequest.of(pageNumber, pageSize));
+        }
+    }
 }

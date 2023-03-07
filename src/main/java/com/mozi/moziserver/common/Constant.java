@@ -96,5 +96,6 @@ public interface Constant {
     int lastIslandSeq = 1;
 
     int lastTurnOfAnimalItem = 2;
+
     int totalImagesPerIsland = 11;
 }

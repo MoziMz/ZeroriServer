@@ -53,11 +53,11 @@ public class UserAuthRepositoryImpl extends QuerydslRepositorySupport implements
 
         return from(qUserAuth)
                 .innerJoin(qUserAuth.user, qUser).fetchJoin()
-                .innerJoin(qUserReward.user, qUser).fetchJoin()
                 .where(predicates)
                 .where(StringUtils.hasLength(keyword) ? qUser.nickName.like('%' + keyword + '%').or(qUser.email.like('%' + keyword + '%')) : null)
-                .offset(pageNumber * pageSize)
+                .orderBy(qUserAuth.user.seq.asc())
                 .limit(pageSize)
+                .offset(pageNumber * pageSize)
                 .fetch();
     }
 
