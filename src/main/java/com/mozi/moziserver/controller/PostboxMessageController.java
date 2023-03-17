@@ -8,10 +8,7 @@ import com.mozi.moziserver.model.mappedenum.UserNoticeType;
 import com.mozi.moziserver.model.req.ReqList;
 import com.mozi.moziserver.model.res.*;
 import com.mozi.moziserver.security.SessionUser;
-import com.mozi.moziserver.service.AnimalService;
-import com.mozi.moziserver.service.PostboxMessageAdminService;
-import com.mozi.moziserver.service.PostboxMessageAnimalService;
-import com.mozi.moziserver.service.UserService;
+import com.mozi.moziserver.service.*;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +18,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.time.DayOfWeek;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,6 +33,7 @@ public class PostboxMessageController {
     private final PostboxMessageAnimalService postboxMessageAnimalService;
     private final AnimalService animalService;
     private final UserService userService;
+    private final UserRewardService userRewardService;
 
     // -------------------- -------------------- PostboxMessageAnimal -------------------- -------------------- //
     // TODO ERASE (NOT USED V2)
@@ -139,7 +139,19 @@ public class PostboxMessageController {
 
         PostboxMessageAnimal postboxMessageAnimal = postboxMessageAnimalService.getPostboxMessageAnimal(userSeq, seq);
         postboxMessageAnimalService.checkMessage(postboxMessageAnimal.getSeq());
-        Integer thisWeekUserRewardPoint = 10; // TODO V2 userRewardService에서 유저의 이번주 획득포인트 가져오기 (저번주 9시 오늘 현재까지)
+
+        User user = userService.getUserBySeq(userSeq);
+
+        LocalDateTime now = LocalDateTime.now();
+        int minusDays = now.getDayOfWeek().getValue();
+
+        if (minusDays == DayOfWeek.SUNDAY.getValue() && now.getHour() >= 21) {
+            minusDays = 0;
+        }
+
+        LocalDateTime sundayDate = LocalDateTime.of(now.getYear(), now.getMonthValue(), now.getDayOfMonth() - minusDays, 21, 0, 0);
+
+        Integer thisWeekUserRewardPoint = userRewardService.getPointOfUserPointRecord(user, sundayDate, now);
 
         return ResPostboxMessageAnimal.of(postboxMessageAnimal, thisWeekUserRewardPoint);
     }
