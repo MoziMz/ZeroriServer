@@ -48,7 +48,7 @@ public class ConfirmController {
         User user = userService.getUserBySeq(userSeq);
 
         if(confirmListType.isEmpty()){
-            confirmListType=Optional.of(ConfirmListType.RECENT);
+            confirmListType=Optional.of(ConfirmListType.ALL);
         }
         return confirmService.getConfirmList(user, req, confirmListType.get())
                 .stream()
@@ -105,9 +105,16 @@ public class ConfirmController {
     @ApiOperation("제로리 주민들의 활동보기")
     @GetMapping("/v1/confirms/week")
     public ResWeekConfirm getWeekConfirm(
-            @ApiParam(hidden = true) @SessionUser Long userSeq
+            @ApiParam(hidden = true) @SessionUser Long userSeq,
+            @RequestParam(required = false) Optional<ConfirmListType> confirmListType
+
     ) {
-        return confirmService.getWeekConfirm();
+
+        if(confirmListType.isEmpty()){
+            confirmListType=Optional.of(ConfirmListType.ALL);
+        }
+
+        return confirmService.getWeekConfirm(confirmListType.get());
     }
 
     @ApiOperation("챌린지별 상세 스토리")

@@ -96,10 +96,9 @@ public class ConfirmService {
         List<Confirm> confirmList = new ArrayList<>();
 
         if (confirmListType.equals(ConfirmListType.RECENT)) {
-//            LocalDateTime startDateTime = LocalDateTime.now().minusDays(6).withHour(0).withMinute(0).withSecond(0);
+            LocalDateTime now = LocalDateTime.now();
 
-            //최근 3주
-            LocalDateTime startDateTime = LocalDateTime.now().minusDays(20).withHour(0).withMinute(0).withSecond(0);
+            LocalDateTime startDateTime = LocalDateTime.of(now.getYear(), now.getMonthValue(), now.getDayOfMonth() - 6, 0, 0, 0);
 
             confirmList = confirmRepository.findByPeriodAndPaging(startDateTime, req.getPrevLastSeq(), req.getPageSize());
 
@@ -298,13 +297,19 @@ public class ConfirmService {
         confirmRepository.decrementLikeCnt(confirm.getSeq());
     }
 
-    public ResWeekConfirm getWeekConfirm() {
+    public ResWeekConfirm getWeekConfirm(ConfirmListType confirmListType) {
 
-        //LocalDateTime startDateTime = LocalDateTime.now().minusDays(6).withHour(0).withMinute(0).withSecond(0);
-        //최근 3주
-        LocalDateTime startDateTime = LocalDateTime.now().minusDays(20).withHour(0).withMinute(0).withSecond(0);
+        LocalDateTime now = LocalDateTime.now();
 
-        List<Confirm> confirmList = confirmRepository.findByCreatedAt(startDateTime);
+        List<Confirm> confirmList = new ArrayList<>();
+
+        if (confirmListType.equals(ConfirmListType.RECENT)) {
+            LocalDateTime startDateTime = LocalDateTime.of(now.getYear(), now.getMonthValue(), now.getDayOfMonth()-6, 0, 0, 0);
+            confirmList = confirmRepository.findByCreatedAt(startDateTime);
+
+        } else if (confirmListType.equals(ConfirmListType.ALL)) {
+            confirmList = confirmRepository.findAll();
+        }
 
         List<User> userList = confirmList.stream().map(Confirm::getUser).collect(Collectors.toList());
 
