@@ -4,6 +4,7 @@ import com.mozi.moziserver.model.entity.QUser;
 import com.mozi.moziserver.model.entity.QUserPointRecord;
 import com.mozi.moziserver.model.entity.User;
 import com.mozi.moziserver.model.entity.UserPointRecord;
+import com.querydsl.core.types.Predicate;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 
 import java.time.LocalDateTime;
@@ -20,10 +21,13 @@ public class UserPointRecordRepositoryImpl extends QuerydslRepositorySupport imp
 
     @Override
     public List<UserPointRecord> findByUserAndPeriod(User user, LocalDateTime startDateTime, LocalDateTime endDateTime) {
+        Predicate[] predicates = new Predicate[]{
+                qUser.eq(user),
+                qUserPointRecord.updatedAt.goe(startDateTime).and(qUserPointRecord.updatedAt.lt(endDateTime))
+        };
 
         return from(qUserPointRecord)
-                .where(qUser.eq(user)
-                        .and(qUserPointRecord.createdAt.between(startDateTime, endDateTime)))
+                .where(predicates)
                 .fetch();
     }
 
