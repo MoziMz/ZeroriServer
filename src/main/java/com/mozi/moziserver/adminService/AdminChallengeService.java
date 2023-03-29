@@ -45,6 +45,9 @@ public class AdminChallengeService {
         Challenge challenge = challengeRepository.findById(seq)
                 .orElseThrow(ResponseError.NotFound.CHALLENGE_NOT_EXISTS::getResponseException);
 
+        ChallengeRecord challengeRecord = challengeRecordRepository.findByChallenge(challenge);
+        challenge.setChallengeRecord(challengeRecord);
+
         return challenge;
     }
 
