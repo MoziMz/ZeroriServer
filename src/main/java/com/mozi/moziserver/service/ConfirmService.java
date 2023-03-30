@@ -189,7 +189,7 @@ public class ConfirmService {
         }
     }
 
-    @Transactional
+    @Transactional // TODO delete transaction where get method
     public List<Confirm> getUserConfirmList(User user, ReqList req) {
 
         List<Confirm> confirmList = confirmRepository.findByUserByOrderDesc(user, req.getPrevLastSeq(), req.getPageSize());
