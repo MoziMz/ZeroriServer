@@ -55,7 +55,7 @@ public class ConfirmRepositoryImpl extends QuerydslRepositorySupport implements 
     public List<Confirm> findAllByChallenge(Challenge challenge, Long prevLastConfirmSeq, Integer pageSize) {
         Predicate[] predicates = new Predicate[]{
                 predicateOptional(qConfirm.seq::lt, prevLastConfirmSeq),
-                predicateOptional(qConfirm.challenge::eq, challenge), // TODO change parameter non optional
+                qConfirm.challenge.eq(challenge),
                 qConfirm.state.notIn(ConfirmStateType.DELETED, ConfirmStateType.BLOCKED)
         };
 
