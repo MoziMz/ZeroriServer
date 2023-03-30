@@ -35,32 +35,43 @@ public class ConfirmRepositoryImpl extends QuerydslRepositorySupport implements 
                 qConfirm.state.notIn(ConfirmStateType.DELETED, ConfirmStateType.BLOCKED)
         };
 
-        return
-                from(qConfirm)
-                        .innerJoin(qConfirm.challenge, qChallenge).fetchJoin()
-                        .innerJoin(qConfirm.user, qUser).fetchJoin()
-                        .leftJoin(qConfirm.confirmStickerList, qConfirmSticker).fetchJoin()
-                        .orderBy(qConfirm.seq.desc())
-                        .where(predicates)
-                        .limit(pageSize)
-                        .fetch();
+        List<Long> confirmSeqList = from(qConfirm)
+                .select(qConfirm.seq)
+                .where(predicates)
+                .orderBy(qConfirm.seq.desc())
+                .limit(pageSize)
+                .fetch();
+
+        return from(qConfirm)
+                .innerJoin(qConfirm.challenge, qChallenge).fetchJoin()
+                .innerJoin(qConfirm.user, qUser).fetchJoin()
+                .leftJoin(qConfirm.confirmStickerList, qConfirmSticker).fetchJoin()
+                .where(qConfirm.seq.in(confirmSeqList))
+                .orderBy(qConfirm.seq.desc())
+                .fetch();
     }
 
     @Override
     public List<Confirm> findAllByChallenge(Challenge challenge, Long prevLastConfirmSeq, Integer pageSize) {
         Predicate[] predicates = new Predicate[]{
                 predicateOptional(qConfirm.seq::lt, prevLastConfirmSeq),
-                predicateOptional(qConfirm.challenge::eq, challenge),
+                predicateOptional(qConfirm.challenge::eq, challenge), // TODO change parameter non optional
                 qConfirm.state.notIn(ConfirmStateType.DELETED, ConfirmStateType.BLOCKED)
         };
+
+        List<Long> confirmSeqList = from(qConfirm)
+                .select(qConfirm.seq)
+                .where(predicates)
+                .orderBy(qConfirm.createdAt.desc())
+                .limit(pageSize)
+                .fetch();
 
         return from(qConfirm)
                 .innerJoin(qConfirm.challenge, qChallenge).fetchJoin()
                 .innerJoin(qConfirm.user, qUser).fetchJoin()
                 .leftJoin(qConfirm.confirmStickerList, qConfirmSticker).fetchJoin()
+                .where(qConfirm.seq.in(confirmSeqList))
                 .orderBy(qConfirm.createdAt.desc())
-                .where(predicates)
-                .limit(pageSize)
                 .fetch();
     }
 
@@ -151,7 +162,7 @@ public class ConfirmRepositoryImpl extends QuerydslRepositorySupport implements 
         };
 
         return from(qConfirm)
-                .leftJoin(qConfirm.challenge, qChallenge).fetchJoin()
+                .leftJoin(qConfirm.challenge, qChallenge).fetchJoin() // TODO change to inner join
                 .where(predicates)
                 .orderBy(qConfirm.seq.desc())
                 .limit(pageSize)
