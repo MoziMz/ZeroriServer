@@ -13,7 +13,6 @@ import java.util.function.Function;
 public class ChallengeRepositoryImpl extends QuerydslRepositorySupport implements ChallengeRepositorySupport {
     private final QChallenge qChallenge = QChallenge.challenge;
     private final QChallengeTag qChallengeTag = QChallengeTag.challengeTag;
-    private final QChallengeRecord qChallengeRecord = QChallengeRecord.challengeRecord;
 
     public ChallengeRepositoryImpl() {
         super(Challenge.class);
@@ -22,9 +21,6 @@ public class ChallengeRepositoryImpl extends QuerydslRepositorySupport implement
     @Override
     public Optional<Challenge> findBySeq(Long seq) {
         return Optional.ofNullable(from(qChallenge)
-                .innerJoin(qChallengeRecord)
-                .on(qChallenge.seq.eq(qChallengeRecord.challenge.seq))
-                .fetchJoin()
                 .where(qChallenge.seq.eq(seq))
                 .fetchFirst());
     }
@@ -90,7 +86,6 @@ public class ChallengeRepositoryImpl extends QuerydslRepositorySupport implement
         };
 
         return from(qChallenge)
-                .innerJoin(qChallenge.challengeRecord, qChallengeRecord).fetchJoin()
                 .innerJoin(qChallengeTag).on(qChallenge.seq.eq(qChallengeTag.challenge.seq)).fetchJoin()
                 .where(predicates)
                 .offset(pageNumber * pageSize)
