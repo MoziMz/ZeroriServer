@@ -1,13 +1,11 @@
 package com.mozi.moziserver.service;
 
 import com.mozi.moziserver.httpException.ResponseError;
-import com.mozi.moziserver.model.entity.Challenge;
-import com.mozi.moziserver.model.entity.ChallengeScrap;
-import com.mozi.moziserver.model.entity.ChallengeTheme;
-import com.mozi.moziserver.model.entity.User;
+import com.mozi.moziserver.model.entity.*;
 import com.mozi.moziserver.model.mappedenum.ChallengeStateType;
 import com.mozi.moziserver.model.req.ReqChallengeList;
 import com.mozi.moziserver.model.req.ReqList;
+import com.mozi.moziserver.repository.ChallengeRecordRepository;
 import com.mozi.moziserver.repository.ChallengeRepository;
 import com.mozi.moziserver.repository.ChallengeScrapRepository;
 import com.mozi.moziserver.repository.ChallengeThemeRepository;
@@ -28,11 +26,15 @@ public class ChallengeService {
     private final ChallengeRepository challengeRepository;
     private final ChallengeScrapRepository challengeScrapRepository;
     private final ChallengeThemeRepository challengeThemeRepository;
+    private final ChallengeRecordRepository challengeRecordRepository;
 
     public Challenge getChallenge(Long seq) {
 
         Challenge challenge = challengeRepository.findBySeq(seq)
                 .orElseThrow(ResponseError.NotFound.CHALLENGE_NOT_EXISTS::getResponseException);
+
+        ChallengeRecord challengeRecord = challengeRecordRepository.findByChallenge(challenge);
+        challenge.setChallengeRecord(challengeRecord);
 
         checkChallengeState(challenge);
 

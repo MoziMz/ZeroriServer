@@ -40,7 +40,7 @@ public class Challenge extends AbstractTimeEntity {
     @Convert(converter = ExplanationConverter.class)
     private ChallengeExplanation explanation;
 
-    @OneToOne(fetch = FetchType.LAZY, mappedBy = "challenge", optional = false)
+    @Transient
     ChallengeRecord challengeRecord;
 
     @OneToMany(fetch = FetchType.LAZY)
