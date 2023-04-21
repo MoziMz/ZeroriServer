@@ -28,8 +28,8 @@ public class ResUserIslandList {
         this.name = island.getName();
         this.description = island.getDescription() + " 동물들을 도울 수 있어요";
         this.totalRequiredPoint = island.getOpenRequiredPoint();
-        this.currentRequiredPoint = island.getSeq() <= lastUserIsland.getSeq()
-                ? 0 : island.getSeq() == lastUserIsland.getSeq() + 1
+        this.currentRequiredPoint = island.getSeq() <= lastUserIsland.getDetailIsland().getIsland().getSeq()
+                ? 0 : island.getSeq() == lastUserIsland.getDetailIsland().getIsland().getSeq() + 1
                 ? Math.max(Constant.islandMaxPoint - currentUserPoint, 0) : Constant.islandMaxPoint;
         this.imgUrl = userIsland != null ? userIsland.getDetailIsland().getImgUrl() : null;
         this.thumbnailImgUrl = userIsland != null ? userIsland.getDetailIsland().getThumbnailImgUrl() : null;
