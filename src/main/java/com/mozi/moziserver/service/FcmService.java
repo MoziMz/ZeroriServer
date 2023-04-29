@@ -12,6 +12,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -22,6 +24,25 @@ public class FcmService {
         Message message = Message.builder()
                 .putData("isSilent", "" + type.isSilent())
                 .putData("type", type.toString())
+                .setToken(token)
+                .build();
+
+        try {
+            String response = FirebaseMessaging.getInstance().send(message);
+            log.debug(response);
+        } catch (FirebaseMessagingException e) {
+            log.error("FIREBASE_MESSAGING_EXCEPTION", e);
+            if (e.getMessagingErrorCode() == MessagingErrorCode.UNREGISTERED) {
+                log.error("UNREGISTERED_TOKEN", e);
+            }
+        }
+    }
+
+    private void sendDateMessage(String token, LocalDate date, FcmMessageType type) {
+        Message message = Message.builder()
+                .putData("isSilent", "" + type.isSilent())
+                .putData("type", type.toString())
+                .putData("date", date.toString())
                 .setToken(token)
                 .build();
 
@@ -56,5 +77,12 @@ public class FcmService {
                 .orElseThrow(() -> new RuntimeException("USER_FCM_TOKEN_IS_NOT_EXIST"));
 
         sendMessage(userFcm.getToken(), type);
+    }
+
+    public void sendDateMessageToUser(User user, LocalDate date, FcmMessageType type) {
+        UserFcm userFcm = userFcmRepository.findByUser(user)
+                .orElseThrow(() -> new RuntimeException("USER_FCM_TOKEN_IS_NOT_EXIST"));
+
+        sendDateMessage(userFcm.getToken(), date, type);
     }
 }
