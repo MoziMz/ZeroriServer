@@ -52,7 +52,7 @@ public class UserRewardService {
         userPointRecordRepository.save(userPointRecord);
     }
 
-    public Integer getPointOfUserPointRecord(User user, LocalDateTime startDateTime, LocalDateTime endDateTime) {
+    public Integer getPointOfUserPointRecordByPeriod(User user, LocalDateTime startDateTime, LocalDateTime endDateTime) {
 
         Integer sumPoint = 0;
         List<UserPointRecord> userPointRecordList = userPointRecordRepository.findByUserAndPeriod(user, startDateTime, endDateTime);

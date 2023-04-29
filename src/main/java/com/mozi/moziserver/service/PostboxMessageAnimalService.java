@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -32,6 +31,7 @@ public class PostboxMessageAnimalService {
 
     private final FcmService fcmService;
 
+    // -------------------- -------------------- PostboxMessageAnimal -------------------- -------------------- //
     public PostboxMessageAnimal getPostboxMessageAnimal(Long userSeq, Long seq) {
 
         User user = userRepository.getById(userSeq);
@@ -71,18 +71,10 @@ public class PostboxMessageAnimalService {
         return postboxMessageAnimalRepository.findAllByUser(user, req.getPageSize(), req.getPrevLastSeq());
     }
 
-    public void checkMessage(Long seq) {
+    public PostboxMessageAnimal getRecentPostboxMessageAnimalByUser(User user) {
 
-        PostboxMessageAnimal postboxMessageAnimal = postboxMessageAnimalRepository.findById(seq)
-                .orElseThrow(ResponseError.NotFound.POSTBOX_MESSAGE_ANIMAL_NOT_EXISTS::getResponseException);
-        postboxMessageAnimal.setCheckedState(true);
-        postboxMessageAnimalRepository.save(postboxMessageAnimal);
-    }
+        return postboxMessageAnimalRepository.findLastOneByUser(user);
 
-    public void createFirstMessageInIsland(User user, Long islandSeq) {
-
-        Animal animal = animalService.getAnimalByIslandAndTurn(islandSeq, 1);
-        createPostboxMessageAnimal(user, animal);
     }
 
     @Transactional
@@ -99,21 +91,33 @@ public class PostboxMessageAnimalService {
         userNoticeService.upsertUserNotice(user, UserNoticeType.POSTBOX_MESSAGE_ANIMAL_NEW_ARRIVED, postboxMessageAnimal.getSeq());
     }
 
+    public void createFirstMessageInIsland(User user, Long islandSeq) {
+
+        Animal animal = animalService.getAnimalByIslandAndTurn(islandSeq, 1);
+        createPostboxMessageAnimal(user, animal);
+    }
+
+    public void checkMessage(Long seq) {
+
+        PostboxMessageAnimal postboxMessageAnimal = postboxMessageAnimalRepository.findById(seq)
+                .orElseThrow(ResponseError.NotFound.POSTBOX_MESSAGE_ANIMAL_NOT_EXISTS::getResponseException);
+        postboxMessageAnimal.setCheckedState(true);
+        postboxMessageAnimalRepository.save(postboxMessageAnimal);
+    }
+
+    // -------------------- -------------------- PostboxMessageAnimalItem -------------------- -------------------- //
+    public List<PostboxMessageAnimalItem> getPostBoxMessageAnimalItemList(PostboxMessageAnimal postboxMessageAnimal) {
+
+        return postboxMessageAnimalItemRepository.findAllByPostboxMessageAnimal(postboxMessageAnimal);
+    }
+
+    // -------------------- -------------------- UserNotice -------------------- -------------------- //
     public UserNotice getUserNoticeByUserAndType(Long userSeq, UserNoticeType userNoticeType) {
         User user = userRepository.findById(userSeq)
                 .orElseThrow(ResponseError.NotFound.USER_NOT_EXISTS::getResponseException);
 
         return userNoticeRepository.findOneByUserAndTypeAndCheckedState(user, userNoticeType)
                 .orElseThrow(ResponseError.NotFound.USER_NOTICE_NOT_EXISTS::getResponseException);
-    }
-
-    @Transactional
-    public PostboxMessageAnimal getRecentPostboxMessageAnimalByUser(Long userSeq) {
-        User user = userRepository.findById(userSeq)
-                .orElseThrow(ResponseError.NotFound.USER_NOT_EXISTS::getResponseException);
-
-        return postboxMessageAnimalRepository.findLastOneByUser(user);
-
     }
 
     @Transactional
@@ -126,6 +130,7 @@ public class PostboxMessageAnimalService {
         userNoticeRepository.save(userNotice);
     }
 
+    // -------------------- -------------------- ETC -------------------- -------------------- //
     // return void new Arrived postboxMessageAnimal
     @Transactional
     public int incrementPostboxMessageAnimalItem(User user) {

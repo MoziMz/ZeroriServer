@@ -89,7 +89,7 @@ public class ScheduleService {
                     lastDetailIsland.getIsland().getSeq(),
                     lastDetailIsland.getAnimalTurn(),
                     lastDetailIsland.getItemTurn());
-            int userWeekPoint = userRewardService.getPointOfUserPointRecord(user, startDateTime, endDateTime);
+            int userWeekPoint = userRewardService.getPointOfUserPointRecordByPeriod(user, startDateTime, endDateTime);
             if (userWeekPoint < nextItemAcquisitionRequiredPoint) {
                 continue;
             }
@@ -97,9 +97,9 @@ public class ScheduleService {
             // step3. 현재 동물의 편지에 아이템을 추가하고 현재 섬을 업그레이드한다.
             AtomicInteger newMessageCnt = new AtomicInteger(0);
             withTransaction(() -> {
-                        newMessageCnt.set(postboxMessageAnimalService.incrementPostboxMessageAnimalItem(user));
-                        islandService.upgradeUserIsland(lastUserIsland, lastDetailIsland);
-                    });
+                newMessageCnt.set(postboxMessageAnimalService.incrementPostboxMessageAnimalItem(user));
+                islandService.upgradeUserIsland(lastUserIsland, lastDetailIsland);
+            });
 
             // step5. 모든 과정이 문제 없이 완료되었다면 FCM 푸시 알림을 보낸다.
             if (newMessageCnt.get() > 0) {
