@@ -1,11 +1,16 @@
 package com.mozi.moziserver.service;
 
 import com.mozi.moziserver.common.Constant;
-import com.mozi.moziserver.model.entity.*;
+import com.mozi.moziserver.model.entity.DetailIsland;
+import com.mozi.moziserver.model.entity.User;
+import com.mozi.moziserver.model.entity.UserChallenge;
+import com.mozi.moziserver.model.entity.UserIsland;
 import com.mozi.moziserver.model.mappedenum.FcmMessageType;
 import com.mozi.moziserver.model.mappedenum.PointReasonType;
 import com.mozi.moziserver.model.mappedenum.UserChallengeStateType;
-import com.mozi.moziserver.repository.*;
+import com.mozi.moziserver.repository.UserChallengeRepository;
+import com.mozi.moziserver.repository.UserRepository;
+import com.mozi.moziserver.repository.UserRewardRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -22,12 +27,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Component
 public class ScheduleService {
 
-
     private final PostboxMessageAnimalService postboxMessageAnimalService;
     private final UserRewardService userRewardService;
     private final FcmService fcmService;
     private final IslandService islandService;
     private final AnimalService animalService;
+    private final AsyncService asyncService;
 
     private final UserChallengeRepository userChallengeRepository;
     private final UserRewardRepository userRewardRepository;
@@ -54,6 +59,9 @@ public class ScheduleService {
             withTransaction(() -> {
                 if (userChallenge.getTotalConfirmCnt() >= userChallenge.getChallenge().getRecommendedCnt()) {
                     userRewardService.incrementPoint(userChallenge.getUser(), PointReasonType.CHALLENGE_EXTRA_POINT, Constant.challengeExtraPoints);
+
+                    //이삿날 푸시 알림 보내기
+                    asyncService.sendNewAnimalNotification(userChallenge.getUser());
                 }
 
                 userChallengeRepository.updateUserChallengeState(userChallenge.getSeq(), UserChallengeStateType.DOING, UserChallengeStateType.END);
@@ -89,7 +97,7 @@ public class ScheduleService {
                     lastDetailIsland.getIsland().getSeq(),
                     lastDetailIsland.getAnimalTurn(),
                     lastDetailIsland.getItemTurn());
-            int userWeekPoint = userRewardService.getPointOfUserPointRecord(user, startDateTime, endDateTime);
+            int userWeekPoint = userRewardService.getPointOfUserPointRecordByPeriod(user, startDateTime, endDateTime);
             if (userWeekPoint < nextItemAcquisitionRequiredPoint) {
                 continue;
             }
@@ -97,9 +105,9 @@ public class ScheduleService {
             // step3. 현재 동물의 편지에 아이템을 추가하고 현재 섬을 업그레이드한다.
             AtomicInteger newMessageCnt = new AtomicInteger(0);
             withTransaction(() -> {
-                        newMessageCnt.set(postboxMessageAnimalService.incrementPostboxMessageAnimalItem(user));
-                        islandService.upgradeUserIsland(lastUserIsland, lastDetailIsland);
-                    });
+                newMessageCnt.set(postboxMessageAnimalService.incrementPostboxMessageAnimalItem(user));
+                islandService.upgradeUserIsland(lastUserIsland, lastDetailIsland);
+            });
 
             // step5. 모든 과정이 문제 없이 완료되었다면 FCM 푸시 알림을 보낸다.
             if (newMessageCnt.get() > 0) {

@@ -9,6 +9,7 @@ import com.mozi.moziserver.repository.UserRewardRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -52,7 +53,7 @@ public class UserRewardService {
         userPointRecordRepository.save(userPointRecord);
     }
 
-    public Integer getPointOfUserPointRecord(User user, LocalDateTime startDateTime, LocalDateTime endDateTime) {
+    public Integer getPointOfUserPointRecordByPeriod(User user, LocalDateTime startDateTime, LocalDateTime endDateTime) {
 
         Integer sumPoint = 0;
         List<UserPointRecord> userPointRecordList = userPointRecordRepository.findByUserAndPeriod(user, startDateTime, endDateTime);
@@ -72,6 +73,21 @@ public class UserRewardService {
                 .point(0)
                 .build();
         userRewardRepository.save(userReward);
+    }
+
+    public Integer getUserPointOfThisWeek(User user) {
+        LocalDateTime now = LocalDateTime.now();
+
+        int minusDays = now.getDayOfWeek().getValue();
+
+        if (minusDays == DayOfWeek.SUNDAY.getValue() && now.getHour() >= 21) {
+            minusDays = 0;
+        }
+        LocalDateTime sundayDate = LocalDateTime.now().minusDays(minusDays).withHour(21).withMinute(0).withSecond(0);
+
+        Integer thisWeekUserPoint = getPointOfUserPointRecordByPeriod(user, sundayDate, now);
+
+        return thisWeekUserPoint;
     }
 
 }

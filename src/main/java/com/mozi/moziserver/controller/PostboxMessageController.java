@@ -18,8 +18,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.time.DayOfWeek;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -142,16 +140,7 @@ public class PostboxMessageController {
 
         User user = userService.getUserBySeq(userSeq);
 
-        LocalDateTime now = LocalDateTime.now();
-        int minusDays = now.getDayOfWeek().getValue();
-
-        if (minusDays == DayOfWeek.SUNDAY.getValue() && now.getHour() >= 21) {
-            minusDays = 0;
-        }
-
-        LocalDateTime sundayDate = LocalDateTime.of(now.getYear(), now.getMonthValue(), now.getDayOfMonth() - minusDays, 21, 0, 0);
-
-        Integer thisWeekUserRewardPoint = userRewardService.getPointOfUserPointRecord(user, sundayDate, now);
+        Integer thisWeekUserRewardPoint = userRewardService.getUserPointOfThisWeek(user);
 
         return ResPostboxMessageAnimal.of(postboxMessageAnimal, thisWeekUserRewardPoint);
     }
