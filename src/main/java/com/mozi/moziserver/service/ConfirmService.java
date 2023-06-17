@@ -33,18 +33,20 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ConfirmService {
 
+    private final UserChallengeService userChallengeService;
+    private final UserRewardService userRewardService;
+    private final AsyncService asyncService;
+    private final S3ImageService s3ImageService;
+
     private final ChallengeRepository challengeRepository;
     private final ConfirmRepository confirmRepository;
     private final ConfirmReportRepository confirmReportRepository;
     private final ConfirmStickerRepository confirmStickerRepository;
-    private final UserChallengeService userChallengeService;
     private final ChallengeRecordRepository challengeRecordRepository;
-    private final UserRewardService userRewardService;
     private final ConfirmLikeRepository confirmLikeRepository;
     private final StickerRepository stickerRepository;
     private final UserStickerRepository userStickerRepository;
 
-    private final S3ImageService s3ImageService;
     private final PlatformTransactionManager transactionManager;
 
     //인증 생성
@@ -88,7 +90,11 @@ public class ConfirmService {
             challengeRecordRepository.save(challengeRecord);
 
             userRewardService.incrementPoint(user, PointReasonType.CHALLENGE_CONFIRM, challenge.getPoint());
+
         });
+
+        //이삿날 푸시 알림 보내기
+        asyncService.sendNewAnimalNotification(user);
     }
 
     public List<Confirm> getConfirmList(User user, ReqList req, ConfirmListType confirmListType) {
