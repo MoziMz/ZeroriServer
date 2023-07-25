@@ -217,8 +217,8 @@ public class UserService {
 
             userAuthRepository.save(userAuth);
 
-            islandService.firstCreateUserIsland(user);
-            userRewardService.firstCreateUserReward(user);
+            islandService.createUserIslandForJoin(user);
+            userRewardService.createUserRewardForJoin(user);
         });
     }
 

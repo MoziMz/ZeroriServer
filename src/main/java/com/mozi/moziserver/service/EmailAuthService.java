@@ -291,8 +291,8 @@ public class EmailAuthService {
                 user.setEmail(userAuth.getId());
                 userRepository.save(user);
 
-                islandService.firstCreateUserIsland(user);
-                userRewardService.firstCreateUserReward(user);
+                islandService.createUserIslandForJoin(user);
+                userRewardService.createUserRewardForJoin(user);
             });
         } catch (DataIntegrityViolationException e) {
             if (JpaUtil.isDuplicateKeyException(e)) {
