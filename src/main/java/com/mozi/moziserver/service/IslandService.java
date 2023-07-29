@@ -14,7 +14,6 @@ import com.mozi.moziserver.repository.UserIslandRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -23,12 +22,12 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class IslandService {
-    
+
     private final UserRewardService userRewardService;
     private final PostboxMessageAnimalService postboxMessageAnimalService;
     private final AnimalService animalService;
     private final AsyncService asyncService;
-    
+
     private final IslandRepository islandRepository;
     private final UserIslandRepository userIslandRepository;
     private final DetailIslandRepository detailIslandRepository;
@@ -39,7 +38,7 @@ public class IslandService {
         return islandRepository.findById(seq)
                 .orElseThrow(ResponseError.NotFound.ISLAND_NOT_EXISTS::getResponseException);
     }
-    
+
     public List<Island> getIslandListOrderBySeq() {
 
         return islandRepository.findAllByOrderBySeqAsc();
@@ -53,8 +52,13 @@ public class IslandService {
     }
 
     public DetailIsland getFirstDetailIslandOfIsland(Long islandSeq) {
-
         return detailIslandRepository.findByIslandSeqAndAnimalTurnAndItemTurn(islandSeq, 0, 0)
+                .orElseThrow(ResponseError.NotFound.DETAIL_ISLAND_NOT_EXISTS::getResponseException);
+    }
+
+    public DetailIsland getDetailIslandForJoin() {
+        //회원가입하자마자 튜토리얼을 고려
+        return detailIslandRepository.findByIslandSeqAndAnimalTurnAndItemTurn(1L, 1, 1)
                 .orElseThrow(ResponseError.NotFound.DETAIL_ISLAND_NOT_EXISTS::getResponseException);
     }
 
@@ -86,15 +90,10 @@ public class IslandService {
 
         return userIslandRepository.findTopByUserOrderByIsland(user);
     }
-    
+
     public List<UserIsland> getUserIslandListOrderByIslandSeq(User user) {
 
         return userIslandRepository.findAllByUserOrderByIsland(user);
-    }
-
-    public void firstCreateUserIsland(User user) {
-
-        createUserIsland(user, 1L);
     }
 
     public void createUserIsland(User user, Long islandSeq) {
@@ -106,10 +105,23 @@ public class IslandService {
                 .build();
         userIslandRepository.save(userIsland);
 
-        postboxMessageAnimalService.createFirstMessageInIsland(user, islandSeq);
-
         asyncService.sendNewAnimalNotification(user);
         asyncService.sendAnimalMention(user);
+        postboxMessageAnimalService.createFirstPostboxMessageAnimal(user, islandSeq);
+
+    }
+
+    @Transactional
+    public void createUserIslandForJoin(User user) {
+
+        DetailIsland detailIsland = getDetailIslandForJoin();
+        UserIsland userIsland = UserIsland.builder()
+                .detailIsland(detailIsland)
+                .user(user)
+                .build();
+        userIslandRepository.save(userIsland);
+
+        postboxMessageAnimalService.createPostboxMessageAnimalForJoin(user, 1L);
     }
 
     @Transactional

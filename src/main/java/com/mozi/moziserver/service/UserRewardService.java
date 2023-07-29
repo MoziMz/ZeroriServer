@@ -1,5 +1,6 @@
 package com.mozi.moziserver.service;
 
+import com.mozi.moziserver.common.Constant;
 import com.mozi.moziserver.model.entity.User;
 import com.mozi.moziserver.model.entity.UserPointRecord;
 import com.mozi.moziserver.model.entity.UserReward;
@@ -67,11 +68,11 @@ public class UserRewardService {
         return sumPoint;
     }
 
-    public void firstCreateUserReward(User user) {
+    public void createUserRewardForJoin(User user) {
 
         UserReward userReward = UserReward.builder()
                 .user(user)
-                .point(0)
+                .point(Constant.TUTORIAL_ANIMAL_ITEM_POINT)
                 .build();
         userRewardRepository.save(userReward);
     }
