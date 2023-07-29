@@ -98,4 +98,6 @@ public interface Constant {
     int lastTurnOfAnimalItem = 2;
 
     int totalImagesPerIsland = 11;
+
+    int TUTORIAL_ANIMAL_ITEM_POINT = 5;
 }
