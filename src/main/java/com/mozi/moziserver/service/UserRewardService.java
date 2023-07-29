@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
+import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 
 @Service
@@ -90,5 +91,17 @@ public class UserRewardService {
         return thisWeekUserPoint;
     }
 
-}
+    /**
+     * @return 다가오는 일요일 9시
+     */
+    public LocalDateTime getNextResetTimeOfUserWeekPoint() {
 
+        LocalDateTime now = LocalDateTime.now();
+
+        if (now.getDayOfWeek().equals(DayOfWeek.SUNDAY) && now.isBefore(now.withHour(21).withMinute(0).withSecond(0))) {
+            return now.withHour(21).withMinute(0).withSecond(0);
+        }
+
+        return now.with(TemporalAdjusters.next(DayOfWeek.SUNDAY)).withHour(21).withMinute(0).withSecond(0);
+    }
+}

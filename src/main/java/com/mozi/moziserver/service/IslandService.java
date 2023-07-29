@@ -27,6 +27,7 @@ public class IslandService {
     private final UserRewardService userRewardService;
     private final PostboxMessageAnimalService postboxMessageAnimalService;
     private final AnimalService animalService;
+    private final AsyncService asyncService;
     
     private final IslandRepository islandRepository;
     private final UserIslandRepository userIslandRepository;
@@ -106,6 +107,9 @@ public class IslandService {
         userIslandRepository.save(userIsland);
 
         postboxMessageAnimalService.createFirstMessageInIsland(user, islandSeq);
+
+        asyncService.sendNewAnimalNotification(user);
+        asyncService.sendAnimalMention(user);
     }
 
     @Transactional

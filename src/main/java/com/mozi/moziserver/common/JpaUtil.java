@@ -7,7 +7,7 @@ import java.sql.SQLException;
 import java.util.Optional;
 
 public class JpaUtil {
-    private final static Integer SQL_ERROR_UNIQUE_KEY_DUPLICATE = 1062;
+    private final static Integer SQL_ERROR_UNIQUE_KEY_DUPLICATE = 1062; // MySQL 한정 에러 코드
 
     public static boolean isDuplicateKeyException(DataIntegrityViolationException e) {
         if (e.getCause() == null || !(e.getCause() instanceof ConstraintViolationException)) {
