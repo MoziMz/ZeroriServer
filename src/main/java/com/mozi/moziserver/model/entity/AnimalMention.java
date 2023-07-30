@@ -14,7 +14,9 @@ public class AnimalMention extends AbstractTimeEntity {
 
     private Integer itemTurn;
 
-    private Integer point;
+    private Integer startPoint;
+
+    private Integer rangePoint;
 
     private String content;
 

@@ -99,6 +99,8 @@ public interface Constant {
 
     int totalImagesPerIsland = 11;
 
+    int TUTORIAL_ANIMAL_ITEM_POINT = 5;
+
     List<String> RANDOM_ANIMAL_MENTIONS = Arrays.asList(
             "매주 일요일 위시리스트를 받을 수 있어!",
             "위시리스트 2개를 모으면 내가 이사갈 수 있어!",

@@ -14,16 +14,14 @@ import java.util.List;
 public class AnimalMentionFcmMessage extends FcmMessage {
 
     private final Long islandSeq;
-    private final Long animalSeq;
     private final String animalImgUrl;
     private final List<String> mentionList;
 
     @Builder
-    public AnimalMentionFcmMessage(@NonNull FcmMessageType fcmMessageType, @NonNull LocalDateTime expirationDateTime, @NonNull Long islandSeq, @NonNull Long animalSeq, @NonNull String animalImgUrl, @NonNull List<String> mentionList) {
+    public AnimalMentionFcmMessage(@NonNull FcmMessageType fcmMessageType, @NonNull LocalDateTime expirationDateTime, @NonNull Long islandSeq, @NonNull String animalImgUrl, @NonNull List<String> mentionList) {
 
         super(fcmMessageType, expirationDateTime);
         this.islandSeq = islandSeq;
-        this.animalSeq = animalSeq;
         this.animalImgUrl = animalImgUrl;
         this.mentionList = mentionList;
     }
@@ -37,7 +35,6 @@ public class AnimalMentionFcmMessage extends FcmMessage {
                 .putData("sendAt", String.valueOf(getSendAt()))
                 .putData("expirationDateTime", String.valueOf(getExpirationDateTime()))
                 .putData("islandSeq", String.valueOf(islandSeq))
-                .putData("animalSeq", String.valueOf(islandSeq))
                 .putData("animalImgUrl", animalImgUrl)
                 .putData("mentions", JsonUtil.toJson(mentionList))
                 .setToken(token)

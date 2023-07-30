@@ -99,7 +99,6 @@ public class AsyncService {
                     .fcmMessageType(fcmMessageType)
                     .expirationDateTime(expirationDateTime)
                     .islandSeq(lastDetailIsland.getSeq())
-                    .animalSeq(currentAnimal.getSeq())
                     .animalImgUrl(currentAnimal.getImgUrl())
                     .mentionList(animalMentions)
                     .build();
@@ -117,7 +116,6 @@ public class AsyncService {
                     .fcmMessageType(fcmMessageType)
                     .expirationDateTime(expirationDateTime)
                     .islandSeq(lastDetailIsland.getSeq())
-                    .animalSeq(nextAnimal.getSeq())
                     .animalImgUrl(nextAnimal.getImgUrl())
                     .mentionList(animalMentions)
                     .build();

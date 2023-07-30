@@ -6,15 +6,15 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.Optional;
+import java.util.*;
 
 @Repository
 public interface AnimalMentionRepository extends JpaRepository<AnimalMention, Long> {
 
-    @Query(name = "SELECT FROM animal_mention WHERE animal_seq = :animalSeq AND item_turn = :itemTurn AND point >= :point ORDER BY point LIMIT 1")
-    Optional<AnimalMention> findByAnimalSeqAndItemTurnAndPoint(
+    @Query("SELECT a FROM animal_mention a WHERE a.animal.seq = :animalSeq AND a.itemTurn = :itemTurn AND a.startPoint <= :userWeekPoint AND :userWeekPoint < (a.startPoint + a.rangePoint)")
+    List<AnimalMention> findByAnimalSeqAndItemTurnAndUserWeekPoint(
             @Param("animalSeq") Long animalSeq,
             @Param("itemTurn") Integer itemTurn,
-            @Param("point") Integer point
+            @Param("userWeekPoint") Integer userWeekPoint
     );
 }

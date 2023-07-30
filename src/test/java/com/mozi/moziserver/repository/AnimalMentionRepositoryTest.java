@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
+import java.util.*;
+
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 public class AnimalMentionRepositoryTest {
@@ -18,10 +20,10 @@ public class AnimalMentionRepositoryTest {
     @Test
     @DisplayName("AnimalMention 적절하게 조회되는지 확인")
     void findAnimalMention() {
-        AnimalMention animalMention = animalMentionRepository.findByAnimalSeqAndItemTurnAndPoint(2L, 2, 5);
+        AnimalMention animalMention = animalMentionRepository.findByAnimalSeqAndItemTurnAndUserWeekPoint(2L, 2, 5).get(0);
 
         Assertions.assertEquals(2L, animalMention.getAnimal().getSeq());
         Assertions.assertEquals(2, animalMention.getItemTurn());
-        Assertions.assertEquals("밤에도 낮에도 선명한 제로리를 보고싶어!", animalMention.getContent());
+        Assertions.assertEquals("한 번 더 제로하면 연못이 온대요!", animalMention.getContent());
     }
 }

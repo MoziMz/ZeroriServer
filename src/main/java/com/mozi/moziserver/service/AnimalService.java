@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -96,8 +97,12 @@ public class AnimalService {
     // -------------------- -------------------- animal mention -------------------- -------------------- //
     public List<String> getAnimalMentionListByAnimalAndItemAndPoint(Long animalSeq, Integer itemTurn, Integer userPoint) {
 
-        Optional<AnimalMention> animalMention = animalMentionRepository.findByAnimalSeqAndItemTurnAndPoint(animalSeq, itemTurn, userPoint);
+        List<AnimalMention> animalMentionList = animalMentionRepository.findByAnimalSeqAndItemTurnAndUserWeekPoint(animalSeq, itemTurn, userPoint);
 
-        return animalMention.map(mention -> Collections.singletonList(mention.getContent())).orElse(Constant.RANDOM_ANIMAL_MENTIONS);
+        if (animalMentionList.isEmpty()) {
+            return Constant.RANDOM_ANIMAL_MENTIONS;
+        }
+
+        return animalMentionList.stream().map(AnimalMention::getContent).collect(Collectors.toList());
     }
 }
