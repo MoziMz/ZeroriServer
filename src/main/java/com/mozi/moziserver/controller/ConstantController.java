@@ -2,6 +2,7 @@ package com.mozi.moziserver.controller;
 
 
 import com.mozi.moziserver.model.entity.ChallengeTheme;
+import com.mozi.moziserver.model.entity.Topic;
 import com.mozi.moziserver.model.res.ResCurrentTagList;
 import com.mozi.moziserver.service.ChallengeService;
 import com.mozi.moziserver.service.CurrentTagListService;
@@ -39,5 +40,12 @@ public class ConstantController {
     public List<ChallengeTheme> getChallengeThemeList() {
 
         return challengeService.getChallengeThemeList();
+    }
+
+    @ApiOperation("챌린지 주제 리스트 조회")
+    @GetMapping("v1/challenge-topics")
+    public List<Topic> getChallengeTopicList() {
+
+        return challengeService.getChallengeTopicList();
     }
 }

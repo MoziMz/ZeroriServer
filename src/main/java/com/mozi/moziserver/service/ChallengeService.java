@@ -5,10 +5,7 @@ import com.mozi.moziserver.model.entity.*;
 import com.mozi.moziserver.model.mappedenum.ChallengeStateType;
 import com.mozi.moziserver.model.req.ReqChallengeList;
 import com.mozi.moziserver.model.req.ReqList;
-import com.mozi.moziserver.repository.ChallengeRecordRepository;
-import com.mozi.moziserver.repository.ChallengeRepository;
-import com.mozi.moziserver.repository.ChallengeScrapRepository;
-import com.mozi.moziserver.repository.ChallengeThemeRepository;
+import com.mozi.moziserver.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -27,6 +24,8 @@ public class ChallengeService {
     private final ChallengeScrapRepository challengeScrapRepository;
     private final ChallengeThemeRepository challengeThemeRepository;
     private final ChallengeRecordRepository challengeRecordRepository;
+    private final TopicRepository topicRepository;
+    private final CurrentTopicRepository currentTopicRepository;
 
     public Challenge getChallenge(Long seq) {
 
@@ -46,6 +45,7 @@ public class ChallengeService {
         return challengeRepository.findAll(
                 req.getTagSeqList(),
                 req.getThemeSeqList(),
+                req.getTopicSeq(),
                 req.getKeyword(),
                 req.getPageSize(),
                 req.getPrevLastPostSeq()
@@ -127,9 +127,14 @@ public class ChallengeService {
         return challengeThemeRepository.findAll();
     }
 
-    public void checkChallengeState(Challenge challenge){
+    public List<Topic> getChallengeTopicList() {
 
-        if(challenge.getState() == ChallengeStateType.DELETED){
+        return topicRepository.findAllOrderByCurrentTopicTurn();
+    }
+
+    public void checkChallengeState(Challenge challenge) {
+
+        if (challenge.getState() == ChallengeStateType.DELETED) {
             throw ResponseError.BadRequest.CHALLENGE_STATE_TYPE_IS_DELETED.getResponseException();
         }
     }

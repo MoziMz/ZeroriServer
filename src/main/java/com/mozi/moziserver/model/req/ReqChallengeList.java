@@ -18,6 +18,8 @@ public class ReqChallengeList {
 
     private List<Long> themeSeqList;
 
+    private Long topicSeq;
+
     private String keyword;
 
     private Boolean isRandom = Boolean.FALSE;

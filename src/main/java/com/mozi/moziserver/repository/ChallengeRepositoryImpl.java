@@ -1,6 +1,9 @@
 package com.mozi.moziserver.repository;
 
-import com.mozi.moziserver.model.entity.*;
+import com.mozi.moziserver.model.entity.Challenge;
+import com.mozi.moziserver.model.entity.QChallenge;
+import com.mozi.moziserver.model.entity.QChallengeTag;
+import com.mozi.moziserver.model.entity.QChallengeTopic;
 import com.mozi.moziserver.model.mappedenum.ChallengeStateType;
 import com.querydsl.core.types.Predicate;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
@@ -13,6 +16,7 @@ import java.util.function.Function;
 public class ChallengeRepositoryImpl extends QuerydslRepositorySupport implements ChallengeRepositorySupport {
     private final QChallenge qChallenge = QChallenge.challenge;
     private final QChallengeTag qChallengeTag = QChallengeTag.challengeTag;
+    private final QChallengeTopic qChallengeTopic = QChallengeTopic.challengeTopic;
 
     public ChallengeRepositoryImpl() {
         super(Challenge.class);
@@ -29,6 +33,7 @@ public class ChallengeRepositoryImpl extends QuerydslRepositorySupport implement
     public List<Challenge> findAll(
             List<Long> tagSeqList,
             List<Long> themeSeqList,
+            Long topicSeq,
             String keyword,
             Integer pageSize,
             Long prevLastPostSeq
@@ -37,12 +42,14 @@ public class ChallengeRepositoryImpl extends QuerydslRepositorySupport implement
                 predicateOptional(qChallenge.seq::lt, prevLastPostSeq),
                 predicateOptional(qChallenge.themeSeq::in, themeSeqList),
                 predicateOptional(qChallengeTag.tag.seq::in, tagSeqList),
+                predicateOptional(QChallengeTopic.challengeTopic.topic.seq::eq, topicSeq),
                 keyword != null ? predicateOptional(qChallenge.name::like, '%' + keyword + '%') : null,
                 qChallenge.state.ne(ChallengeStateType.DELETED)
         };
 
         return from(qChallenge)
                 .innerJoin(qChallengeTag).on(qChallenge.seq.eq(qChallengeTag.challenge.seq)).fetchJoin()
+                .innerJoin(qChallengeTopic).on(qChallenge.seq.eq(qChallengeTopic.challenge.seq)).fetchJoin()
                 .where(predicates)
                 .orderBy(qChallenge.seq.desc())
                 .limit(pageSize)

@@ -1,6 +1,5 @@
 package com.mozi.moziserver.controller;
 
-import com.mozi.moziserver.httpException.ResponseError;
 import com.mozi.moziserver.model.entity.*;
 import com.mozi.moziserver.model.req.ReqChallengeList;
 import com.mozi.moziserver.model.req.ReqList;
@@ -8,7 +7,6 @@ import com.mozi.moziserver.model.res.ResChallenge;
 import com.mozi.moziserver.model.res.ResChallengeList;
 import com.mozi.moziserver.model.res.ResChallengeTagList;
 import com.mozi.moziserver.model.res.ResSearchOfChallengeList;
-import com.mozi.moziserver.repository.UserRepository;
 import com.mozi.moziserver.security.SessionUser;
 import com.mozi.moziserver.service.*;
 import io.swagger.annotations.ApiOperation;
@@ -62,9 +60,9 @@ public class ChallengeController {
 
         ChallengeScrap challengeScrap = challengeService.getChallengeScrap(challenge, user);
 
-        Optional<Confirm> optionalConfirm=confirmService.getConfirmByChallenge(challenge);
+        Optional<Confirm> optionalConfirm = confirmService.getConfirmByChallenge(challenge);
 
-        return ResChallenge.of(challenge, optionalUserChallenge, optionalUserChallengeRecord, challengeStatisticsList, challengeTagList, challengeScrap,optionalConfirm);
+        return ResChallenge.of(challenge, optionalUserChallenge, optionalUserChallengeRecord, challengeStatisticsList, challengeTagList, challengeScrap, optionalConfirm);
     }
 
     @ApiOperation("챌린지 모두 조회")
@@ -78,13 +76,13 @@ public class ChallengeController {
 
         List<ChallengeScrap> challengeScrapList = challengeScrapService.getChallengeScrapList(user);
 
-        long challengeCnt=challengeService.getChallengeCnt(req);
+        long challengeCnt = challengeService.getChallengeCnt(req);
 
         List<Challenge> challengeListPaging = challengeService.getChallengeList(req);
 
         List<ResChallengeList> challengeLists = new ArrayList<ResChallengeList>();
 
-        for (Challenge challenge: challengeListPaging) {
+        for (Challenge challenge : challengeListPaging) {
             Boolean flag = false;
             for (ChallengeScrap cs : challengeScrapList) {
                 if (cs.getChallenge().equals(challenge)) {
@@ -93,7 +91,7 @@ public class ChallengeController {
                 }
             }
             if (!flag) {
-                challengeLists.add(ResChallengeList.of(challenge,false));
+                challengeLists.add(ResChallengeList.of(challenge, false));
             }
         }
 
@@ -107,7 +105,7 @@ public class ChallengeController {
             challengeLists.add(lastResChallenge);
         }
 
-        return ResSearchOfChallengeList.of(challengeCnt,challengeLists);
+        return ResSearchOfChallengeList.of(challengeCnt, challengeLists);
     }
 
     @ApiOperation("스크랩한 챌린지 리스트 조회")
@@ -152,4 +150,3 @@ public class ChallengeController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }
-

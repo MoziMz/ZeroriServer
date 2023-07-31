@@ -15,6 +15,7 @@ public class CurrentTagListService {
     private final CurrentTagListRepository currentTagListRepository;
 
     public List<CurrentTagList> getCurrentTagList() {
+
         return currentTagListRepository.findAllByOrderByTurn();
     }
 
