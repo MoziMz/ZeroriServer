@@ -54,7 +54,13 @@ public interface ResponseError {
         INVALID_CURRENT_TAG_LIST("invalid current tag list"),
         INVALID_CURRENT_THEME_LIST("invalid current theme list"),
         CHALLENGE_STATE_TYPE_IS_DELETED("challenge state type is deleted"),
-        INVALID_ANIMAL_SEQ("invalid animal seq");
+        INVALID_ANIMAL_SEQ("invalid animal seq"),
+        ALREADY_EXISTS_TOPIC_TITLE("already exists topic title"),
+        TOPIC_SEQ_IS_DUPLICATED("topic seq is duplicated"),
+        CHALLENGE_SEQ_IS_DUPLICATED("challenge seq is duplicated"),
+        ALREADY_EXISTS_CHALLENGE_TOPIC("already exists challenge topic"),
+        ALREADY_EXISTS_CHALLENGE_SEQ("already exists challenge seq");
+
         private final String message;
 
         public ResponseException getResponseException() {
@@ -132,8 +138,8 @@ public interface ResponseError {
         CHALLENGE_TAG_NOT_EXISTS("challenge tag not exists"),
         DETAIL_ISLAND_NOT_EXISTS("detail island not exists"),
         NOT_EXISTS("not exists"),
-
-        ANIMAL_ITEM_NOT_EXISTS("animal item not exists");
+        ANIMAL_ITEM_NOT_EXISTS("animal item not exists"),
+        CHALLENGE_TOPIC_NOT_EXISTS("challenge topic not exists");
 
         private final String message;
 

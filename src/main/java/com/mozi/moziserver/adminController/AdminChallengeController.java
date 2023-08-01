@@ -10,6 +10,7 @@ import com.mozi.moziserver.model.adminRes.*;
 import com.mozi.moziserver.model.entity.Challenge;
 import com.mozi.moziserver.model.entity.ChallengeStatistics;
 import com.mozi.moziserver.model.entity.ChallengeTheme;
+import com.mozi.moziserver.model.entity.Topic;
 import com.mozi.moziserver.model.mappedenum.ChallengeTagType;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
@@ -17,11 +18,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Max;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Slf4j
 @RestController
@@ -52,11 +55,12 @@ public class AdminChallengeController {
             @RequestParam(name = "themeSeq", required = false) Long themeSeq,
             @RequestParam(name = "main_tag", required = false) ChallengeTagType tag,
             @RequestParam(name = "keyword", required = false) String keyword, // challenge name
+            @RequestParam(name = "topicSeq", required = false) Long topicSeq,
             @RequestParam(name = "pageNumber", required = false, defaultValue = "0") Integer pageNumber,
             @RequestParam(name = "pageSize", required = false, defaultValue = "20") @Max(30) Integer pageSize
 
     ) {
-        List<Challenge> challengeList = adminChallengeService.getChallengeListByThemeAndTagAndName(themeSeq, tag, keyword, pageNumber, pageSize);
+        List<Challenge> challengeList = adminChallengeService.getChallengeListByThemeAndTagAndName(themeSeq, tag, topicSeq, keyword, pageNumber, pageSize);
 
         return challengeList
                 .stream()
@@ -299,6 +303,113 @@ public class AdminChallengeController {
             @PathVariable(name = "seq") Long seq
     ) {
         adminChallengeService.deleteCurrentThemeList(seq);
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    // -------------------- -------------------- ChallengeTopic -------------------- -------------------- //
+    @ApiOperation("전체 챌린지 주제 리스트 조회")
+    @GetMapping("/admin/topics")
+    public List<Topic> getTopicList() {
+
+        return adminChallengeService.getTopicList();
+    }
+
+    @ApiOperation("현재 챌린지 주제 리스트 조회")
+    @GetMapping("/admin/current-topic-lists")
+    public List<AdminResCurrentTopicList> getCurrentTopicList() {
+
+        List<Topic> topicList = adminChallengeService.getCurrentTopicList();
+
+        return IntStream.range(0, topicList.size())
+                .mapToObj(i -> AdminResCurrentTopicList.of(i + 1, topicList.get(i)))
+                .collect(Collectors.toList());
+    }
+
+    @ApiOperation("챌린지 주제 등록")
+    @PostMapping("/admin/topics")
+    public ResponseEntity<Object> createTopic(
+            @RequestParam(value = "title", required = true) String title,
+            @RequestParam(value = "subTitle", required = true) String subTitle,
+            @RequestPart(required = true) MultipartFile image,
+            @RequestParam(value = "isCurrentTopicList", required = true) boolean isCurrentTopicLists
+    ) {
+
+        if (isCurrentTopicLists) {
+            adminChallengeService.createTopicAndCurrentTopic(title, subTitle, image);
+        } else {
+            adminChallengeService.createTopicOnly(title, subTitle, image);
+        }
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @ApiOperation("챌린지 주제에 챌린지 등록")
+    @PostMapping("/admin/challenge-topics")
+    public ResponseEntity<Object> createChallengeTopicByTopic(
+            @RequestBody(required = true) Long topicSeq,
+            @RequestBody(required = true) List<Long> challengeSeqList
+    ) {
+
+        List<Long> distinctChallengeSeqList = challengeSeqList.stream().distinct().collect(Collectors.toList());
+        if (distinctChallengeSeqList.size() != challengeSeqList.size()) {
+            throw ResponseError.BadRequest.CHALLENGE_SEQ_IS_DUPLICATED.getResponseException();
+        }
+
+        adminChallengeService.createChallengeTopicByTopic(topicSeq, challengeSeqList);
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @ApiOperation("챌린지 주제 수정")
+    @PutMapping("/admin/topics/{seq}")
+    public ResponseEntity<Object> updateTopic(
+            @PathVariable(value = "seq", required = true) Long seq,
+            @RequestParam(value = "title", required = false) String title,
+            @RequestParam(value = "subTitle", required = false) String subTitle,
+            @RequestPart(required = false) MultipartFile image
+    ) {
+
+        adminChallengeService.updateTopic(seq, title, subTitle, image);
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @ApiOperation("현재 챌린지 주제 리스트 변경 (순서 변경/ 추가/ 삭제)")
+    @PutMapping("/admin/current-topic-list")
+    public ResponseEntity<Object> updateCurrentTopicList(
+            @RequestBody @Valid List<Long> topicSeqList
+    ) {
+
+        List<Long> distinctTopicSeqList = topicSeqList.stream().distinct().collect(Collectors.toList());
+        if (topicSeqList.size() != distinctTopicSeqList.size()) {
+            throw ResponseError.BadRequest.TOPIC_SEQ_IS_DUPLICATED.getResponseException();
+        }
+
+        adminChallengeService.updateAllCurrentTopicList(topicSeqList);
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @ApiOperation("챌린지 주제 삭제")
+    @DeleteMapping("/admin/topics/{seq}")
+    public ResponseEntity<Object> deleteTopic(
+            @PathVariable(value = "seq", required = true) Long seq
+    ) {
+
+        adminChallengeService.deleteTopic(seq);
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @ApiOperation("챌린지 주제에서 챌린지 삭제")
+    @DeleteMapping("/admin/challenge-topics")
+    public ResponseEntity<Object> deleteChallengeTopic(
+            @RequestParam(required = true) Long topicSeq,
+            @RequestParam(required = true) Long challengeSeq
+    ) {
+
+        adminChallengeService.deleteChallengeTopicByTopicAndChallenge(topicSeq, challengeSeq);
 
         return new ResponseEntity<>(HttpStatus.OK);
     }

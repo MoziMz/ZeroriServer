@@ -26,9 +26,10 @@ public interface ChallengeRepositorySupport {
 
     // -------------------- -------------------- below admin methods -------------------- -------------------- //
 
-    List<Challenge> findAllByThemeAndTagAndName(
+    List<Challenge> findAllByThemeAndTagAndTopicAndName(
             Long themeSeq,
             Long tagSeq,
+            Long topicSeq,
             String keyword,
             Integer pageNumber,
             Integer pageSize

@@ -16,8 +16,6 @@ public class ChallengeTopic extends AbstractTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long seq;
 
-    private Integer turn;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "topic_seq")
     private Topic topic;

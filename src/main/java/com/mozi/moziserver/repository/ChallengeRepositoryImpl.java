@@ -79,9 +79,10 @@ public class ChallengeRepositoryImpl extends QuerydslRepositorySupport implement
     // -------------------- -------------------- below admin methods -------------------- -------------------- //
 
     @Override
-    public List<Challenge> findAllByThemeAndTagAndName(
+    public List<Challenge> findAllByThemeAndTagAndTopicAndName(
             Long themeSeq,
             Long tagSeq,
+            Long topicSeq,
             String keyword,
             Integer pageNumber,
             Integer pageSize
@@ -89,11 +90,13 @@ public class ChallengeRepositoryImpl extends QuerydslRepositorySupport implement
         final Predicate[] predicates = new Predicate[]{
                 predicateOptional(qChallenge.themeSeq::eq, themeSeq),
                 predicateOptional(qChallengeTag.tag.seq::eq, tagSeq),
+                predicateOptional(QChallengeTopic.challengeTopic.topic.seq::eq, topicSeq),
                 StringUtils.hasText(keyword) ? predicateOptional(qChallenge.name::like, '%' + keyword + '%') : null
         };
 
         return from(qChallenge)
                 .innerJoin(qChallengeTag).on(qChallenge.seq.eq(qChallengeTag.challenge.seq)).fetchJoin()
+                .innerJoin(qChallengeTopic).on(qChallenge.seq.eq(qChallengeTopic.challenge.seq)).fetchJoin()
                 .where(predicates)
                 .offset(pageNumber * pageSize)
                 .limit(pageSize)

@@ -1,5 +1,6 @@
 package com.mozi.moziserver.adminService;
 
+import com.mozi.moziserver.common.JpaUtil;
 import com.mozi.moziserver.httpException.ResponseError;
 import com.mozi.moziserver.model.ChallengeExplanation;
 import com.mozi.moziserver.model.ChallengeExplanationContent;
@@ -11,14 +12,17 @@ import com.mozi.moziserver.model.entity.*;
 import com.mozi.moziserver.model.mappedenum.ChallengeStateType;
 import com.mozi.moziserver.model.mappedenum.ChallengeTagType;
 import com.mozi.moziserver.repository.*;
+import com.mozi.moziserver.service.S3ImageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -28,6 +32,9 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class AdminChallengeService {
+
+    private final S3ImageService s3ImageService;
+
     private final ChallengeRepository challengeRepository;
     private final ChallengeRecordRepository challengeRecordRepository;
     private final ChallengeThemeRepository challengeThemeRepository;
@@ -36,6 +43,9 @@ public class AdminChallengeService {
     private final ChallengeTagRepository challengeTagRepository;
     private final CurrentTagListRepository currentTagListRepository;
     private final CurrentThemeListRepository currentThemeListRepository;
+    private final TopicRepository topicRepository;
+    private final CurrentTopicListRepository currentTopicListRepository;
+    private final ChallengeTopicRepository challengeTopicRepository;
 
     private final PlatformTransactionManager transactionManager;
 
@@ -51,7 +61,12 @@ public class AdminChallengeService {
         return challenge;
     }
 
-    public List<Challenge> getChallengeListByThemeAndTagAndName(Long themeSeq, ChallengeTagType challengeTagType, String keyword, Integer pageNumber, Integer pageSize) {
+    private List<Challenge> getChallengeListBySeq(List<Long> challengeSeqList) {
+
+        return challengeRepository.findAllBySeqIn(challengeSeqList);
+    }
+
+    public List<Challenge> getChallengeListByThemeAndTagAndName(Long themeSeq, ChallengeTagType challengeTagType, Long topicSeq, String keyword, Integer pageNumber, Integer pageSize) {
 
         if (themeSeq != null) {
             getChallengeTheme(themeSeq.intValue());
@@ -63,7 +78,7 @@ public class AdminChallengeService {
         }
 
 
-        return challengeRepository.findAllByThemeAndTagAndName(themeSeq, tagSeq, keyword, pageNumber, pageSize);
+        return challengeRepository.findAllByThemeAndTagAndTopicAndName(themeSeq, tagSeq, topicSeq, keyword, pageNumber, pageSize);
     }
 
     @Transactional
@@ -605,6 +620,237 @@ public class AdminChallengeService {
                 .orElseThrow(ResponseError.NotFound.CHALLENGE_THEME_NOT_EXISTS::getResponseException);
 
         return challengeTheme;
+    }
+
+    // -------------------- -------------------- Challenge Topic -------------------- -------------------- //
+    public List<Topic> getTopicList() {
+
+        return topicRepository.findAll();
+    }
+
+    public List<Topic> getCurrentTopicList() {
+
+        return topicRepository.findAllOrderByCurrentTopicTurn();
+    }
+
+    private List<ChallengeTopic> getChallengeTopicByChallenge(List<Challenge> challengeList) {
+
+        return challengeTopicRepository.findByChallengeIn(challengeList);
+    }
+
+    @Transactional
+    public void createTopicOnly(
+            String title,
+            String subTitle,
+            MultipartFile image
+    ) {
+
+        createTopic(title, subTitle, image);
+    }
+
+    @Transactional
+    public void createTopicAndCurrentTopic(
+            String title,
+            String subTitle,
+            MultipartFile image
+    ) {
+
+        Topic topic = createTopic(title, subTitle, image);
+
+        createCurrentTopic(topic);
+    }
+
+    private Topic createTopic(
+            String title,
+            String subTitle,
+            MultipartFile image
+    ) {
+
+        String imgUrl;
+        try {
+            imgUrl = s3ImageService.uploadFile(image, "topic");
+        } catch (Exception e) {
+            throw new RuntimeException(e.getCause());
+        }
+
+        Topic topic = Topic.builder()
+                .title(title)
+                .subTitle(subTitle)
+                .imgUrl(imgUrl)
+                .build();
+
+        try {
+            topicRepository.save(topic);
+        } catch (DataIntegrityViolationException e) {
+            if (JpaUtil.isDuplicateKeyException(e)) {
+                throw ResponseError.BadRequest.ALREADY_EXISTS_TOPIC_TITLE.getResponseException();
+            }
+            throw ResponseError.InternalServerError.UNEXPECTED_ERROR.getResponseException();
+        } catch (Exception e) {
+            throw ResponseError.InternalServerError.UNEXPECTED_ERROR.getResponseException();
+        }
+
+        return topic;
+    }
+
+    private void createCurrentTopic(Topic topic) {
+
+        int nextTurn = currentTopicListRepository.findAll().size() + 1;
+        CurrentTopicList currentTopicList = CurrentTopicList.builder()
+                .turn(nextTurn)
+                .topic(topic)
+                .build();
+        currentTopicListRepository.save(currentTopicList);
+    }
+
+    @Transactional
+    public void createChallengeTopicByTopic(Long topicSeq, List<Long> challengeSeqList) {
+
+        Topic topic = topicRepository.findById(topicSeq)
+                .orElseThrow(ResponseError.NotFound.CHALLENGE_TOPIC_NOT_EXISTS::getResponseException);
+
+        List<Challenge> existChallengeList = getChallengeListBySeq(challengeSeqList);
+        if (challengeSeqList.size() != existChallengeList.size()) {
+            String notFoundedChallengeSeqListString = challengeSeqList.stream()
+                    .filter(seq -> existChallengeList.stream().noneMatch(challenge -> challenge.getSeq().equals(seq)))
+                    .map(Object::toString)
+                    .collect(Collectors.joining(","));
+
+            throw ResponseError.NotFound.CHALLENGE_NOT_EXISTS.getResponseException(notFoundedChallengeSeqListString);
+        }
+
+        List<ChallengeTopic> challengeTopicList = existChallengeList.stream()
+                .map(challenge -> ChallengeTopic.builder().topic(topic).challenge(challenge).build())
+                .collect(Collectors.toList());
+
+        try {
+            challengeTopicRepository.saveAll(challengeTopicList);
+        } catch (DataIntegrityViolationException e) {
+            if (JpaUtil.isDuplicateKeyException(e)) {
+                throw ResponseError.BadRequest.ALREADY_EXISTS_CHALLENGE_SEQ.getResponseException();
+
+            }
+            throw ResponseError.InternalServerError.UNEXPECTED_ERROR.getResponseException();
+        } catch (Exception e) {
+            throw ResponseError.InternalServerError.UNEXPECTED_ERROR.getResponseException();
+        }
+    }
+
+    @Transactional
+    public void updateTopic(
+            Long seq,
+            String title,
+            String subTitle,
+            MultipartFile image
+    ) {
+
+        Topic topic = topicRepository.findById(seq)
+                .orElseThrow(ResponseError.NotFound.CHALLENGE_TOPIC_NOT_EXISTS::getResponseException);
+
+        if (StringUtils.hasLength(title)) {
+            topic.setTitle(title);
+        }
+
+        if (StringUtils.hasLength(subTitle)) {
+            topic.setTitle(subTitle);
+        }
+
+        String imgUrl;
+        if (image != null) {
+            try {
+                imgUrl = s3ImageService.uploadFile(image, "animalItem");
+            } catch (Exception e) {
+                throw new RuntimeException(e.getCause());
+            }
+            topic.setImgUrl(imgUrl);
+        }
+
+        try {
+            topicRepository.save(topic);
+        } catch (DataIntegrityViolationException e) {
+            if (JpaUtil.isDuplicateKeyException(e)) {
+                throw ResponseError.BadRequest.ALREADY_EXISTS_TOPIC_TITLE.getResponseException();
+            }
+            throw ResponseError.InternalServerError.UNEXPECTED_ERROR.getResponseException();
+        } catch (Exception e) {
+            throw ResponseError.InternalServerError.UNEXPECTED_ERROR.getResponseException();
+        }
+    }
+
+    @Transactional
+    public void updateAllCurrentTopicList(List<Long> topicSeqList) {
+
+        List<CurrentTopicList> currentTopicList = new ArrayList<>();
+        for (int i = 0; i < topicSeqList.size(); i++) {
+            Topic topic = topicRepository.findById(topicSeqList.get(i))
+                    .orElseThrow(ResponseError.NotFound.CHALLENGE_TOPIC_NOT_EXISTS::getResponseException);
+
+            CurrentTopicList currentTopic = CurrentTopicList.builder()
+                    .turn(i + 1)
+                    .topic(topic)
+                    .build();
+            currentTopicList.add(currentTopic);
+        }
+
+        currentTopicListRepository.deleteAllInBatch();
+        currentTopicListRepository.saveAll(currentTopicList);
+    }
+
+    @Transactional
+    public void deleteTopic(Long topicSeq) {
+
+        Topic topic = topicRepository.findById(topicSeq)
+                .orElseThrow(ResponseError.NotFound.CHALLENGE_TOPIC_NOT_EXISTS::getResponseException);
+
+        deleteCurrentTopicByTopic(topic);
+
+        deleteChallengeTopicByTopic(topic);
+
+        topicRepository.delete(topic);
+    }
+
+    @Transactional
+    public void deleteChallengeTopicByTopicAndChallenge(Long topicSeq, Long challengeSeq) {
+
+        Topic topic = topicRepository.findById(topicSeq)
+                .orElseThrow(ResponseError.NotFound.CHALLENGE_TOPIC_NOT_EXISTS::getResponseException);
+
+        Challenge challenge = challengeRepository.findById(challengeSeq)
+                .orElseThrow(ResponseError.NotFound.CHALLENGE_NOT_EXISTS::getResponseException);
+
+        ChallengeTopic challengeTopic = challengeTopicRepository.findByTopicAndChallenge(topic, challenge)
+                .orElseThrow(ResponseError.NotFound.CHALLENGE_TOPIC_NOT_EXISTS::getResponseException);
+
+        try {
+            challengeTopicRepository.delete(challengeTopic);
+        } catch (Exception e) {
+            throw ResponseError.BadRequest.ALREADY_DELETED.getResponseException(); // for duplicate exception
+        }
+    }
+
+    private void deleteCurrentTopicByTopic(Topic topic) {
+
+        Optional<CurrentTopicList> optionalCurrentTopic = currentTopicListRepository.findByTopic(topic);
+
+        if (optionalCurrentTopic.isEmpty()) {
+            return;
+        }
+
+        CurrentTopicList currentTopic = optionalCurrentTopic.get();
+        int turn = currentTopic.getTurn();
+
+        currentTopicListRepository.delete(currentTopic);
+
+        List<CurrentTopicList> currentTopicList = currentTopicListRepository.findByTurnGreaterThan(turn);
+        for (CurrentTopicList nextTopic : currentTopicList) {
+            nextTopic.setTurn(turn);
+            turn++;
+        }
+    }
+
+    private void deleteChallengeTopicByTopic(Topic topic) {
+
+        challengeTopicRepository.deleteByTopic(topic);
     }
 
     // -------------------- -------------------- ChallengeStatistics -------------------- -------------------- //
