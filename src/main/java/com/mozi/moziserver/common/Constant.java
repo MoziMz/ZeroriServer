@@ -100,4 +100,11 @@ public interface Constant {
     int totalImagesPerIsland = 11;
 
     int TUTORIAL_ANIMAL_ITEM_POINT = 5;
+
+    List<String> RANDOM_ANIMAL_MENTIONS = Arrays.asList(
+            "매주 일요일 위시리스트를 받을 수 있어!",
+            "위시리스트 2개를 모으면 내가 이사갈 수 있어!",
+            "위시리스트는 일주일에 하나씩 받을 수 있어!",
+            "이주 동물마다 필요한 위시 포인트가 달라!"
+    );
 }
