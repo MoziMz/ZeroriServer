@@ -44,6 +44,7 @@ public class ScheduleService {
 //    @Scheduled(initialDelay = 1000L, fixedDelay = 100000000000000L)
     @Scheduled(cron = "0 0 0 * * *")
     public void updateUserChallenge() {
+
         final LocalDate today = LocalDate.now();
 
         // TODO return 되는 값은 로그로 남긴다.
@@ -53,6 +54,7 @@ public class ScheduleService {
     }
 
     public void updateUserChallengeDoingToEnd(final LocalDate date) {
+
         List<UserChallenge> endedUserChallengeList = userChallengeRepository.findAllByStateAndStartDate(UserChallengeStateType.DOING, date.minusDays(7));
 
         for (UserChallenge userChallenge : endedUserChallengeList) {
@@ -68,10 +70,11 @@ public class ScheduleService {
             });
 
             fcmService.sendMessageToUser(userChallenge.getUser(), FcmMessageType.END_USER_CHALLENGE_MESSAGE);
+            asyncService.sendAnimalMention(userChallenge.getUser());
         }
     }
 
-//    For test
+    //    For test
 //    @Scheduled(initialDelay = 1000L, fixedDelay = 100000000000000L)
     @Scheduled(cron = "0 0 21 ? * SUN")
     public void updatePostboxAnimalByUserPointRecord() {
@@ -113,12 +116,15 @@ public class ScheduleService {
             if (newMessageCnt.get() > 0) {
                 fcmService.sendMessageToUser(user, FcmMessageType.POSTBOX_MESSAGE_ANIMAL_NEW_ARRIVED);
             }
+
             fcmService.sendMessageToUser(user, FcmMessageType.NEW_POST_BOX_MESSAGE);
             fcmService.sendMessageToUser(user, FcmMessageType.POSTBOX_MESSAGE_ANIMAL_RECEIVED_ITEM);
+            asyncService.sendAnimalMention(user);
         }
     }
 
     private void withTransaction(Runnable runnable) {
+
         DefaultTransactionDefinition definition = new DefaultTransactionDefinition();
 
         TransactionStatus status = transactionManager.getTransaction(definition);

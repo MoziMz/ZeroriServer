@@ -1,14 +1,21 @@
 package com.mozi.moziserver.service;
 
+import com.mozi.moziserver.common.Constant;
 import com.mozi.moziserver.httpException.ResponseError;
 import com.mozi.moziserver.model.entity.Animal;
 import com.mozi.moziserver.model.entity.AnimalItem;
+import com.mozi.moziserver.model.entity.AnimalMention;
 import com.mozi.moziserver.repository.AnimalItemRepository;
+import com.mozi.moziserver.repository.AnimalMentionRepository;
 import com.mozi.moziserver.repository.AnimalRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -17,6 +24,7 @@ public class AnimalService {
 
     private final AnimalRepository animalRepository;
     private final AnimalItemRepository animalItemRepository;
+    private final AnimalMentionRepository animalMentionRepository;
 
     public Animal getAnimal(Long seq) {
 
@@ -84,5 +92,17 @@ public class AnimalService {
         AnimalItem animalItem = animalItemRepository.findByAnimalAndTurn(animal, itemTurn + 1)
                 .orElseThrow();
         return animalItem.getAcquisitionRequiredPoint();
+    }
+
+    // -------------------- -------------------- animal mention -------------------- -------------------- //
+    public List<String> getAnimalMentionListByAnimalAndItemAndPoint(Long animalSeq, Integer itemTurn, Integer userPoint) {
+
+        List<AnimalMention> animalMentionList = animalMentionRepository.findByAnimalSeqAndItemTurnAndUserWeekPoint(animalSeq, itemTurn, userPoint);
+
+        if (animalMentionList.isEmpty()) {
+            return Constant.RANDOM_ANIMAL_MENTIONS;
+        }
+
+        return animalMentionList.stream().map(AnimalMention::getContent).collect(Collectors.toList());
     }
 }

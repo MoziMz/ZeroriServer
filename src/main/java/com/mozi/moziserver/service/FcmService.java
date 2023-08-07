@@ -4,6 +4,7 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingException;
 import com.google.firebase.messaging.Message;
 import com.google.firebase.messaging.MessagingErrorCode;
+import com.mozi.moziserver.model.FcmMessage;
 import com.mozi.moziserver.model.entity.User;
 import com.mozi.moziserver.model.entity.UserFcm;
 import com.mozi.moziserver.model.mappedenum.FcmMessageType;
@@ -18,9 +19,12 @@ import java.time.LocalDate;
 @Service
 @RequiredArgsConstructor
 public class FcmService {
+    // TODO FCM 에러 로그 전체적으로 손보기
+
     private final UserFcmRepository userFcmRepository;
 
     private void sendMessage(String token, FcmMessageType type) {
+
         Message message = Message.builder()
                 .putData("isSilent", "" + type.isSilent())
                 .putData("type", type.toString())
@@ -38,7 +42,23 @@ public class FcmService {
         }
     }
 
+    private void sendMessage(String token, FcmMessage fcmMessage) {
+
+        Message message = fcmMessage.getMessage(token);
+
+        try {
+            String response = FirebaseMessaging.getInstance().send(message);
+            log.debug(response);
+        } catch (FirebaseMessagingException e) {
+            log.error("FIREBASE_MESSAGING_EXCEPTION", e);
+            if (e.getMessagingErrorCode() == MessagingErrorCode.UNREGISTERED) {
+                log.error("UNREGISTERED_TOKEN", e);
+            }
+        }
+    }
+
     private void sendDateMessage(String token, LocalDate date, FcmMessageType type) {
+
         Message message = Message.builder()
                 .putData("isSilent", "" + type.isSilent())
                 .putData("type", type.toString())
@@ -58,6 +78,7 @@ public class FcmService {
     }
 
     public void sendMessageToAll(FcmMessageType type) {
+
         Message message = Message.builder()
                 .putData("isSilent", "" + type.isSilent())
                 .putData("type", type.toString())
@@ -73,13 +94,23 @@ public class FcmService {
     }
 
     public void sendMessageToUser(User user, FcmMessageType type) {
+
         UserFcm userFcm = userFcmRepository.findByUser(user)
                 .orElseThrow(() -> new RuntimeException("USER_FCM_TOKEN_IS_NOT_EXIST"));
 
         sendMessage(userFcm.getToken(), type);
     }
 
+    public void sendMessageToUser(User user, FcmMessage message) {
+
+        UserFcm userFcm = userFcmRepository.findByUser(user)
+                .orElseThrow(() -> new RuntimeException("USER_FCM_TOKEN_IS_NOT_EXIST"));
+
+        sendMessage(userFcm.getToken(), message);
+    }
+
     public void sendDateMessageToUser(User user, LocalDate date, FcmMessageType type) {
+
         UserFcm userFcm = userFcmRepository.findByUser(user)
                 .orElseThrow(() -> new RuntimeException("USER_FCM_TOKEN_IS_NOT_EXIST"));
 

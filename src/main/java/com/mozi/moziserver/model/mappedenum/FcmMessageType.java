@@ -10,7 +10,8 @@ public enum FcmMessageType {
     END_USER_CHALLENGE_MESSAGE(true),
     POSTBOX_MESSAGE_ANIMAL_RECEIVED_ITEM(true),
     POSTBOX_MESSAGE_ANIMAL_NEW_ARRIVED(true),
-    MOVING_DAY_OF_NEW_ANIMAL(true);
+    MOVING_DAY_OF_NEW_ANIMAL(true),
+    ANIMAL_MENTION(true);
 
     private final boolean isSilent;
 }

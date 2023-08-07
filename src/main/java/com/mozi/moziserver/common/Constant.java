@@ -85,7 +85,7 @@ public interface Constant {
             Arrays.asList("devwon.com")
     );
 
-    List<String> IMAGE_MIME_TYPE_LIST = List.of("image/png", "image/jpeg");
+    List<String> IMAGE_MIME_TYPE_LIST = List.of("image/png", "image/jpeg", "image/heic");
 
     int challengeExtraPoints = 5;
 

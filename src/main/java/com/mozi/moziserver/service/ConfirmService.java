@@ -93,8 +93,8 @@ public class ConfirmService {
 
         });
 
-        //이삿날 푸시 알림 보내기
         asyncService.sendNewAnimalNotification(user);
+        asyncService.sendAnimalMention(user);
     }
 
     public List<Confirm> getConfirmList(User user, ReqList req, ConfirmListType confirmListType) {
@@ -310,7 +310,7 @@ public class ConfirmService {
         List<Confirm> confirmList = new ArrayList<>();
 
         if (confirmListType.equals(ConfirmListType.RECENT)) {
-            LocalDateTime startDateTime = LocalDateTime.of(now.getYear(), now.getMonthValue(), now.getDayOfMonth()-6, 0, 0, 0);
+            LocalDateTime startDateTime = LocalDateTime.of(now.getYear(), now.getMonthValue(), now.getDayOfMonth() - 6, 0, 0, 0);
             confirmList = confirmRepository.findByCreatedAt(startDateTime);
 
         } else if (confirmListType.equals(ConfirmListType.ALL)) {
