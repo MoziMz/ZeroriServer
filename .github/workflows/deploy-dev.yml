@@ -62,8 +62,8 @@ jobs:
       - name: Build and push
         #       if: contains(github.ref, 'main')
         run: |
-          docker build -t ${{ secrets.HOST_PROD }}/mozi-server:dev .
-          docker push ${{ secrets.HOST_PROD }}/mozi-server:dev
+          docker build -t ${{ secrets.DOCKER_HOST }}/mozi-server:dev .
+          docker push ${{ secrets.DOCKER_HOST }}/mozi-server:dev
 
       - name: Executing remote ssh commands using ssh key
         uses: appleboy/ssh-action@v1.0.3
