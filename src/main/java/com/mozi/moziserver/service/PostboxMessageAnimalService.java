@@ -77,7 +77,6 @@ public class PostboxMessageAnimalService {
 
     }
 
-    @Transactional
     public void createPostboxMessageAnimal(User user, Animal animal) {
 
         PostboxMessageAnimal postboxMessageAnimal = PostboxMessageAnimal.builder()
@@ -91,9 +90,18 @@ public class PostboxMessageAnimalService {
         userNoticeService.upsertUserNotice(user, UserNoticeType.POSTBOX_MESSAGE_ANIMAL_NEW_ARRIVED, postboxMessageAnimal.getSeq());
     }
 
-    public void createFirstMessageInIsland(User user, Long islandSeq) {
+    public void createFirstPostboxMessageAnimal(User user, Long islandSeq) {
 
         Animal animal = animalService.getAnimalByIslandAndTurn(islandSeq, 1);
+        createPostboxMessageAnimal(user, animal);
+    }
+
+    public void createPostboxMessageAnimalForJoin(User user, Long islandSeq) {
+        //Animal : 달팽이, turn : 1
+        createTutorialPostboxMessage(user, islandSeq);
+
+        //Animal : 수달, turn : 2
+        Animal animal = animalService.getAnimalByIslandAndTurn(islandSeq, 2);
         createPostboxMessageAnimal(user, animal);
     }
 
@@ -161,5 +169,24 @@ public class PostboxMessageAnimalService {
         }
 
         return 0;
+    }
+
+    public void createTutorialPostboxMessage(User user, Long islandSeq) {
+
+        Animal animal = animalService.getAnimalByIslandAndTurn(islandSeq, 1);
+        PostboxMessageAnimal postboxMessageAnimal = PostboxMessageAnimal.builder()
+                .user(user)
+                .animal(animal)
+                .checkedState(true)
+                .build();
+        postboxMessageAnimalRepository.save(postboxMessageAnimal);
+
+        AnimalItem animalItem = animalService.getAnimalItem(animal, 1);
+        PostboxMessageAnimalItem postboxMessageAnimalItem = PostboxMessageAnimalItem.builder()
+                .animalItem(animalItem)
+                .postboxMessageAnimal(postboxMessageAnimal)
+                .build();
+        postboxMessageAnimalItemRepository.save(postboxMessageAnimalItem);
+
     }
 }
