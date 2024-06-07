@@ -68,9 +68,9 @@ jobs:
       - name: Executing remote ssh commands using ssh key
         uses: appleboy/ssh-action@v1.0.3
         with:
-          host: ${{ secrets.HOST_PROD }}
-          username: ${{ secrets.USERNAME_PROD }}
-          key: ${{ secrets.KEY_PROD }}
+          host: ${{ secrets.HOST_CONOHA }}
+          username: ${{ secrets.USERNAME_CONOHA }}
+          key: ${{ secrets.KEY_CONOHA }}
           script: sudo ./dev/server-deploy-dev.sh
 
   ## time
