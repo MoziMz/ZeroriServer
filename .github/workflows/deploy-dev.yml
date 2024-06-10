@@ -71,7 +71,7 @@ jobs:
           host: ${{ secrets.HOST_CONOHA }}
           username: ${{ secrets.USERNAME_CONOHA }}
           key: ${{ secrets.KEY_CONOHA }}
-          script: sudo ./dev/server-deploy-dev.sh
+          script: ./dev/server-deploy-dev.sh
 
   ## time
   current-time:
