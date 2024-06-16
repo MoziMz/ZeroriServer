@@ -4,12 +4,6 @@ on:
   push:
     branches:
       - dev
-  workflow_dispatch:
-    inputs:
-      logLevel:
-        description: 'Log level'
-        required: true
-        default: 'warning'
 
 # Need to Consider about permission
 # permissions:
