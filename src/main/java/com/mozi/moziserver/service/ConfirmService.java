@@ -95,6 +95,9 @@ public class ConfirmService {
 
         //이삿날 푸시 알림 보내기
         asyncService.sendNewAnimalNotification(user);
+
+        //인증 이미지 검증
+        asyncService.verifyConfirm(confirm.getSeq(), imgUrl, challenge.getName());
     }
 
     public List<Confirm> getConfirmList(User user, ReqList req, ConfirmListType confirmListType) {
