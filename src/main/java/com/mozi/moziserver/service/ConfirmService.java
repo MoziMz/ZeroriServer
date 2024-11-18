@@ -94,7 +94,11 @@ public class ConfirmService {
         });
 
         asyncService.sendNewAnimalNotification(user);
+
         asyncService.sendAnimalMention(user);
+
+        //인증 이미지 검증
+        asyncService.verifyConfirm(confirm.getSeq(), imgUrl, challenge.getName());
     }
 
     public List<Confirm> getConfirmList(User user, ReqList req, ConfirmListType confirmListType) {

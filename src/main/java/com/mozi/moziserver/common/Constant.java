@@ -77,12 +77,12 @@ public interface Constant {
     String NICKNAME_REGEX = "^[ㄱ-ㅎ가-힣A-Za-z0-9!@#$%^&*(),.?\":{}|<>]{1,8}$";
 
     List<List<String>> EMAIL_DOMAIN_GROUPS = Arrays.asList(
-            Arrays.asList("gmail.com"),
-            Arrays.asList("naver.com"),
+            List.of("gmail.com"),
+            List.of("naver.com"),
             Arrays.asList("daum.net", "hanmail.net"),
-            Arrays.asList("kakao.com"),
+            List.of("kakao.com"),
             Arrays.asList("icloud.com", "me.com", "mac.com"),
-            Arrays.asList("devwon.com")
+            List.of("devwon.com")
     );
 
     List<String> IMAGE_MIME_TYPE_LIST = List.of("image/png", "image/jpeg", "image/heic");
@@ -107,4 +107,12 @@ public interface Constant {
             "위시리스트는 일주일에 하나씩 받을 수 있어!",
             "이주 동물마다 필요한 위시 포인트가 달라!"
     );
+
+    int GITHUB_MODELS_MAX_TOKENS = 8000;
+
+    String GITHUB_MODELS_MODEL_NAME = "gpt-4o-mini";
+
+    String GITHUB_MODELS_CHALLENGE_PROMPT = "이 사진이 제로웨이스트 활동인 '%s' 실천한 인증 사진이 맞으면 'Y' 아니라면 'N'으로 대답해줘.";
+
+    String GITHUB_MODELS_ROLE = "user";
 }
