@@ -35,6 +35,7 @@ public class AsyncService {
     private final FcmService fcmService;
     private final GithubModelsClient githubModelsClient;
     private final AdminConfirmService adminConfirmService;
+    private final SlackNotiService slackNotiService;
 
     private final IslandRepository islandRepository;
     private final UserIslandRepository userIslandRepository;
@@ -184,6 +185,7 @@ public class AsyncService {
             //제로 챌린지에 알맞지 않은 인증 이미지이면 BLOCKED 처리
             if (res.isAllContentN()) {
                 adminConfirmService.updateConfirmState(confirmSeq, ConfirmStateType.BLOCKED);
+                slackNotiService.sendConfirmBlockedMessage(challengeName, confirmSeq, imgUrl);
             }
         });
     }
