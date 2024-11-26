@@ -39,6 +39,11 @@ social:
 jwt:
   key: ${JWT_KEY}
 
+github:
+  models:
+    url: https://models.inference.ai.azure.com
+    apiKey: ${GITHUB_MODELS_APIKEY}
+
 cloud:
   aws:
     s3:
@@ -58,3 +63,7 @@ sentry:
   stacktrace:
     app-packages:
       - com.mozi.moziserver
+
+slack:
+  webhook:
+    blocked-info: ${SLACK_WEBHOOK_BLOCKED_INFO}
