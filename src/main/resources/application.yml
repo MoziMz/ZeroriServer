@@ -63,3 +63,7 @@ sentry:
   stacktrace:
     app-packages:
       - com.mozi.moziserver
+
+slack:
+  webhook:
+    blocked-info: ${SLACK_WEBHOOK_BLOCKED_INFO}
