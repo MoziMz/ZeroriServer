@@ -77,7 +77,7 @@ public class ApiLogFilter extends OncePerRequestFilter {
         }
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth != null && auth.isAuthenticated()) {
+        if (auth != null && auth.isAuthenticated() && SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof ResUserSignIn) {
             MDC.put(Constant.MDC_KEY_USER_SEQ, ((ResUserSignIn) auth.getPrincipal()).getUserSeq().toString());
         }
 

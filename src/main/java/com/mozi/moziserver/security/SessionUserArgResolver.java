@@ -12,6 +12,7 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
 import static com.mozi.moziserver.common.Constant.MDC_KEY_USER_SEQ;
+import static com.mozi.moziserver.common.Constant.TEST_USER_SEQ;
 
 @RequiredArgsConstructor
 public class SessionUserArgResolver implements HandlerMethodArgumentResolver {
@@ -37,6 +38,8 @@ public class SessionUserArgResolver implements HandlerMethodArgumentResolver {
                 MDC.put(MDC_KEY_USER_SEQ, userSeq.toString());
             }
             return userSeq;
+        }else if(SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof org.springframework.security.core.userdetails.User){
+                return TEST_USER_SEQ;
         }
         return null;
     }
