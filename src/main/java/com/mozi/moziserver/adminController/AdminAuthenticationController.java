@@ -2,7 +2,7 @@ package com.mozi.moziserver.adminController;
 
 import com.mozi.moziserver.adminService.AdminUserService;
 import com.mozi.moziserver.model.adminReq.ReqAdminSignIn;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -31,7 +31,7 @@ public class AdminAuthenticationController {
 
     private final AdminUserService adminUserService;
 
-    @ApiOperation("관리자 로그인 (ID)")
+    @Operation(summary = "관리자 로그인 (ID)")
     @PostMapping(value = "/admin/signin", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> signInUser(
             @RequestBody @Valid ReqAdminSignIn req,

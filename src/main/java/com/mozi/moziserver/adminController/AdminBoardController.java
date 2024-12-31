@@ -4,7 +4,7 @@ import com.mozi.moziserver.adminService.AdminBoardService;
 import com.mozi.moziserver.model.adminReq.ReqAdminPostboxMessageAdminCreate;
 import com.mozi.moziserver.model.adminRes.AdminResBoard;
 import com.mozi.moziserver.model.adminRes.AdminResPostboxMessageAdmin;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -24,7 +24,7 @@ public class AdminBoardController {
 
     private final AdminBoardService adminBoardService;
 
-    @ApiOperation("공지사항 리스트 조회")
+    @Operation(summary = "공지사항 리스트 조회")
     @GetMapping("/admin/boards")
     public List<AdminResBoard> getBoardList(
             @RequestParam(name = "pageNumber", required = false, defaultValue = "0") Integer pageNumber,
@@ -36,7 +36,7 @@ public class AdminBoardController {
                 .collect(Collectors.toList());
     }
 
-    @ApiOperation("공지사항 하나 조회")
+    @Operation(summary = "공지사항 하나 조회")
     @GetMapping("/admin/boards/{seq}")
     public AdminResBoard getBoard(
             @PathVariable("seq") Long seq
@@ -44,7 +44,7 @@ public class AdminBoardController {
         return AdminResBoard.of(adminBoardService.getBoard(seq));
     }
 
-    @ApiOperation("공지사항 생성")
+    @Operation(summary = "공지사항 생성")
     @PostMapping("/admin/boards")
     public ResponseEntity<Object> createBoard(
             @RequestParam("title") String title,
@@ -56,7 +56,7 @@ public class AdminBoardController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @ApiOperation("공지사항 수정")
+    @Operation(summary = "공지사항 수정")
     @PutMapping("/admin/boards/{seq}")
     public ResponseEntity<Object> updateBoard(
             @PathVariable(value = "seq") Long seq,
@@ -69,7 +69,7 @@ public class AdminBoardController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @ApiOperation("공지사항 삭제")
+    @Operation(summary = "공지사항 삭제")
     @DeleteMapping("/admin/boards/{seq}")
     public ResponseEntity<Object> deleteBoard(
             @PathVariable("seq") Long seq
@@ -79,7 +79,7 @@ public class AdminBoardController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @ApiOperation("관리자 편지 리스트 조회")
+    @Operation(summary = "관리자 편지 리스트 조회")
     @GetMapping("/admin/postbox-message-admins")
     public List<AdminResPostboxMessageAdmin> getPostboxMessageAdminList(
             @RequestParam(value = "keyword", required = false) String keyword, //keyword is userSeq or content
@@ -92,7 +92,7 @@ public class AdminBoardController {
                 .collect(Collectors.toList());
     }
 
-    @ApiOperation("관리자 편지 하나 조회")
+    @Operation(summary = "관리자 편지 하나 조회")
     @GetMapping("/admin/postbox-message-admins/{seq}")
     public AdminResPostboxMessageAdmin getPostboxMessageAdmin(
             @PathVariable("seq") Long seq
@@ -100,7 +100,7 @@ public class AdminBoardController {
         return AdminResPostboxMessageAdmin.of(adminBoardService.getPostboxMessageAdmin(seq));
     }
 
-    @ApiOperation("관리자 편지 생성")
+    @Operation(summary = "관리자 편지 생성")
     @PostMapping("/admin/postbox-message-admins")
     public ResponseEntity<Object> createPostboxMessageAdmin(
             @RequestBody @Valid ReqAdminPostboxMessageAdminCreate req
@@ -110,7 +110,7 @@ public class AdminBoardController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @ApiOperation("관리자 편지 수정")
+    @Operation(summary = "관리자 편지 수정")
     @PutMapping("/admin/postbox-message-admins/{seq}")
     public ResponseEntity<Object> updatePostboxMessageAdmin(
             @PathVariable(value = "seq") Long seq,
@@ -124,7 +124,7 @@ public class AdminBoardController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @ApiOperation("관리자 편지 삭제")
+    @Operation(summary = "관리자 편지 삭제")
     @DeleteMapping("/admin/postbox-message-admins/{seq}")
     public ResponseEntity<Object> deletePostboxMessageAdmin(
             @PathVariable("seq") Long seq

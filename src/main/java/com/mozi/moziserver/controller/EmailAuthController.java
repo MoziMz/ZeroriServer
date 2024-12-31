@@ -2,7 +2,8 @@ package com.mozi.moziserver.controller;
 
 import com.mozi.moziserver.model.entity.EmailAuth;
 import com.mozi.moziserver.service.EmailAuthService;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Hidden;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -11,11 +12,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import springfox.documentation.annotations.ApiIgnore;
 
 import java.net.URI;
 
-@ApiIgnore
+@Hidden
 @RestController
 @RequestMapping("/email/auth")
 @RequiredArgsConstructor
@@ -23,7 +23,7 @@ public class EmailAuthController {
 
     private final EmailAuthService emailAuthService;
 
-    @ApiOperation(value = "", hidden = true)
+    @Operation(summary = "", hidden = true)
     @GetMapping("/{token}")
     public ResponseEntity<Object> authEmail(@PathVariable String token) throws Exception {
         HttpHeaders httpHeaders = new HttpHeaders();

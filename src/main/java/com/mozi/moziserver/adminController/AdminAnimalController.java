@@ -9,7 +9,7 @@ import com.mozi.moziserver.model.adminRes.AdminResAnimalList;
 import com.mozi.moziserver.model.entity.Animal;
 import com.mozi.moziserver.model.entity.AnimalItem;
 import com.mozi.moziserver.model.entity.Island;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -33,7 +33,7 @@ public class AdminAnimalController {
     private final AdminIslandService adminIslandService;
 
     // -------------------- -------------------- animal -------------------- -------------------- //
-    @ApiOperation("동물 하나 조회")
+    @Operation(summary = "동물 하나 조회")
     @GetMapping("/admin/animals/{seq}")
     public AdminResAnimal getAnimal(
             @PathVariable("seq") Long seq
@@ -45,7 +45,7 @@ public class AdminAnimalController {
         return AdminResAnimal.of(animal, animalItemList);
     }
 
-    @ApiOperation("동물 리스트 조회")
+    @Operation(summary = "동물 리스트 조회")
     @GetMapping("/admin/animals")
     public List<AdminResAnimalList> getAnimalList(
             @RequestParam(name = "keyword", required = false) Long keyword, //islandSeq
@@ -63,7 +63,7 @@ public class AdminAnimalController {
                 .collect(Collectors.toList());
     }
 
-    @ApiOperation("동물 생성")
+    @Operation(summary = "동물 생성")
     @PostMapping("/admin/animals")
     public ResponseEntity<Object> createAnimal(
             @RequestParam(name = "name") @NotBlank String name,
@@ -87,7 +87,7 @@ public class AdminAnimalController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @ApiOperation("동물 수정")
+    @Operation(summary = "동물 수정")
     @PutMapping("/admin/animals/{seq}")
     public ResponseEntity<Object> updateAnimal(
             @PathVariable("seq") Long seq,
@@ -106,7 +106,7 @@ public class AdminAnimalController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @ApiOperation("동물 삭제")
+    @Operation(summary = "동물 삭제")
     @DeleteMapping("/admin/animals/{seq}")
     public ResponseEntity<Object> deleteAnimal(
             @PathVariable("seq") Long seq
@@ -118,7 +118,7 @@ public class AdminAnimalController {
     }
 
     // -------------------- -------------------- AnimalItem -------------------- -------------------- //
-    @ApiOperation("동물 아이템 하나 조회")
+    @Operation(summary = "동물 아이템 하나 조회")
     @GetMapping("/admin/animal-items/{seq}")
     public AdminResAnimalItem getAnimalItem(
             @PathVariable("seq") Long seq
@@ -127,7 +127,7 @@ public class AdminAnimalController {
         return AdminResAnimalItem.of(adminAnimalService.getAnimalItem(seq));
     }
 
-    @ApiOperation("동물 아이템 리스트 조회")
+    @Operation(summary = "동물 아이템 리스트 조회")
     @GetMapping("/admin/animal-items")
     public List<AdminResAnimalItem> getAnimalItemList(
             @RequestParam(value = "animalSeq", required = false) Long animalSeq,
@@ -140,7 +140,7 @@ public class AdminAnimalController {
                 .collect(Collectors.toList());
     }
 
-    @ApiOperation("동물의 아이템 등록")
+    @Operation(summary = "동물의 아이템 등록")
     @PostMapping("/admin/animal-items")
     public ResponseEntity<Object> createPreparationItem(
             @RequestParam("animalSeq") Long animalSeq,
@@ -160,7 +160,7 @@ public class AdminAnimalController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @ApiOperation("동물의 아이템 수정")
+    @Operation(summary = "동물의 아이템 수정")
     @PutMapping("/admin/animal-items/{seq}")
     public ResponseEntity<Object> updatePreparationItem(
             @PathVariable(value = "seq") Long itemSeq,
@@ -179,7 +179,7 @@ public class AdminAnimalController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @ApiOperation("동물의 아이템 삭제")
+    @Operation(summary = "동물의 아이템 삭제")
     @DeleteMapping("/admin/animal-items/{seq}")
     public ResponseEntity<Object> deleteAnimalItem(
             @PathVariable(value = "seq") Long itemSeq

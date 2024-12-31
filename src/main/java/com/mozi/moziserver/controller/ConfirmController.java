@@ -13,8 +13,8 @@ import com.mozi.moziserver.model.res.ResWeekConfirm;
 import com.mozi.moziserver.security.SessionUser;
 import com.mozi.moziserver.service.ConfirmService;
 import com.mozi.moziserver.service.UserService;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -36,10 +36,10 @@ public class ConfirmController {
     private final ConfirmService confirmService;
     private final UserService userService;
 
-    @ApiOperation("스토리 리스트 조회")
+    @Operation(summary = "스토리 리스트 조회")
     @GetMapping("/v1/challenges/confirms")
     public List<ResConfirmList> getConfirmList(
-            @ApiParam(hidden = true) @SessionUser Long userSeq,
+            @Parameter(hidden = true) @SessionUser Long userSeq,
             @RequestParam(required = false) Optional<ConfirmListType> confirmListType,
             @Valid ReqList req
     )
@@ -56,10 +56,10 @@ public class ConfirmController {
                 .collect(Collectors.toList());
     }
 
-    @ApiOperation("챌린지별 스토리 전체 조회")
+    @Operation(summary = "챌린지별 스토리 전체 조회")
     @GetMapping("/v1/challenges/{challengeSeq}/confirms")
     public List<ResConfirmList> getConfirmListByChallenge(
-            @ApiParam(hidden = true) @SessionUser Long userSeq,
+            @Parameter(hidden = true) @SessionUser Long userSeq,
             @PathVariable Long challengeSeq,
             @Valid ReqList req
     ) {
@@ -72,10 +72,10 @@ public class ConfirmController {
                 .collect(Collectors.toList());
     }
 
-    @ApiOperation("유저 챌린지별 스토리 전체 조회")
+    @Operation(summary = "유저 챌린지별 스토리 전체 조회")
     @GetMapping("/v1/user-challenges/{userChallengeSeq}/confirms")
     public List<ResConfirmList> getConfirmListNyUserChallenge(
-            @ApiParam(hidden = true) @SessionUser Long userSeq,
+            @Parameter(hidden = true) @SessionUser Long userSeq,
             @PathVariable Long userChallengeSeq
     ) {
 
@@ -87,10 +87,10 @@ public class ConfirmController {
                 .collect(Collectors.toList());
     }
 
-    @ApiOperation("본인 스토리 전체 조회")
+    @Operation(summary = "본인 스토리 전체 조회")
     @GetMapping("/v1/users/me/confirms")
     public List<ResConfirmList> getUserConfirmList(
-            @ApiParam(hidden = true) @SessionUser Long userSeq,
+            @Parameter(hidden = true) @SessionUser Long userSeq,
             @Valid ReqList req
     ) {
 
@@ -102,10 +102,10 @@ public class ConfirmController {
                 .collect(Collectors.toList());
     }
 
-    @ApiOperation("제로리 주민들의 활동보기")
+    @Operation(summary = "제로리 주민들의 활동보기")
     @GetMapping("/v1/confirms/week")
     public ResWeekConfirm getWeekConfirm(
-            @ApiParam(hidden = true) @SessionUser Long userSeq,
+            @Parameter(hidden = true) @SessionUser Long userSeq,
             @RequestParam(required = false) Optional<ConfirmListType> confirmListType
 
     ) {
@@ -117,10 +117,10 @@ public class ConfirmController {
         return confirmService.getWeekConfirm(confirmListType.get());
     }
 
-    @ApiOperation("챌린지별 상세 스토리")
+    @Operation(summary = "챌린지별 상세 스토리")
     @GetMapping("/v1/users/me/challenges/confirms")
     public List<ResConfirmList> getConfirmOfUser(
-            @ApiParam(hidden = true) @SessionUser Long userSeq,
+            @Parameter(hidden = true) @SessionUser Long userSeq,
             @Valid ReqConfirmOfUser reqConfirmOfUser
     ) {
 
@@ -132,10 +132,10 @@ public class ConfirmController {
                 .collect(Collectors.toList());
     }
 
-    @ApiOperation("스토리 생성")
+    @Operation(summary = "스토리 생성")
     @PostMapping("/v1/challenges/{challengeSeq}/confirms")
     public ResponseEntity<Object> createConfirm(
-            @ApiParam(hidden = true) @SessionUser Long userSeq,
+            @Parameter(hidden = true) @SessionUser Long userSeq,
             @PathVariable Long challengeSeq,
             @RequestPart MultipartFile image
     ) {
@@ -151,10 +151,10 @@ public class ConfirmController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @ApiOperation("스토리 좋아요")
+    @Operation(summary = "스토리 좋아요")
     @PostMapping("/v1/confirms/{seq}/like")
     public ResponseEntity<Object> createConfirmLike(
-            @ApiParam(hidden = true) @SessionUser Long userSeq,
+            @Parameter(hidden = true) @SessionUser Long userSeq,
             @PathVariable Long seq
     ) {
 
@@ -164,10 +164,10 @@ public class ConfirmController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @ApiOperation("스토리 좋아요 취소")
+    @Operation(summary = "스토리 좋아요 취소")
     @DeleteMapping ("/v1/confirms/{seq}/like")
     public ResponseEntity<Object> deleteConfirmLike(
-            @ApiParam(hidden = true) @SessionUser Long userSeq,
+            @Parameter(hidden = true) @SessionUser Long userSeq,
             @PathVariable Long seq
     ) {
 
@@ -177,10 +177,10 @@ public class ConfirmController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @ApiOperation("신고 생성")
+    @Operation(summary = "신고 생성")
     @PostMapping("/v1/confirms/{confirmSeq}/declarations")
     public ResponseEntity<Object> createDeclaration(
-            @ApiParam(hidden = true) @SessionUser Long userSeq,
+            @Parameter(hidden = true) @SessionUser Long userSeq,
             @PathVariable Long confirmSeq,
             @RequestBody @Valid ReqDeclarationCreate req
     ) {
@@ -190,10 +190,10 @@ public class ConfirmController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @ApiOperation("스토리 삭제")
+    @Operation(summary = "스토리 삭제")
     @DeleteMapping("/v1/confirms/{seq}")
     public ResponseEntity<Object> deleteConfirm(
-            @ApiParam(hidden = true) @SessionUser Long userSeq,
+            @Parameter(hidden = true) @SessionUser Long userSeq,
             @PathVariable Long seq
     ) {
 
@@ -204,10 +204,10 @@ public class ConfirmController {
     }
 
     // -------------------- -------------------- ConfirmSticker -------------------- -------------------- //
-    @ApiOperation("스티커 전체 조회")
+    @Operation(summary = "스티커 전체 조회")
     @GetMapping("/v1/stickers")
     public List<ResStickerList> getStickerList(
-            @ApiParam(hidden = true) @SessionUser Long userSeq
+            @Parameter(hidden = true) @SessionUser Long userSeq
     ) {
         return confirmService.getSticker()
                 .stream()
@@ -215,10 +215,10 @@ public class ConfirmController {
                 .collect(Collectors.toList());
     }
 
-    @ApiOperation("스티커 생성(부착)")
+    @Operation(summary = "스티커 생성(부착)")
     @PostMapping("/v1/confirms/{seq}/confirm-stickers")
     public ResponseEntity<Object> createConfirmSticker(
-            @ApiParam(hidden = true) @SessionUser Long userSeq,
+            @Parameter(hidden = true) @SessionUser Long userSeq,
             @RequestBody @Valid ReqConfirmSticker reqConfirmSticker,
             @PathVariable Long seq
     ) {

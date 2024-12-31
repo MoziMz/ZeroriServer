@@ -11,8 +11,8 @@ import com.mozi.moziserver.model.res.ResSearchOfChallengeList;
 import com.mozi.moziserver.repository.UserRepository;
 import com.mozi.moziserver.security.SessionUser;
 import com.mozi.moziserver.service.*;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -39,10 +39,10 @@ public class ChallengeController {
     private final ConfirmService confirmService;
     private final UserService userService;
 
-    @ApiOperation("챌린지 하나 조회")
+    @Operation(summary = "챌린지 하나 조회")
     @GetMapping("/v1/challenges/{seq}")
     public ResChallenge getChallenge(
-            @ApiParam(hidden = true) @SessionUser Long userSeq,
+            @Parameter(hidden = true) @SessionUser Long userSeq,
             @PathVariable Long seq
     ) {
 
@@ -67,10 +67,10 @@ public class ChallengeController {
         return ResChallenge.of(challenge, optionalUserChallenge, optionalUserChallengeRecord, challengeStatisticsList, challengeTagList, challengeScrap,optionalConfirm);
     }
 
-    @ApiOperation("챌린지 모두 조회")
+    @Operation(summary = "챌린지 모두 조회")
     @GetMapping("/v1/challenges")
     public ResSearchOfChallengeList getChallengeList(
-            @ApiParam(hidden = true) @SessionUser Long userSeq,
+            @Parameter(hidden = true) @SessionUser Long userSeq,
             @Valid ReqChallengeList req
     ) {
 
@@ -110,10 +110,10 @@ public class ChallengeController {
         return ResSearchOfChallengeList.of(challengeCnt,challengeLists);
     }
 
-    @ApiOperation("스크랩한 챌린지 리스트 조회")
+    @Operation(summary = "스크랩한 챌린지 리스트 조회")
     @GetMapping("v1/challenges/scrap")
     public List<ResChallengeList> getScrappedChallengeList(
-            @ApiParam(hidden = true) @SessionUser Long userSeq,
+            @Parameter(hidden = true) @SessionUser Long userSeq,
             @Valid ReqList req
     ) {
 
@@ -126,10 +126,10 @@ public class ChallengeController {
                 .collect(Collectors.toList());
     }
 
-    @ApiOperation("챌린지 스크랩 생성")
+    @Operation(summary = "챌린지 스크랩 생성")
     @PostMapping("/v1/challenges/{seq}/scraps")
     public ResponseEntity<Object> createChallengeScrap(
-            @ApiParam(hidden = true) @SessionUser Long userSeq,
+            @Parameter(hidden = true) @SessionUser Long userSeq,
             @PathVariable Long seq
     ) {
 
@@ -139,10 +139,10 @@ public class ChallengeController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @ApiOperation("챌린지 스크랩 취소")
+    @Operation(summary = "챌린지 스크랩 취소")
     @DeleteMapping("/v1/challenges/{seq}/scraps")
     public ResponseEntity<Object> deleteChallengeScrap(
-            @ApiParam(hidden = true) @SessionUser Long userSeq,
+            @Parameter(hidden = true) @SessionUser Long userSeq,
             @PathVariable Long seq
     ) {
 

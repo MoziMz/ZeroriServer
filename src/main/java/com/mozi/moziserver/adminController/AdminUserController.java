@@ -12,7 +12,7 @@ import com.mozi.moziserver.model.entity.UserIsland;
 import com.mozi.moziserver.model.entity.UserReward;
 import com.mozi.moziserver.model.mappedenum.PointReasonType;
 import com.mozi.moziserver.model.mappedenum.UserAuthType;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -33,7 +33,7 @@ public class AdminUserController {
     private final AdminUserRewardService adminUserRewardService;
 
     // -------------------- -------------------- UserPointRecord -------------------- -------------------- //
-    @ApiOperation("유저별 포인트 이력 조회")
+    @Operation(summary = "유저별 포인트 이력 조회")
     @GetMapping("/admin/users/{seq}/user-point-records")
     public List<AdminResUserPointRecordList> getUserPointRecordList(
             @PathVariable("seq") Long userSeq,
@@ -48,7 +48,7 @@ public class AdminUserController {
     }
 
     // -------------------- -------------------- ETC -------------------- -------------------- //
-    @ApiOperation("유저 리스트 조회")
+    @Operation(summary = "유저 리스트 조회")
     @GetMapping("/admin/users")
     public List<AdminResUserList> getUserList(
             @RequestParam(name = "keyword", required = false) String keyword, // keyword is userNickName or userEmail
@@ -75,7 +75,7 @@ public class AdminUserController {
                 .collect(Collectors.toList());
     }
 
-    @ApiOperation("유저 보상(포인트/섬) 조회")
+    @Operation(summary = "유저 보상(포인트/섬) 조회")
     @GetMapping("/admin/user-rewards")
     public List<AdminResUserRewardList> getUserRewardList(
             @RequestParam(name = "keyword", required = false) String keyword, // keyword is userSeq or userNickname
