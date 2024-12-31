@@ -2,12 +2,12 @@ package com.mozi.moziserver.model.mappedenum;
 
 import org.springframework.util.StringUtils;
 
-import javax.persistence.AttributeConverter;
+import jakarta.persistence.AttributeConverter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-import javax.persistence.Converter;
+import jakarta.persistence.Converter;
 
 @Converter(autoApply = true)
 public class UserRoleTypeConverter implements AttributeConverter<List<UserRoleType>, String> {

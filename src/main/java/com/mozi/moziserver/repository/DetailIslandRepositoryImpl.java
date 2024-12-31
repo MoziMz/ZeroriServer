@@ -4,8 +4,8 @@
 //import com.mozi.moziserver.model.entity.QDetailIsland;
 //import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 //
-//import javax.persistence.EntityManager;
-//import javax.persistence.PersistenceContext;
+//import jakarta.persistence.EntityManager;
+//import jakarta.persistence.PersistenceContext;
 //
 //public class DetailIslandRepositoryImpl extends QuerydslRepositorySupport implements DetailIslandRepositorySupport {
 //

@@ -4,7 +4,7 @@ import com.mozi.moziserver.model.mappedenum.ConfirmStateType;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.List;
 
 @Getter

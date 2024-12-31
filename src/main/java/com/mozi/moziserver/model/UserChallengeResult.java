@@ -3,8 +3,8 @@ package com.mozi.moziserver.model;
 import com.mozi.moziserver.model.mappedenum.UserChallengeResultType;
 import lombok.*;
 
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 
 @Getter
 @Setter
