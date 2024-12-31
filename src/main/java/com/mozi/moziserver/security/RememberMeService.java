@@ -8,14 +8,13 @@ import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.JWSHeader;
 import com.nimbusds.jose.crypto.ECDSASigner;
 import com.nimbusds.jose.crypto.ECDSAVerifier;
+import com.nimbusds.jose.crypto.bc.BouncyCastleProviderSingleton;
 import com.nimbusds.jose.jwk.ECKey;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -28,7 +27,12 @@ import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.*;
+import java.security.Provider;
+import java.security.Security;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Optional;
 
 @Component
 public class RememberMeService implements RememberMeServices {
@@ -62,6 +66,7 @@ public class RememberMeService implements RememberMeServices {
         private final UserAuthRepository userAuthRepository;
         private final ECDSASigner signer;
         private final ECDSAVerifier verifier;
+        private final Provider bc = BouncyCastleProviderSingleton.getInstance();
 
         public AbstractServices(
                 final UserDetailsService userDetailsService,
@@ -73,7 +78,10 @@ public class RememberMeService implements RememberMeServices {
             try {
                 final ECKey key = ECKey.parse(jwtKeyString);
                 signer = new ECDSASigner(key);
+                signer.getJCAContext().setProvider(BouncyCastleProviderSingleton.getInstance());
                 verifier = new ECDSAVerifier(key);
+                verifier.getJCAContext().setProvider(BouncyCastleProviderSingleton.getInstance());
+                Security.addProvider(bc);
             } catch (Exception e) {
                 e.printStackTrace();
                 throw new RuntimeException(e.getCause());
