@@ -9,15 +9,15 @@ import com.mozi.moziserver.model.req.ReqList;
 import com.mozi.moziserver.model.res.*;
 import com.mozi.moziserver.security.SessionUser;
 import com.mozi.moziserver.service.*;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -35,10 +35,10 @@ public class PostboxMessageController {
 
     // -------------------- -------------------- PostboxMessageAnimal -------------------- -------------------- //
     // TODO ERASE (NOT USED V2)
-    @ApiOperation("동물의 편지 하나 조회")
+    @Operation(summary = "동물의 편지 하나 조회")
     @GetMapping("/v1/postbox-message-animals/{seq}")
     public ResPostboxMessageAnimal getPostboxMessageAnimalV1(
-            @ApiParam(hidden = true) @SessionUser Long userSeq,
+            @Parameter(hidden = true) @SessionUser Long userSeq,
             @PathVariable("seq") Long seq
 
     ) {
@@ -50,10 +50,10 @@ public class PostboxMessageController {
         return ResPostboxMessageAnimal.of(postboxMessageAnimal, preparationItemList);
     }
 
-    @ApiOperation("동물의 편지 리스트 조회")
+    @Operation(summary = "동물의 편지 리스트 조회")
     @GetMapping("/v1/postbox-message-animals")
     public List<ResPostboxMessageAnimalList> getPostboxMessageAnimalList(
-            @ApiParam(hidden = true) @SessionUser Long userSeq,
+            @Parameter(hidden = true) @SessionUser Long userSeq,
             @Valid ReqList req
     ) {
 
@@ -64,10 +64,10 @@ public class PostboxMessageController {
     }
 
     // -------------------- -------------------- PostboxMessageAdmin -------------------- -------------------- //
-    @ApiOperation("관리자의 편지 리스트 조회")
+    @Operation(summary = "관리자의 편지 리스트 조회")
     @GetMapping("/v1/postbox-message-admins")
     public List<ResPostboxMessageAdminList> getPostboxMessageAdminList(
-            @ApiParam(hidden = true) @SessionUser Long userSeq,
+            @Parameter(hidden = true) @SessionUser Long userSeq,
             @Valid ReqList req
     ) {
 
@@ -78,10 +78,10 @@ public class PostboxMessageController {
                 .collect(Collectors.toList());
     }
 
-    @ApiOperation("관리자 편지 확인 완료")
+    @Operation(summary = "관리자 편지 확인 완료")
     @PutMapping("/v1/postbox-message-admins/{seq}/checked")
     public ResponseEntity<Object> checkUserChallenge(
-            @ApiParam(hidden = true) @SessionUser Long userSeq,
+            @Parameter(hidden = true) @SessionUser Long userSeq,
             @PathVariable("seq") Long seq
     ) {
 
@@ -91,10 +91,10 @@ public class PostboxMessageController {
     }
 
     // -------------------- -------------------- Animal -------------------- -------------------- //
-    @ApiOperation("동물 하나 조회")
+    @Operation(summary = "동물 하나 조회")
     @GetMapping("/v1/animals/{seq}")
     public ResAnimal getAnimal(
-            @ApiParam(hidden = true) @SessionUser Long userSeq,
+            @Parameter(hidden = true) @SessionUser Long userSeq,
             @PathVariable("seq") Long seq
     ) {
 
@@ -102,10 +102,10 @@ public class PostboxMessageController {
     }
 
     // -------------------- -------------------- UserNotice -------------------- -------------------- //
-    @ApiOperation("유저 알림 조회")
+    @Operation(summary = "유저 알림 조회")
     @GetMapping("/v1/user-notices/{type}")
     public ResUserNotice getUserNotice(
-            @ApiParam(hidden = true) @SessionUser Long userSeq,
+            @Parameter(hidden = true) @SessionUser Long userSeq,
             @PathVariable UserNoticeType type
     ) {
 
@@ -114,10 +114,10 @@ public class PostboxMessageController {
         return ResUserNotice.of(userNotice);
     }
 
-    @ApiOperation("유저 알림 확인")
+    @Operation(summary = "유저 알림 확인")
     @PutMapping("/v1/user-notices/{type}/checked")
     public ResponseEntity<Object> checkUserNotice(
-            @ApiParam(hidden = true) @SessionUser Long userSeq,
+            @Parameter(hidden = true) @SessionUser Long userSeq,
             @PathVariable UserNoticeType type
     ) {
 
@@ -127,10 +127,10 @@ public class PostboxMessageController {
     }
 
     // -------------------- v2 -------------------- //
-    @ApiOperation("동물의 편지 하나 조회")
+    @Operation(summary = "동물의 편지 하나 조회")
     @GetMapping("/v2/postbox-message-animals/{seq}")
     public ResPostboxMessageAnimal getPostboxMessageAnimal(
-            @ApiParam(hidden = true) @SessionUser Long userSeq,
+            @Parameter(hidden = true) @SessionUser Long userSeq,
             @PathVariable("seq") Long seq
 
     ) {

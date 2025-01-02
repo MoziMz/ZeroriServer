@@ -1,6 +1,9 @@
 spring:
   application:
     name: zerori
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
   datasource:
     driverClassName: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://${DB_ADDRESS}:3306/zeroplanet?autoReconnect=true

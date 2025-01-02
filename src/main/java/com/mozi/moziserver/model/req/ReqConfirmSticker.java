@@ -2,7 +2,7 @@ package com.mozi.moziserver.model.req;
 
 import lombok.Getter;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 

@@ -1,7 +1,7 @@
 package com.mozi.moziserver.model.mappedenum;
 
-import javax.persistence.AttributeConverter;
-import javax.persistence.Converter;
+import jakarta.persistence.AttributeConverter;
+import jakarta.persistence.Converter;
 
 @Converter(autoApply = true)
 public class UserAuthTypeConverter implements AttributeConverter<UserAuthType, Integer> {

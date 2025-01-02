@@ -11,15 +11,15 @@ import com.mozi.moziserver.model.entity.Challenge;
 import com.mozi.moziserver.model.entity.ChallengeStatistics;
 import com.mozi.moziserver.model.entity.ChallengeTheme;
 import com.mozi.moziserver.model.mappedenum.ChallengeTagType;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
-import javax.validation.constraints.Max;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,7 +31,7 @@ public class AdminChallengeController {
     private final AdminChallengeService adminChallengeService;
 
     // -------------------- -------------------- Challenge -------------------- -------------------- //
-    @ApiOperation("챌린지 하나 조회")
+    @Operation(summary = "챌린지 하나 조회")
     @GetMapping("/admin/challenges/{seq}")
     public AdminResChallenge getChallenge(
             @PathVariable Long seq
@@ -46,7 +46,7 @@ public class AdminChallengeController {
         return AdminResChallenge.of(challenge, challengeTheme, challengeStatisticsList);
     }
 
-    @ApiOperation("챌린지 리스트 조회")
+    @Operation(summary = "챌린지 리스트 조회")
     @GetMapping("/admin/challenges")
     public List<AdminResChallengeList> getChallengeList(
             @RequestParam(name = "themeSeq", required = false) Long themeSeq,
@@ -64,7 +64,7 @@ public class AdminChallengeController {
                 .collect(Collectors.toList());
     }
 
-    @ApiOperation("챌린지 생성")
+    @Operation(summary = "챌린지 생성")
     @PostMapping("/admin/challenges")
     public ResponseEntity<Object> createChallenge(
             @Valid AdminReqChallengeCreate req
@@ -74,7 +74,7 @@ public class AdminChallengeController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @ApiOperation("챌린지 설명 추가")
+    @Operation(summary = "챌린지 설명 추가")
     @PostMapping("/admin/challenges/{seq}/explanations")
     public ResponseEntity<Object> createChallengeTest(
             @PathVariable Long seq,
@@ -86,7 +86,7 @@ public class AdminChallengeController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @ApiOperation("챌린지 수정")
+    @Operation(summary = "챌린지 수정")
     @PutMapping("/admin/challenges/{seq}")
     public ResponseEntity<Object> updateChallenge(
             @PathVariable Long seq,
@@ -105,7 +105,7 @@ public class AdminChallengeController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @ApiOperation("챌린지 삭제")
+    @Operation(summary = "챌린지 삭제")
     @DeleteMapping("/admin/challenges/{seq}")
     public ResponseEntity<Object> deleteChallenge(
             @PathVariable Long seq
@@ -117,7 +117,7 @@ public class AdminChallengeController {
 
     // -------------------- -------------------- Tag -------------------- -------------------- //
 
-    @ApiOperation("태그 리스트 조회")
+    @Operation(summary = "태그 리스트 조회")
     @GetMapping("/admin/tags")
     public List<AdminResTag> getTagList(
             @RequestParam(name = "keyword", required = false) String keyword
@@ -128,7 +128,7 @@ public class AdminChallengeController {
                 .collect(Collectors.toList());
     }
 
-    @ApiOperation("태그 등록")
+    @Operation(summary = "태그 등록")
     @PostMapping("/admin/tags")
     public ResponseEntity<Object> createTag(
             @RequestParam(name = "name") String name
@@ -138,7 +138,7 @@ public class AdminChallengeController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @ApiOperation("태그 수정")
+    @Operation(summary = "태그 수정")
     @PutMapping("/admin/tags/{seq}")
     public ResponseEntity<Object> updateTag(
             @PathVariable(name = "seq") Long seq,
@@ -150,7 +150,7 @@ public class AdminChallengeController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @ApiOperation("태그 삭제")
+    @Operation(summary = "태그 삭제")
     @DeleteMapping("/admin/tags/{seq}")
     public ResponseEntity<Object> updateTag(
             @PathVariable(name = "seq") Long seq
@@ -161,7 +161,7 @@ public class AdminChallengeController {
     }
 
     // -------------------- -------------------- ChallengeTheme -------------------- -------------------- //
-    @ApiOperation("테마 리스트 조회")
+    @Operation(summary = "테마 리스트 조회")
     @GetMapping("/admin/challege-themes")
     public List<ChallengeTheme> getChallengeThemeList(
             @RequestParam(name = "keyword", required = false) String keyword
@@ -169,7 +169,7 @@ public class AdminChallengeController {
         return adminChallengeService.getChallengeThemeList(keyword);
     }
 
-    @ApiOperation("테마 등록")
+    @Operation(summary = "테마 등록")
     @PostMapping("/admin/challege-themes")
     public ResponseEntity<Object> createChallengeTheme(
             @RequestParam(value = "name") String name,
@@ -181,7 +181,7 @@ public class AdminChallengeController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @ApiOperation("테마 수정")
+    @Operation(summary = "테마 수정")
     @PutMapping("/admin/challege-themes/{seq}")
     public ResponseEntity<Object> updateChallengeTheme(
             @PathVariable(name = "seq") Integer seq,
@@ -196,7 +196,7 @@ public class AdminChallengeController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @ApiOperation("테마 삭제")
+    @Operation(summary = "테마 삭제")
     @DeleteMapping("/admin/challege-themes/{seq}")
     public ResponseEntity<Object> deleteChallengeTheme(
             @PathVariable(name = "seq") Integer seq
@@ -207,7 +207,7 @@ public class AdminChallengeController {
     }
 
     // -------------------- -------------------- CurrentTagList -------------------- -------------------- //
-    @ApiOperation("현재 태그 리스트 조회")
+    @Operation(summary = "현재 태그 리스트 조회")
     @GetMapping("/admin/current-tag-lists")
     public List<AdminResCurrentTagList> getCurrentTagList(
     ) {
@@ -217,7 +217,7 @@ public class AdminChallengeController {
                 .collect(Collectors.toList());
     }
 
-    @ApiOperation("현재 태그 리스트 생성")
+    @Operation(summary = "현재 태그 리스트 생성")
     @PostMapping("/admin/current-tag-lists")
     public ResponseEntity<Object> createCurrentTagList(
             @RequestParam(name = "turn") Integer turn,
@@ -231,7 +231,7 @@ public class AdminChallengeController {
     }
 
     //모든 태그 리스트를 받아서 수정하기
-    @ApiOperation("현재 태그 리스트 수정")
+    @Operation(summary = "현재 태그 리스트 수정")
     @PutMapping("/admin/current-tag-lists")
     public ResponseEntity<Object> updateCurrentTagList(
             @RequestBody @Valid List<AdminReqCurrentTagList> req
@@ -244,7 +244,7 @@ public class AdminChallengeController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @ApiOperation("현재 태그 리스트 삭제")
+    @Operation(summary = "현재 태그 리스트 삭제")
     @DeleteMapping("/admin/current-tag-lists/{seq}")
     public ResponseEntity<Object> deleteCurrentTagList(
             @PathVariable(name = "seq") Long seq
@@ -255,7 +255,7 @@ public class AdminChallengeController {
     }
 
     // -------------------- -------------------- CurrentThemeList -------------------- -------------------- //
-    @ApiOperation("현재 테마 리스트 조회")
+    @Operation(summary = "현재 테마 리스트 조회")
     @GetMapping("/admin/current-theme-lists")
     public List<AdminResCurrentThemeList> getCurrentThemeList(
     ) {
@@ -265,7 +265,7 @@ public class AdminChallengeController {
                 .collect(Collectors.toList());
     }
 
-    @ApiOperation("현재 테마 리스트 생성")
+    @Operation(summary = "현재 테마 리스트 생성")
     @PostMapping("/admin/current-theme-lists")
     public ResponseEntity<Object> createCurrentThemeList(
             @RequestParam(name = "turn") Integer turn,
@@ -278,7 +278,7 @@ public class AdminChallengeController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @ApiOperation("현재 테마 리스트 수정")
+    @Operation(summary = "현재 테마 리스트 수정")
     @PutMapping("/admin/current-theme-lists")
     public ResponseEntity<Object> updateCurrentThemeList(
             @RequestBody @Valid List<AdminReqCurrentThemeList> req
@@ -293,7 +293,7 @@ public class AdminChallengeController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @ApiOperation("현재 테마 리스트 삭제")
+    @Operation(summary = "현재 테마 리스트 삭제")
     @DeleteMapping("/admin/current-theme-lists/{seq}")
     public ResponseEntity<Object> deleteCurrentThemeList(
             @PathVariable(name = "seq") Long seq

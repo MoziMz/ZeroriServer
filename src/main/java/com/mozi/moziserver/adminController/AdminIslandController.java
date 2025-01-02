@@ -6,7 +6,7 @@ import com.mozi.moziserver.httpException.ResponseError;
 import com.mozi.moziserver.model.adminRes.AdminResIsland;
 import com.mozi.moziserver.model.entity.DetailIsland;
 import com.mozi.moziserver.model.entity.Island;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -26,7 +26,7 @@ public class AdminIslandController {
     private final AdminIslandService adminIslandService;
 
     // -------------------- -------------------- Island -------------------- -------------------- //
-    @ApiOperation("섬 하나 조회")
+    @Operation(summary = "섬 하나 조회")
     @GetMapping(value = "/admin/islands/{seq}")
     public AdminResIsland getIsland(
             @PathVariable(value = "seq") Long seq
@@ -38,7 +38,7 @@ public class AdminIslandController {
         return AdminResIsland.of(island, detailIslandList);
     }
 
-    @ApiOperation("섬 모두 조회")
+    @Operation(summary = "섬 모두 조회")
     @GetMapping(value = "/admin/islands")
     public List<Island> getIslandList(
     ) {
@@ -46,7 +46,7 @@ public class AdminIslandController {
         return adminIslandService.getIslandList();
     }
 
-    @ApiOperation("섬 정보(Island) 생성")
+    @Operation(summary = "섬 정보(Island) 생성")
     @PostMapping(value = "/admin/islands")
     public ResponseEntity<Object> createIsland(
             @RequestParam(value = "name", required = true) String name,
@@ -59,7 +59,7 @@ public class AdminIslandController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @ApiOperation("섬 정보(Island) 수정")
+    @Operation(summary = "섬 정보(Island) 수정")
     @PutMapping(value = "/admin/islands/{seq}")
     public ResponseEntity<Object> updateIsland(
             @PathVariable(value = "seq", required = true) Long seq,
@@ -75,7 +75,7 @@ public class AdminIslandController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @ApiOperation("섬 삭제")
+    @Operation(summary = "섬 삭제")
     @DeleteMapping("/admin/islands/{seq}")
     public ResponseEntity<Object> deleteIsland(
             @PathVariable(value = "seq") Long seq
@@ -88,7 +88,7 @@ public class AdminIslandController {
 
     // -------------------- -------------------- DetailIsland -------------------- -------------------- //
 
-    @ApiOperation("이미지(DetailIsland) 생성")
+    @Operation(summary = "이미지(DetailIsland) 생성")
     @PostMapping(value = "/admin/detail-islands", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Object> createIsland(
             @RequestParam("islandSeq") Long islandSeq,
@@ -107,7 +107,7 @@ public class AdminIslandController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @ApiOperation("섬 이미지(detailIsland) 수정")
+    @Operation(summary = "섬 이미지(detailIsland) 수정")
     @PutMapping(value = "/admin/detail-islands/{seq}")
     public ResponseEntity<Object> updateIslandImg(
             @PathVariable("seq") Long seq,
@@ -122,7 +122,7 @@ public class AdminIslandController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @ApiOperation("섬 이미지(detailIsland) 삭제")
+    @Operation(summary = "섬 이미지(detailIsland) 삭제")
     @DeleteMapping("/admin/detail-islands/{seq}")
     public ResponseEntity<Object> deleteDetailIsland(
             @PathVariable(value = "seq") Long seq

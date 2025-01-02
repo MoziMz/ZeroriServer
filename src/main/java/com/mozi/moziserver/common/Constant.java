@@ -22,6 +22,8 @@ public interface Constant {
 
     String CURRENT_PW_FIELD_NAME = "currentPw";
 
+    Long TEST_USER_SEQ = 1L;
+
     //TODO fix
     String ID_REGEX = "[A-Za-z0-9]{5,}$";
 

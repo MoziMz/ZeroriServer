@@ -6,7 +6,7 @@ import com.mozi.moziserver.model.mappedenum.ChallengeTagType;
 import com.mozi.moziserver.model.mappedenum.ExplanationConverter;
 import lombok.*;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.List;
 
 @Getter

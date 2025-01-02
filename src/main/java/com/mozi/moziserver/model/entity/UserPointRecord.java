@@ -3,7 +3,7 @@ package com.mozi.moziserver.model.entity;
 import com.mozi.moziserver.model.mappedenum.PointReasonType;
 import lombok.*;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 @Getter
 @Setter

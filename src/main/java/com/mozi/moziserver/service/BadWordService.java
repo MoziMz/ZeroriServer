@@ -9,7 +9,7 @@ import org.ahocorasick.trie.Emit;
 import org.ahocorasick.trie.Trie;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;

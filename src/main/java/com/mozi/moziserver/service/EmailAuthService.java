@@ -21,7 +21,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
-import javax.mail.internet.MimeMessage;
+import jakarta.mail.internet.MimeMessage;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -375,7 +375,7 @@ public class EmailAuthService {
 
     public void checkEmailAuth(User user) {
 
-        EmailAuth emailAuth = emailAuthRepository.findByUserAndTypeOrderByCreatedAt(user, EmailAuthType.JOIN.getType())
+        EmailAuth emailAuth = emailAuthRepository.findByUserAndTypeOrderByCreatedAt(user.getSeq(), EmailAuthType.JOIN.getType())
                 .orElseThrow(ResponseError.NotFound.EMAIL_AUTH_NOT_EXISTS::getResponseException);
 
         if (emailAuth.getEmailAuthResultState() == null) {

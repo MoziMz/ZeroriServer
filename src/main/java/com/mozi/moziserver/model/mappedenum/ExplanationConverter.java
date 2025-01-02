@@ -7,8 +7,8 @@ import com.mozi.moziserver.model.ChallengeExplanation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
 
-import javax.persistence.AttributeConverter;
-import javax.persistence.Converter;
+import jakarta.persistence.AttributeConverter;
+import jakarta.persistence.Converter;
 
 /**
  * Mysql post links 타입 JSON

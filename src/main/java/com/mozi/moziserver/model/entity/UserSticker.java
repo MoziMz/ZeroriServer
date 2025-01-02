@@ -2,8 +2,8 @@ package com.mozi.moziserver.model.entity;
 
 import lombok.*;
 
-import javax.persistence.EmbeddedId;
-import javax.persistence.Entity;
+import jakarta.persistence.EmbeddedId;
+import jakarta.persistence.Entity;
 
 @Getter
 @Setter

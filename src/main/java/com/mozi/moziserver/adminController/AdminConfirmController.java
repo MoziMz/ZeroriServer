@@ -4,14 +4,14 @@ import com.mozi.moziserver.adminService.AdminConfirmService;
 import com.mozi.moziserver.httpException.ResponseError;
 import com.mozi.moziserver.model.adminRes.AdminResConfirmList;
 import com.mozi.moziserver.model.mappedenum.ConfirmStateType;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.constraints.Max;
+import jakarta.validation.constraints.Max;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,7 +23,7 @@ public class AdminConfirmController {
 
     private final AdminConfirmService adminConfirmService;
 
-    @ApiOperation("인증 리스트 조회")
+    @Operation(summary = "인증 리스트 조회")
     @GetMapping("/admin/confirms")
     public List<AdminResConfirmList> getConfirmList(
             @RequestParam(name = "userSeq", required = false) Long userSeq,
@@ -36,7 +36,7 @@ public class AdminConfirmController {
                 .collect(Collectors.toList());
     }
 
-    @ApiOperation("인증 상태 변경 (BLOCKED or ACTIVE 상태로)")
+    @Operation(summary = "인증 상태 변경 (BLOCKED or ACTIVE 상태로)")
     @GetMapping("/admin/confirms/{seq}")
     public ResponseEntity<Object> updateConfirmState(
             @PathVariable("seq") Long seq,
@@ -51,7 +51,7 @@ public class AdminConfirmController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @ApiOperation("인증 삭제")
+    @Operation(summary = "인증 삭제")
     @DeleteMapping("/admin/confirms/{seq}")
     public ResponseEntity<Object> deleteConfirm(
             @PathVariable("seq") Long seq

@@ -21,10 +21,10 @@ import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.util.ContentCachingRequestWrapper;
 import org.springframework.web.util.ContentCachingResponseWrapper;
 
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.time.LocalDateTime;
@@ -77,7 +77,7 @@ public class ApiLogFilter extends OncePerRequestFilter {
         }
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth != null && auth.isAuthenticated()) {
+        if (auth != null && auth.isAuthenticated() && SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof ResUserSignIn) {
             MDC.put(Constant.MDC_KEY_USER_SEQ, ((ResUserSignIn) auth.getPrincipal()).getUserSeq().toString());
         }
 
