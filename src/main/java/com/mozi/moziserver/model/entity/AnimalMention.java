@@ -2,7 +2,7 @@ package com.mozi.moziserver.model.entity;
 
 import lombok.Getter;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 @Getter
 @Entity(name = "animal_mention")
