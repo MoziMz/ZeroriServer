@@ -132,8 +132,8 @@ public interface ResponseError {
         CHALLENGE_TAG_NOT_EXISTS("challenge tag not exists"),
         DETAIL_ISLAND_NOT_EXISTS("detail island not exists"),
         NOT_EXISTS("not exists"),
-
-        ANIMAL_ITEM_NOT_EXISTS("animal item not exists");
+        ANIMAL_ITEM_NOT_EXISTS("animal item not exists"),
+        RESOURCE_NOT_FOUND("The requested resource could not be found");
 
         private final String message;
 
