@@ -44,7 +44,7 @@ jwt:
 
 github:
   models:
-    url: https://models.inference.ai.azure.com
+    url: https://models.github.ai
     apiKey: ${GITHUB_MODELS_APIKEY}
 
 cloud:
