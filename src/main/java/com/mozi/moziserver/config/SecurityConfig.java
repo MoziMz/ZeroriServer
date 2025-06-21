@@ -55,7 +55,7 @@ public class SecurityConfig {
         final String activeProfiles = String.join(",", env.getActiveProfiles());
 
         http
-
+                .authenticationManager(authManager(http))
                 .csrf(AbstractHttpConfigurer::disable)
                 .headers((headerConfig) ->
                         headerConfig.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable
