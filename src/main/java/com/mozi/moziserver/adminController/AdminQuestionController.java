@@ -7,14 +7,14 @@ import com.mozi.moziserver.model.adminRes.AdminResSuggestionList;
 import com.mozi.moziserver.model.mappedenum.PriorityType;
 import com.mozi.moziserver.model.mappedenum.QuestionCategoryType;
 import com.mozi.moziserver.model.mappedenum.QuestionStateType;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.constraints.Max;
+import jakarta.validation.constraints.Max;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,7 +28,7 @@ public class AdminQuestionController {
 
     private final AdminSuggestionService adminSuggestionService;
 
-    @ApiOperation("문의 리스트 조회")
+    @Operation(summary = "문의 리스트 조회")
     @GetMapping("/admin/questions")
     public List<AdminResQuestionList> getQuestionList(
             @RequestParam(name = "category", required = false) QuestionCategoryType category,
@@ -42,7 +42,7 @@ public class AdminQuestionController {
                 .collect(Collectors.toList());
     }
 
-    @ApiOperation("문의 (상태, 우선순위) 변경")
+    @Operation(summary = "문의 (상태, 우선순위) 변경")
     @PutMapping("/admin/questions/{seq}")
     public ResponseEntity<Object> updateQuestion(
             @PathVariable(value = "seq", required = true) Long seq,
@@ -54,7 +54,7 @@ public class AdminQuestionController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @ApiOperation("문의 삭제")
+    @Operation(summary = "문의 삭제")
     @DeleteMapping("/admin/questions/{seq}")
     public ResponseEntity<Object> updateQuestion(
             @PathVariable(value = "seq", required = true) Long seq
@@ -64,7 +64,7 @@ public class AdminQuestionController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @ApiOperation("챌린지 제안 리스트 조회")
+    @Operation(summary = "챌린지 제안 리스트 조회")
     @GetMapping("/admin/suggestions")
     public List<AdminResSuggestionList> getSuggestionList(
             @RequestParam(name = "pageNumber", required = false, defaultValue = "0") Integer pageNumber,
@@ -75,7 +75,7 @@ public class AdminQuestionController {
                 .collect(Collectors.toList());
     }
 
-    @ApiOperation("챌린지 제안 삭제")
+    @Operation(summary = "챌린지 제안 삭제")
     @DeleteMapping("/admin/suggestions/{seq}")
     public ResponseEntity<Object> deleteSuggestion(
             @PathVariable(value = "seq", required = true) Long seq

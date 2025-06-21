@@ -5,8 +5,8 @@ import com.mozi.moziserver.model.mappedenum.ChallengeThemeType;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;

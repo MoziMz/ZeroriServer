@@ -9,8 +9,8 @@ import com.mozi.moziserver.security.SessionUser;
 import com.mozi.moziserver.service.IslandService;
 import com.mozi.moziserver.service.UserRewardService;
 import com.mozi.moziserver.service.UserService;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -35,10 +35,10 @@ public class UserIslandController {
     private final UserService userService;
 
     // TODO ERASE (NOT USED V2)
-    @ApiOperation("섬리스트 조회")
+    @Operation(summary = "섬리스트 조회")
     @GetMapping("/v1/users/me/user-islands")
     public List<ResUserIslandList> getUserIslandListV1(
-            @ApiParam(hidden = true) @SessionUser Long userSeq
+            @Parameter(hidden = true) @SessionUser Long userSeq
     ) {
 
         User user = userService.getUserBySeq(userSeq);
@@ -57,10 +57,10 @@ public class UserIslandController {
         return resUserIslandLists;
     }
 
-    @ApiOperation("섬 오픈하기")
+    @Operation(summary = "섬 오픈하기")
     @PostMapping("/v1/users/me/user-islands/open")
     public ResponseEntity<Object> openUserIslandV1(
-            @ApiParam(hidden = true) @SessionUser Long userSeq
+            @Parameter(hidden = true) @SessionUser Long userSeq
     ) {
 
         User user = userService.getUserBySeq(userSeq);
@@ -70,10 +70,10 @@ public class UserIslandController {
     }
 
     // -------------------- v2 -------------------- //
-    @ApiOperation("섬 리스트 조회")
+    @Operation(summary = "섬 리스트 조회")
     @GetMapping("/v2/users/me/user-islands")
     public List<ResUserIslandList> getUserIslandList(
-            @ApiParam(hidden = true) @SessionUser Long userSeq
+            @Parameter(hidden = true) @SessionUser Long userSeq
     ) {
 
         User user = userService.getUserBySeq(userSeq);

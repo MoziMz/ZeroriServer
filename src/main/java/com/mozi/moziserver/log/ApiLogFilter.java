@@ -1,7 +1,5 @@
 package com.mozi.moziserver.log;
 
-import co.elastic.apm.api.ElasticApm;
-import co.elastic.apm.api.Transaction;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mozi.moziserver.common.Constant;
 import com.mozi.moziserver.security.ResUserSignIn;
@@ -21,10 +19,10 @@ import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.util.ContentCachingRequestWrapper;
 import org.springframework.web.util.ContentCachingResponseWrapper;
 
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.time.LocalDateTime;
@@ -70,14 +68,8 @@ public class ApiLogFilter extends OncePerRequestFilter {
         MDC.put(Constant.MDC_KEY_THREAD_ID, threadId);
         apiLogBuilder.threadId(threadId);
 
-        Transaction transaction = ElasticApm.currentTransaction();
-        final String traceId = transaction.getTraceId();
-        if (StringUtils.hasLength(traceId)) {
-            MDC.put(Constant.MDC_KEY_THREAD_ID, traceId);
-        }
-
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth != null && auth.isAuthenticated()) {
+        if (auth != null && auth.isAuthenticated() && SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof ResUserSignIn) {
             MDC.put(Constant.MDC_KEY_USER_SEQ, ((ResUserSignIn) auth.getPrincipal()).getUserSeq().toString());
         }
 

@@ -5,9 +5,7 @@ import com.mozi.moziserver.common.Constant;
 import com.mozi.moziserver.log.ApiLogFilter;
 import com.mozi.moziserver.repository.RememberMeTokenRepository;
 import com.mozi.moziserver.security.*;
-import com.mozi.moziserver.security.UserEmailSignInService;
-import com.mozi.moziserver.security.RememberMeService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
@@ -15,84 +13,82 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import javax.servlet.http.HttpServletResponse;
+import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 
 @Configuration
 @EnableWebSecurity
-@SuppressWarnings("unused")
-public class SecurityConfig extends WebSecurityConfigurerAdapter {
+@RequiredArgsConstructor
+//@SuppressWarnings("unused")
+public class SecurityConfig {
 
-    @Autowired
-    UserSocialAuthenticationProvider userSocialAuthenticationProvider;
+    private final UserSocialAuthenticationProvider userSocialAuthenticationProvider;
 
-    @Autowired
-    private RememberMeTokenRepository rememberMeTokenRepository;
+    private final RememberMeTokenRepository rememberMeTokenRepository;
 
-    @Autowired
-    private UserEmailSignInService userEmailSignInService;
+    private final UserEmailSignInService userEmailSignInService;
 
-    @Autowired
-    private RememberMeService rememberMeService;
+    private final RememberMeService rememberMeService;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper;
 
-    @Autowired
-    private Environment env;
+    private final Environment env;
 
+    @Bean
+    public AuthenticationManager authManager(HttpSecurity http) throws Exception {
+        AuthenticationManagerBuilder authenticationManagerBuilder =
+                http.getSharedObject(AuthenticationManagerBuilder.class);
 
-    @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth
-                .userDetailsService(userEmailSignInService)
-                .and()
-                .authenticationProvider(userSocialAuthenticationProvider)
-                .authenticationProvider(new UserRememberAuthenticationProvider());
-    }
-
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        final String activeProfiles = String.join(",", env.getActiveProfiles());
-
-        http
-                .cors()
-                .and()
-                .csrf().disable()
-                .headers().frameOptions().disable()
-                .and()
-                .addFilterBefore(new ApiLogFilter(activeProfiles, objectMapper), UsernamePasswordAuthenticationFilter.class)
-                .authorizeRequests()
-                .antMatchers(Constant.PERMIT_ALL_PATHS).permitAll()
-                .antMatchers(Constant.AUTHENTICATED_PATHS).authenticated()
-                .antMatchers(Constant.ROLE_ADMIN_PATHS).hasRole(Constant.ROLE_ADMIN)
-                .antMatchers(Constant.ROLE_USER_PATHS).hasRole(Constant.ROLE_USER)
-                .anyRequest().permitAll()
-                .and()
-                .formLogin().disable()
-                .httpBasic().disable()
-                .exceptionHandling()
-                .authenticationEntryPoint(new DefaultAuthenticationEntryPoint())
-                .accessDeniedHandler(new DefaultAccessDeniedHandler())
-                .and()
-                .rememberMe(configurer -> configurer
-                        .alwaysRemember(true)
-                        .rememberMeServices(rememberMeService))
-                .logout()
-                .logoutUrl("/api/v1/users/signout")
-                .logoutSuccessHandler((request, response, authentication) -> {
-                    response.setStatus(HttpServletResponse.SC_OK);
-                })
-                .deleteCookies("JSESSIONID",  "remember-me");
+        authenticationManagerBuilder.userDetailsService(userEmailSignInService);
+        authenticationManagerBuilder.authenticationProvider(userSocialAuthenticationProvider);
+        authenticationManagerBuilder.authenticationProvider(new UserRememberAuthenticationProvider());
+        return authenticationManagerBuilder.build();
     }
 
     @Bean
-    @Override
-    public AuthenticationManager authenticationManagerBean() throws Exception {
-        return super.authenticationManagerBean();
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception { // 3
+        final String activeProfiles = String.join(",", env.getActiveProfiles());
+
+        http
+                .authenticationManager(authManager(http))
+                .csrf(AbstractHttpConfigurer::disable)
+                .headers((headerConfig) ->
+                        headerConfig.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable
+                        )
+                )
+                .addFilterBefore(new ApiLogFilter(activeProfiles, objectMapper), UsernamePasswordAuthenticationFilter.class)
+                .formLogin(AbstractHttpConfigurer::disable)
+                .httpBasic(AbstractHttpConfigurer::disable)
+                .exceptionHandling((exceptionHandling) ->
+                        exceptionHandling.authenticationEntryPoint(new DefaultAuthenticationEntryPoint())
+                                .accessDeniedHandler(new DefaultAccessDeniedHandler())
+                )
+                .authorizeHttpRequests((authorize) ->
+                        authorize
+                                .requestMatchers(Constant.PERMIT_ALL_PATHS).permitAll()
+                                .requestMatchers(Constant.AUTHENTICATED_PATHS).authenticated()
+                                .requestMatchers(Constant.ROLE_ADMIN_PATHS).hasRole(Constant.ROLE_ADMIN)
+                                .requestMatchers(Constant.ROLE_USER_PATHS).hasRole(Constant.ROLE_USER)
+                                .anyRequest().permitAll()
+                )
+                .rememberMe((rememberMe) ->
+                        rememberMe
+                                .alwaysRemember(true)
+                                .rememberMeServices(rememberMeService)
+                )
+                .logout((logout) ->
+                        logout
+                                .logoutUrl("/api/v1/users/signout")
+                                .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler())
+                                .deleteCookies("JSESSIONID", "remember-me")
+                );
+
+        return http.build();
     }
 
     @Bean

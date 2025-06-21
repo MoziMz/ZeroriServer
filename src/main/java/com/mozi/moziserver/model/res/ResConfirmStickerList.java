@@ -4,7 +4,7 @@ import com.mozi.moziserver.model.entity.ConfirmSticker;
 import com.mozi.moziserver.model.entity.Sticker;
 import lombok.Getter;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.util.List;
 
