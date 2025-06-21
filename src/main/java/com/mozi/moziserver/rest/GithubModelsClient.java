@@ -14,7 +14,7 @@ import java.util.List;
 @FeignClient(name = "githubModelsClient", url = "${github.models.url}",
         configuration = GithubModelsConfig.class)
 public interface GithubModelsClient {
-    @PostMapping("/chat/completions")
+    @PostMapping("/inference/chat/completions")
     ResConfirmCheck verifyConfirmForChallengeName(
             @RequestBody ReqConfirmCheck reqChallgeCheck
     );

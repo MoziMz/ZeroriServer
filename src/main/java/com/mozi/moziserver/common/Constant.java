@@ -103,8 +103,11 @@ public interface Constant {
 
     int TUTORIAL_ANIMAL_ITEM_POINT = 5;
 
-    int GITHUB_MODELS_MAX_TOKENS = 8000;
-    String GITHUB_MODELS_MODEL_NAME = "gpt-4o-mini";
+    int GITHUB_MODELS_MAX_TOKENS = 4000;
+
+    String GITHUB_MODELS_MODEL_NAME = "openai/gpt-4.1";
+
     String GITHUB_MODELS_CHALLENGE_PROMPT = "이 사진이 제로웨이스트 활동인 '%s' 실천한 인증 사진이 맞으면 'Y' 아니라면 'N'으로 대답해줘.";
+
     String GITHUB_MODELS_ROLE = "user";
 }
