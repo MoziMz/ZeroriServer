@@ -37,8 +37,7 @@ dependencies {
     implementation group: 'org.springframework.cloud', name: 'spring-cloud-aws', version: '2.2.1.RELEASE', ext: 'pom'
     implementation group: 'com.amazonaws', name: 'aws-java-sdk-s3', version: '1.12.39'
 
-    // Spring Boot의 BOM(Bill of Materials)에 버전 관리 위임
-    implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
+    implementation 'org.springframework.security:spring-security-oauth2-jose:6.2.4'
 
     implementation group: 'org.bouncycastle', name: 'bcprov-jdk18on', version: '1.78'
 
