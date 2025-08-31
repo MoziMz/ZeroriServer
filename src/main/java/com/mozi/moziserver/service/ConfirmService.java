@@ -3,10 +3,7 @@ package com.mozi.moziserver.service;
 import com.mozi.moziserver.common.JpaUtil;
 import com.mozi.moziserver.httpException.ResponseError;
 import com.mozi.moziserver.model.entity.*;
-import com.mozi.moziserver.model.mappedenum.ConfirmListType;
-import com.mozi.moziserver.model.mappedenum.ConfirmReportType;
-import com.mozi.moziserver.model.mappedenum.ConfirmStateType;
-import com.mozi.moziserver.model.mappedenum.PointReasonType;
+import com.mozi.moziserver.model.mappedenum.*;
 import com.mozi.moziserver.model.req.ReqConfirmOfUser;
 import com.mozi.moziserver.model.req.ReqConfirmSticker;
 import com.mozi.moziserver.model.req.ReqList;
@@ -36,7 +33,7 @@ public class ConfirmService {
     private final UserChallengeService userChallengeService;
     private final UserRewardService userRewardService;
     private final AsyncService asyncService;
-    private final S3ImageService s3ImageService;
+    private final ImageStorageService imageStorageService;
 
     private final ChallengeRepository challengeRepository;
     private final ConfirmRepository confirmRepository;
@@ -60,7 +57,7 @@ public class ConfirmService {
 
         String imgUrl = null;
         try {
-            imgUrl = s3ImageService.uploadFile(image, "confirm");
+            imgUrl = imageStorageService.writeImageFile(image, ImageDomain.CONFIRM.getDirectory());
         } catch (Exception e) {
             throw new RuntimeException(e.getCause());
         }

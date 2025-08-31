@@ -3,6 +3,7 @@ package com.mozi.moziserver.service;
 import com.mozi.moziserver.httpException.ResponseError;
 import com.mozi.moziserver.model.entity.Question;
 import com.mozi.moziserver.model.entity.User;
+import com.mozi.moziserver.model.mappedenum.ImageDomain;
 import com.mozi.moziserver.model.req.ReqQuestionCreate;
 import com.mozi.moziserver.repository.QuestionRepository;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +18,7 @@ public class QuestionService {
 
     private final QuestionRepository questionRepository;
 
-    private final S3ImageService s3ImageService;
+    private final ImageStorageService imageStorageService;
 
     @Transactional
     public void createQuestion(User user, ReqQuestionCreate reqQuestionCreate) {
@@ -25,7 +26,7 @@ public class QuestionService {
         String imgUrl = null;
         if (reqQuestionCreate.getImage() != null) {
             try {
-                imgUrl = s3ImageService.uploadFile(reqQuestionCreate.getImage(), "animal");
+                imgUrl = imageStorageService.writeImageFile(reqQuestionCreate.getImage(), ImageDomain.QUESTION.getDirectory());
             } catch (Exception e) {
                 throw new RuntimeException(e.getCause());
             }

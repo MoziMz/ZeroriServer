@@ -70,3 +70,8 @@ sentry:
 slack:
   webhook:
     blocked-info: ${SLACK_WEBHOOK_BLOCKED_INFO}
+
+storage:
+  base-dir: /var/zerori/uploads/
+  directories:
+    image: images/

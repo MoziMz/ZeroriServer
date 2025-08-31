@@ -18,6 +18,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -133,7 +134,7 @@ public class ConfirmController {
     }
 
     @Operation(summary = "스토리 생성")
-    @PostMapping("/v1/challenges/{challengeSeq}/confirms")
+    @PostMapping(value = "/v1/challenges/{challengeSeq}/confirms" , consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> createConfirm(
             @Parameter(hidden = true) @SessionUser Long userSeq,
             @PathVariable Long challengeSeq,
