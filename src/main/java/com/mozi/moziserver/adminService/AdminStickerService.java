@@ -2,8 +2,9 @@ package com.mozi.moziserver.adminService;
 
 import com.mozi.moziserver.httpException.ResponseError;
 import com.mozi.moziserver.model.entity.Sticker;
+import com.mozi.moziserver.model.mappedenum.ImageDomain;
 import com.mozi.moziserver.repository.StickerRepository;
-import com.mozi.moziserver.service.S3ImageService;
+import com.mozi.moziserver.service.ImageStorageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -15,7 +16,8 @@ import org.springframework.web.multipart.MultipartFile;
 public class AdminStickerService {
 
     private final StickerRepository stickerRepository;
-    private final S3ImageService s3ImageService;
+
+    private final ImageStorageService imageStorageService;
 
     private Sticker getSticker(Long seq) {
         Sticker sticker = stickerRepository.findById(seq)
@@ -27,7 +29,7 @@ public class AdminStickerService {
     public void createSticker(MultipartFile image) {
         String imgUrl = null;
         try {
-            imgUrl = s3ImageService.uploadFile(image, "confirm");
+            imgUrl = imageStorageService.writeImageFile(image, ImageDomain.STICKER.getDirectory());
         } catch (Exception e) {
             throw new RuntimeException(e.getCause());
         }
@@ -46,7 +48,7 @@ public class AdminStickerService {
 
         String imgUrl = null;
         try {
-            imgUrl = s3ImageService.uploadFile(image, "confirm");
+            imgUrl = imageStorageService.writeImageFile(image, ImageDomain.STICKER.getDirectory());
         } catch (Exception e) {
             throw new RuntimeException(e.getCause());
         }

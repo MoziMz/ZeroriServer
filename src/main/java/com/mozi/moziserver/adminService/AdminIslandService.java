@@ -4,10 +4,11 @@ import com.mozi.moziserver.common.Constant;
 import com.mozi.moziserver.httpException.ResponseError;
 import com.mozi.moziserver.model.entity.DetailIsland;
 import com.mozi.moziserver.model.entity.Island;
+import com.mozi.moziserver.model.mappedenum.ImageDomain;
 import com.mozi.moziserver.repository.DetailIslandRepository;
 import com.mozi.moziserver.repository.IslandRepository;
 import com.mozi.moziserver.repository.UserIslandRepository;
-import com.mozi.moziserver.service.S3ImageService;
+import com.mozi.moziserver.service.ImageStorageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -24,7 +25,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AdminIslandService {
 
-    private final S3ImageService s3ImageService;
+    private final ImageStorageService imageStorageService;
 
     private final IslandRepository islandRepository;
     private final DetailIslandRepository detailIslandRepository;
@@ -205,7 +206,7 @@ public class AdminIslandService {
 
     public String islandUploadFile(MultipartFile multipartFile, Integer animalTurn, Integer itemTurn) {
         try {
-            return s3ImageService.uploadFile(multipartFile, "DetailIsland_animal" + animalTurn + "_item" + itemTurn);
+            return imageStorageService.writeImageFile(multipartFile, ImageDomain.DETAIL_ISLAND.getDirectory());
         } catch (Exception e) {
             throw new RuntimeException(e.getCause());
         }
