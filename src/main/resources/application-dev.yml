@@ -1,5 +1,6 @@
 server:
   domain: https://dev.zero-ri.com
+  assets-domain: https://dev-assets.zero-ri.com
 
 sentry:
   environment: dev

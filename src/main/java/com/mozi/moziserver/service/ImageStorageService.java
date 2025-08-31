@@ -25,6 +25,8 @@ public class ImageStorageService {
     private String baseDirStr;
     @Value("${storage.directories.image}")
     private String imageDirStr;
+    @Value("${server.assets-domain}")
+    private String assetsDomain;
 
     public String writeImageFile(final MultipartFile multipartFile, final String subDir) {
         final String extension;
@@ -62,7 +64,7 @@ public class ImageStorageService {
             throw ResponseError.InternalServerError.UNEXPECTED_ERROR.getResponseException("fail to upload file ( Files.copy IOException " + e.getMessage() + ")");
         }
 
-        return imageDirStr + relativePath;
+        return assetsDomain + imageDirStr + relativePath;
     }
 
     public void deleteImageFile(final String filePathStr) {
@@ -99,7 +101,7 @@ public class ImageStorageService {
     private String buildRelativePath(final String subDir, final String extension) {
         String yearMonth = LocalDate.now().format(YEAR_MONTH_FORMATTER);
         String fileName = generateUniqueFileName();
-        return String.join("/", subDir, yearMonth, fileName + extension);
+        return "/"+String.join("/", subDir, yearMonth, fileName + extension);
     }
 
     private String generateUniqueFileName() {

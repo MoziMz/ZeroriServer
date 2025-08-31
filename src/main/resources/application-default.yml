@@ -1,5 +1,6 @@
 server:
   domain: http://localhost:8080
+  assets-domain: https://dev-assets.zero-ri.com
 
 sentry:
   logging:
