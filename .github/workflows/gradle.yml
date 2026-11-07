@@ -71,7 +71,7 @@ jobs:
         host: ${{ secrets.HOST_PROD }}
         username: ${{ secrets.USERNAME_PROD }}
         key: ${{ secrets.KEY_PROD }}
-        script: sudo ./server-deploy.sh
+        script: ./server-deploy.sh
   
   ## time
   current-time:
