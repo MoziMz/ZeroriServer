@@ -11,6 +11,7 @@ import com.mozi.moziserver.model.mappedenum.UserAuthType;
 import com.mozi.moziserver.model.mappedenum.UserRoleType;
 import com.mozi.moziserver.repository.*;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -29,6 +30,7 @@ import java.util.UUID;
 
 import static com.mozi.moziserver.common.Constant.PW_REGEX;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class EmailAuthService {
@@ -395,6 +397,7 @@ public class EmailAuthService {
             transactionManager.commit(status);
         } catch (Exception e) {
             transactionManager.rollback(status);
+            log.error(e.getMessage(), e);
         }
     }
 }

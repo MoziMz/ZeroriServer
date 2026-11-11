@@ -19,6 +19,7 @@ import com.mozi.moziserver.security.ReqUserSocialSignIn;
 import com.mozi.moziserver.security.ResUserSignIn;
 import com.mozi.moziserver.security.UserSocialAuthenticationProvider;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -36,6 +37,7 @@ import java.util.Optional;
 
 import static com.mozi.moziserver.common.Constant.*;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -439,6 +441,7 @@ public class UserService {
             transactionManager.commit(status);
         } catch (Exception e) {
             transactionManager.rollback(status);
+            log.error(e.getMessage(), e);
         }
     }
 }

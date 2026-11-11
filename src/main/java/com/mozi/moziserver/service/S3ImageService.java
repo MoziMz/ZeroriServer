@@ -19,6 +19,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Deprecated
 public class S3ImageService {
 
     @Autowired

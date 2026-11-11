@@ -12,6 +12,7 @@ import com.mozi.moziserver.repository.UserChallengeRepository;
 import com.mozi.moziserver.repository.UserRepository;
 import com.mozi.moziserver.repository.UserRewardRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -23,6 +24,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
+@Slf4j
 @RequiredArgsConstructor
 @Component
 public class ScheduleService {
@@ -127,6 +129,7 @@ public class ScheduleService {
             transactionManager.commit(status);
         } catch (Exception e) {
             transactionManager.rollback(status);
+            log.error(e.getMessage(), e);
         }
     }
 }

@@ -666,6 +666,7 @@ public class AdminChallengeService {
             transactionManager.commit(status);
         } catch (Exception e) {
             transactionManager.rollback(status);
+            log.error(e.getMessage(), e);
         }
     }
 }

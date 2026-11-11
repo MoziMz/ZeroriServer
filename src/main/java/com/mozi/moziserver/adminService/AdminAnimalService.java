@@ -6,9 +6,10 @@ import com.mozi.moziserver.httpException.ResponseError;
 import com.mozi.moziserver.model.entity.Animal;
 import com.mozi.moziserver.model.entity.AnimalItem;
 import com.mozi.moziserver.model.entity.Island;
+import com.mozi.moziserver.model.mappedenum.ImageDomain;
 import com.mozi.moziserver.repository.AnimalItemRepository;
 import com.mozi.moziserver.repository.AnimalRepository;
-import com.mozi.moziserver.service.S3ImageService;
+import com.mozi.moziserver.service.ImageStorageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -27,7 +28,7 @@ public class AdminAnimalService {
 
     private final AnimalRepository animalRepository;
     private final AnimalItemRepository animalItemRepository;
-    private final S3ImageService s3ImageService;
+    private final ImageStorageService imageStorageService;
 
     // -------------------- -------------------- animal -------------------- -------------------- //
     public Animal getAnimal(Long seq) {
@@ -48,14 +49,14 @@ public class AdminAnimalService {
 
         String imgUrl = null;
         try {
-            imgUrl = s3ImageService.uploadFile(image, "animal");
+            imgUrl = imageStorageService.writeImageFile(image, ImageDomain.ANIMAL.getDirectory());
         } catch (Exception e) {
             throw new RuntimeException(e.getCause());
         }
 
         String fullBodyImgUrl = null;
         try {
-            fullBodyImgUrl = s3ImageService.uploadFile(fullBodyImage, "animal");
+            fullBodyImgUrl = imageStorageService.writeImageFile(fullBodyImage, ImageDomain.ANIMAL.getDirectory());
         } catch (Exception e) {
             throw new RuntimeException(e.getCause());
         }
@@ -88,7 +89,7 @@ public class AdminAnimalService {
         String imgUrl = null;
         if (image != null) {
             try {
-                imgUrl = s3ImageService.uploadFile(image, "animal");
+                imgUrl = imageStorageService.writeImageFile(image, ImageDomain.ANIMAL.getDirectory());
             } catch (Exception e) {
                 throw new RuntimeException(e.getCause());
             }
@@ -98,7 +99,7 @@ public class AdminAnimalService {
         String fullBodyImgUrl = null;
         if (fullBodyImage != null) {
             try {
-                fullBodyImgUrl = s3ImageService.uploadFile(fullBodyImage, "animal");
+                fullBodyImgUrl = imageStorageService.writeImageFile(fullBodyImage, ImageDomain.ANIMAL.getDirectory());
             } catch (Exception e) {
                 throw new RuntimeException(e.getCause());
             }
@@ -175,14 +176,14 @@ public class AdminAnimalService {
 
         String colorImgUrl = null;
         try {
-            colorImgUrl = s3ImageService.uploadFile(colorImage, "animalItem");
+            colorImgUrl = imageStorageService.writeImageFile(colorImage, ImageDomain.ANIMAL_ITEM.getDirectory());
         } catch (Exception e) {
             throw new RuntimeException(e.getCause());
         }
 
         String blackImgUrl = null;
         try {
-            blackImgUrl = s3ImageService.uploadFile(blackImage, "animalItem");
+            blackImgUrl = imageStorageService.writeImageFile(blackImage, ImageDomain.ANIMAL_ITEM.getDirectory());
         } catch (Exception e) {
             throw new RuntimeException(e.getCause());
         }
@@ -224,7 +225,7 @@ public class AdminAnimalService {
         String colorImgUrl = null;
         if (colorImage != null) {
             try {
-                colorImgUrl = s3ImageService.uploadFile(colorImage, "animalItem");
+                colorImgUrl = imageStorageService.writeImageFile(colorImage, ImageDomain.ANIMAL_ITEM.getDirectory());
             } catch (Exception e) {
                 throw new RuntimeException(e.getCause());
             }
@@ -234,7 +235,7 @@ public class AdminAnimalService {
         String blackImgUrl = null;
         if (blackImage != null) {
             try {
-                blackImgUrl = s3ImageService.uploadFile(blackImage, "animalItem");
+                blackImgUrl = imageStorageService.writeImageFile(blackImage, ImageDomain.ANIMAL_ITEM.getDirectory());
             } catch (Exception e) {
                 throw new RuntimeException(e.getCause());
             }
